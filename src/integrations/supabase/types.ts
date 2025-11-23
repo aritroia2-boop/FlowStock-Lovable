@@ -406,6 +406,7 @@ export type Database = {
       teams: {
         Row: {
           created_at: string | null
+          description: string | null
           id: string
           name: string
           restaurant_id: string
@@ -413,6 +414,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          description?: string | null
           id?: string
           name: string
           restaurant_id: string
@@ -420,6 +422,7 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          description?: string | null
           id?: string
           name?: string
           restaurant_id?: string
