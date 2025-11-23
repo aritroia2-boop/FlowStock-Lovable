@@ -52,38 +52,47 @@ export type Database = {
       }
       ingredients: {
         Row: {
+          category: string | null
           created_at: string | null
           id: string
           is_shared: boolean | null
           low_stock_threshold: number
+          minimum_stock: number
           name: string
           owner_id: string | null
           quantity: number
           restaurant_id: string | null
+          supplier: string | null
           unit: string
           updated_at: string | null
         }
         Insert: {
+          category?: string | null
           created_at?: string | null
           id?: string
           is_shared?: boolean | null
           low_stock_threshold?: number
+          minimum_stock?: number
           name: string
           owner_id?: string | null
           quantity?: number
           restaurant_id?: string | null
+          supplier?: string | null
           unit: string
           updated_at?: string | null
         }
         Update: {
+          category?: string | null
           created_at?: string | null
           id?: string
           is_shared?: boolean | null
           low_stock_threshold?: number
+          minimum_stock?: number
           name?: string
           owner_id?: string | null
           quantity?: number
           restaurant_id?: string | null
+          supplier?: string | null
           unit?: string
           updated_at?: string | null
         }
@@ -254,6 +263,7 @@ export type Database = {
       recipes: {
         Row: {
           category: string | null
+          cost: number
           created_at: string | null
           description: string | null
           id: string
@@ -266,6 +276,7 @@ export type Database = {
         }
         Insert: {
           category?: string | null
+          cost?: number
           created_at?: string | null
           description?: string | null
           id?: string
@@ -278,6 +289,7 @@ export type Database = {
         }
         Update: {
           category?: string | null
+          cost?: number
           created_at?: string | null
           description?: string | null
           id?: string
