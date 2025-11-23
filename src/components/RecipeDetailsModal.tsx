@@ -46,10 +46,18 @@ export const RecipeDetailsModal = ({ recipe, onClose, onUpdate, permissions }: R
 
   const loadRecipeData = async () => {
     try {
-      const [ingredients, recipeIngs] = await Promise.all([
-        ingredientsService.getAll(),
-        recipeIngredientsService.getByRecipeId(recipe.id)
-      ]);
+      // Fetch ingredients based on recipe type
+      let ingredients: Ingredient[];
+      
+      if (recipe.restaurant_id) {
+        // Restaurant recipe → fetch ONLY restaurant ingredients
+        ingredients = await ingredientsService.getRestaurant(recipe.restaurant_id);
+      } else {
+        // Personal recipe → fetch ONLY personal ingredients
+        ingredients = await ingredientsService.getPersonal();
+      }
+      
+      const recipeIngs = await recipeIngredientsService.getByRecipeId(recipe.id);
 
       setAllIngredients(ingredients);
       setRecipeIngredients(recipeIngs);
@@ -182,7 +190,14 @@ export const RecipeDetailsModal = ({ recipe, onClose, onUpdate, permissions }: R
       if (!user) throw new Error('Not authenticated');
 
       const recipeIngs = await recipeIngredientsService.getByRecipeId(recipe.id);
-      const allIngredients = await ingredientsService.getAll();
+      
+      // Fetch ingredients based on recipe type (same logic as loadRecipeData)
+      let allIngredients: Ingredient[];
+      if (recipe.restaurant_id) {
+        allIngredients = await ingredientsService.getRestaurant(recipe.restaurant_id);
+      } else {
+        allIngredients = await ingredientsService.getPersonal();
+      }
 
       const ingredientsToUpdate: Array<{
         ingredient: Ingredient;
@@ -375,6 +390,20 @@ export const RecipeDetailsModal = ({ recipe, onClose, onUpdate, permissions }: R
             </div>
           </div>
 
+          {isEditMode && (
+            <div className="mb-4 p-4 bg-blue-50 border-2 border-blue-200 rounded-xl">
+              <div className="flex items-center gap-2 text-blue-800">
+                <AlertCircle size={20} />
+                <p className="font-medium">
+                  {recipe.restaurant_id 
+                    ? 'Editing Restaurant Recipe - Only restaurant ingredients are available'
+                    : 'Editing Personal Recipe - Only your personal ingredients are available'
+                  }
+                </p>
+              </div>
+            </div>
+          )}
+
           {isEditMode ? (
             <div className="mb-6 space-y-4">
               <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-6">
@@ -518,7 +547,12 @@ export const RecipeDetailsModal = ({ recipe, onClose, onUpdate, permissions }: R
                       onChange={(e) => setNewIngredient({ ...newIngredient, ingredient_id: e.target.value })}
                       className="w-full px-3 py-2 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-400"
                     >
-                      <option value="">Select ingredient</option>
+                      <option value="">
+                        {recipe.restaurant_id 
+                          ? 'Select restaurant ingredient...' 
+                          : 'Select personal ingredient...'
+                        }
+                      </option>
                       {allIngredients.map((ing) => (
                         <option key={ing.id} value={ing.id}>{ing.name}</option>
                       ))}
