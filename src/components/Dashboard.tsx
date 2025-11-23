@@ -365,6 +365,7 @@ export const Dashboard = () => {
               </button>
 
               <button
+                onClick={() => setCurrentPage('orders')}
                 className="w-full group relative flex items-center gap-3 px-4 py-3 text-slate-300 hover:text-white rounded-xl font-medium transition-all duration-300 hover:bg-white/5 backdrop-blur-sm"
               >
                 <div className="relative bg-slate-700/50 group-hover:bg-gradient-to-br group-hover:from-blue-500 group-hover:to-cyan-400 p-2 rounded-lg transition-all duration-300 group-hover:shadow-lg group-hover:shadow-blue-500/30">

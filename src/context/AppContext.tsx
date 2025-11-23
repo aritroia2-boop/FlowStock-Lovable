@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { authService, User } from '../lib/auth';
 
-type Page = 'login' | 'signup' | 'dashboard' | 'inventory' | 'recipes' | 'audit-logs' | 'settings';
+type Page = 'login' | 'signup' | 'dashboard' | 'inventory' | 'recipes' | 'audit-logs' | 'settings' | 'orders';
 type InventoryFilter = 'All' | 'Low Stock' | 'In Stock';
 
 interface AppContextType {

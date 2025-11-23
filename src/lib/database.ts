@@ -1,6 +1,6 @@
-import { supabase, Ingredient, Recipe, RecipeIngredient, AuditLog, Team, TeamMember, Profile, Notification } from './supabase';
+import { supabase, Ingredient, Recipe, RecipeIngredient, AuditLog, Team, TeamMember, Profile, Notification, Order, OrderItem } from './supabase';
 
-export type { Ingredient, Recipe, RecipeIngredient, AuditLog, Team, TeamMember, Profile, Notification };
+export type { Ingredient, Recipe, RecipeIngredient, AuditLog, Team, TeamMember, Profile, Notification, Order, OrderItem };
 
 export const restaurantService = {
   async leaveRestaurant() {
@@ -606,6 +606,147 @@ export const notificationsService = {
       .update({ status: 'cancelled', read_at: new Date().toISOString() })
       .eq('type', 'team_invite')
       .eq('status', 'pending');
+
+    if (error) throw error;
+  }
+};
+
+export const ordersService = {
+  async getAll() {
+    const { data, error } = await supabase
+      .from('orders')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data as Order[];
+  },
+
+  async getPersonal() {
+    const { data, error } = await supabase
+      .from('orders')
+      .select('*')
+      .is('restaurant_id', null)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data as Order[];
+  },
+
+  async getRestaurant(restaurantId: string) {
+    const { data, error } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('restaurant_id', restaurantId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data as Order[];
+  },
+
+  async getById(id: string) {
+    const { data, error } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) throw error;
+    return data as Order;
+  },
+
+  async create(order: Partial<Order>) {
+    const { data, error } = await supabase
+      .from('orders')
+      .insert(order)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data as Order;
+  },
+
+  async update(id: string, updates: Partial<Order>) {
+    const { data, error } = await supabase
+      .from('orders')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data as Order;
+  },
+
+  async delete(id: string) {
+    const { error } = await supabase
+      .from('orders')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+  }
+};
+
+export const orderItemsService = {
+  async getByOrderId(orderId: string) {
+    const { data, error } = await supabase
+      .from('order_items')
+      .select('*')
+      .eq('order_id', orderId)
+      .order('ingredient_name');
+
+    if (error) throw error;
+    return data as OrderItem[];
+  },
+
+  async create(item: Partial<OrderItem>) {
+    const { data, error } = await supabase
+      .from('order_items')
+      .insert(item)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data as OrderItem;
+  },
+
+  async createMany(items: Partial<OrderItem>[]) {
+    const { data, error } = await supabase
+      .from('order_items')
+      .insert(items)
+      .select();
+
+    if (error) throw error;
+    return data as OrderItem[];
+  },
+
+  async update(id: string, updates: Partial<OrderItem>) {
+    const { data, error } = await supabase
+      .from('order_items')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data as OrderItem;
+  },
+
+  async delete(id: string) {
+    const { error } = await supabase
+      .from('order_items')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+  },
+
+  async deleteByOrderId(orderId: string) {
+    const { error } = await supabase
+      .from('order_items')
+      .delete()
+      .eq('order_id', orderId);
 
     if (error) throw error;
   }

@@ -55,6 +55,54 @@ export const deleteRecipeImage = async (imageUrl: string): Promise<void> => {
   if (error) throw error;
 };
 
+export const uploadOrderInvoice = async (file: File, userId: string): Promise<string> => {
+  // Validate file size (10MB limit)
+  const MAX_FILE_SIZE = 10 * 1024 * 1024;
+  if (file.size > MAX_FILE_SIZE) {
+    throw new Error(`File size exceeds 10MB limit. Your file is ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+  }
+
+  // Validate file type
+  if (file.type !== 'application/pdf') {
+    throw new Error('Invalid file type. Please upload a PDF file');
+  }
+
+  const fileExt = 'pdf';
+  const fileName = `${userId}/${Date.now()}.${fileExt}`;
+
+  console.log('Uploading invoice:', { fileName, fileSize: file.size });
+
+  const { error: uploadError } = await supabase.storage
+    .from('order-invoices')
+    .upload(fileName, file, {
+      cacheControl: '3600',
+      upsert: false
+    });
+
+  if (uploadError) {
+    console.error('Upload error:', uploadError);
+    throw new Error(`Failed to upload PDF: ${uploadError.message}`);
+  }
+
+  const { data } = supabase.storage
+    .from('order-invoices')
+    .getPublicUrl(fileName);
+
+  console.log('PDF uploaded successfully:', data.publicUrl);
+  return data.publicUrl;
+};
+
+export const deleteOrderInvoice = async (fileUrl: string): Promise<void> => {
+  const path = fileUrl.split('/order-invoices/')[1];
+  if (!path) return;
+
+  const { error } = await supabase.storage
+    .from('order-invoices')
+    .remove([path]);
+
+  if (error) throw error;
+};
+
 export interface Ingredient {
   id: string;
   name: string;
@@ -91,6 +139,33 @@ export interface RecipeIngredient {
   ingredient_id: string;
   quantity: number;
   unit: string;
+  created_at: string;
+}
+
+export interface Order {
+  id: string;
+  user_id: string;
+  restaurant_id?: string;
+  file_name: string;
+  file_url: string;
+  supplier?: string;
+  status: 'pending' | 'processing' | 'processed' | 'error';
+  error_message?: string;
+  extracted_data?: any;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface OrderItem {
+  id: string;
+  order_id: string;
+  ingredient_name: string;
+  quantity: number;
+  unit: string;
+  price_per_unit: number;
+  matched_ingredient_id?: string;
+  needs_confirmation: boolean;
+  is_new_ingredient: boolean;
   created_at: string;
 }
 
