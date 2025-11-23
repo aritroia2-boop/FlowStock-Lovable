@@ -156,7 +156,7 @@ export const Dashboard = () => {
     try {
       const allLogs = await auditLogsService.getAll();
       const sortedLogs = allLogs.sort((a, b) =>
-        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       );
       setRecentActivities(sortedLogs.slice(0, 5));
     } catch (error) {
@@ -642,6 +642,14 @@ export const Dashboard = () => {
                     recentActivities.map((activity) => {
                       const style = getActivityStyle(activity.operation);
                       const Icon = style.icon;
+                      
+                      const ingredientName = activity.table_name === 'ingredients'
+                        ? (activity.new_values?.name || activity.old_values?.name || 'Unknown Item')
+                        : 'Item';
+                      
+                      const oldQty = activity.old_values?.quantity || 0;
+                      const newQty = activity.new_values?.quantity || 0;
+                      const amount = Math.abs(newQty - oldQty);
 
                       return (
                         <div
@@ -653,16 +661,16 @@ export const Dashboard = () => {
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-gray-700 font-medium text-sm truncate">
-                              {activity.operation === 'Added' && `Added ${activity.amount} ${activity.ingredient_name}`}
-                              {activity.operation === 'Removed' && `Removed ${activity.ingredient_name}`}
-                              {activity.operation === 'Adjusted' && `Adjusted ${activity.ingredient_name}`}
+                              {activity.operation === 'Added' && `Added ${amount} of ${ingredientName}`}
+                              {activity.operation === 'Removed' && `Removed ${amount} of ${ingredientName}`}
+                              {activity.operation === 'Adjusted' && `Adjusted ${ingredientName}`}
                               {activity.operation.startsWith('Recipe:') && activity.operation}
-                              {!['Added', 'Removed', 'Adjusted'].includes(activity.operation) && !activity.operation.startsWith('Recipe:') && `${activity.operation} ${activity.ingredient_name}`}
+                              {!['Added', 'Removed', 'Adjusted'].includes(activity.operation) && !activity.operation.startsWith('Recipe:') && `${activity.operation} - ${ingredientName}`}
                             </p>
                             <div className="flex items-center gap-2 mt-0.5">
                               <p className="text-gray-500 text-xs truncate">{activity.user_name}</p>
                               <span className="text-gray-400 text-xs">•</span>
-                              <p className="text-gray-400 text-xs whitespace-nowrap">{getRelativeTime(activity.timestamp)}</p>
+                              <p className="text-gray-400 text-xs whitespace-nowrap">{getRelativeTime(activity.created_at)}</p>
                             </div>
                           </div>
                         </div>

@@ -237,13 +237,23 @@ export const RecipeDetailsModal = ({ recipe, onClose, onUpdate, permissions }: R
         });
 
         await auditLogsService.create({
-          ingredient_id: ingredient.id,
-          ingredient_name: ingredient.name,
-          operation: `Recipe: ${recipe.name}`,
-          amount: recipeIngredient.quantity,
-          user_name: user.email || 'Unknown',
           user_id: user.id,
-          timestamp: new Date().toISOString(),
+          user_name: user.email || 'Unknown',
+          operation: `Recipe: ${recipe.name}`,
+          table_name: 'ingredients',
+          record_id: ingredient.id,
+          old_values: { 
+            quantity: ingredient.quantity, 
+            name: ingredient.name,
+            recipe: recipe.name,
+            amount_used: recipeIngredient.quantity
+          },
+          new_values: { 
+            quantity: newQuantity, 
+            name: ingredient.name,
+            recipe: recipe.name,
+            amount_used: recipeIngredient.quantity
+          }
         });
       }
 
