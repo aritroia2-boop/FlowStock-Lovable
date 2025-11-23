@@ -1,0 +1,151 @@
+import { useState, useEffect } from 'react';
+import { Calendar, ChevronLeft, ChevronRight, Home, Settings } from 'lucide-react';
+import { auditLogsService, AuditLog } from '../lib/database';
+import { useApp } from '../context/AppContext';
+
+export const AuditLogPage = () => {
+  const { setCurrentPage: navigateTo } = useApp();
+  const [logs, setLogs] = useState<AuditLog[]>([]);
+  const [filterIngredient, setFilterIngredient] = useState('');
+  const [filterOperation, setFilterOperation] = useState('Operation');
+  const [filterUser, setFilterUser] = useState('');
+  const [currentLogPage] = useState(2);
+
+  useEffect(() => {
+    loadLogs();
+  }, []);
+
+  const loadLogs = async () => {
+    try {
+      const data = await auditLogsService.getAll();
+      setLogs(data);
+    } catch (error) {
+      console.error('Error loading logs:', error);
+    }
+  };
+
+  const filteredLogs = logs.filter(log => {
+    const matchesIngredient = !filterIngredient || log.ingredient_name.toLowerCase().includes(filterIngredient.toLowerCase());
+    const matchesOperation = filterOperation === 'Operation' || log.operation === filterOperation;
+    const matchesUser = !filterUser || log.user_name.toLowerCase().includes(filterUser.toLowerCase());
+    return matchesIngredient && matchesOperation && matchesUser;
+  });
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 p-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="bg-white rounded-3xl shadow-xl p-8">
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-4">
+              <h1 className="text-2xl font-bold">
+                <span className="text-gray-900">Flow</span>
+                <span className="text-cyan-400">Stock</span>
+              </h1>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => navigateTo('settings')}
+                className="group p-3 bg-slate-100 hover:bg-slate-200 rounded-2xl transition-all duration-300"
+                title="Settings"
+              >
+                <Settings size={24} className="text-slate-600 group-hover:text-blue-600 group-hover:rotate-90 transition-all duration-300" />
+              </button>
+              <button
+                onClick={() => navigateTo('dashboard')}
+                className="p-3 hover:bg-gray-50 rounded-xl transition-colors"
+                title="Go to Dashboard"
+              >
+                <Home size={28} className="text-gray-600" />
+              </button>
+            </div>
+          </div>
+
+          <h2 className="text-4xl font-bold text-gray-900 mb-8">Audit Log</h2>
+
+          <div className="flex items-center gap-4 mb-8">
+            <input
+              type="text"
+              placeholder="Ingredient"
+              value={filterIngredient}
+              onChange={(e) => setFilterIngredient(e.target.value)}
+              className="px-6 py-3 border-2 border-blue-300 rounded-2xl focus:outline-none focus:border-blue-400 transition-colors"
+            />
+
+            <select
+              value={filterOperation}
+              onChange={(e) => setFilterOperation(e.target.value)}
+              className="px-6 py-3 border-2 border-cyan-400 bg-cyan-50 text-gray-700 rounded-2xl focus:outline-none appearance-none cursor-pointer font-medium"
+            >
+              <option>Operation</option>
+              <option>Added</option>
+              <option>Removed</option>
+              <option>Adjusted</option>
+            </select>
+
+            <input
+              type="text"
+              placeholder="User"
+              value={filterUser}
+              onChange={(e) => setFilterUser(e.target.value)}
+              className="px-6 py-3 border-2 border-blue-300 rounded-2xl focus:outline-none focus:border-blue-400 transition-colors"
+            />
+
+            <div className="flex items-center gap-3 px-6 py-3 border-2 border-cyan-400 bg-cyan-50 rounded-2xl">
+              <Calendar size={20} className="text-gray-600" />
+              <span className="text-gray-700 font-medium">Tiamestopp</span>
+              <Calendar size={20} className="text-gray-600" />
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-r from-purple-400 via-blue-400 to-cyan-400 rounded-t-2xl p-4"></div>
+
+          <div className="bg-gray-50 rounded-b-2xl overflow-hidden">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-white border-b-2 border-gray-100">
+                  <th className="text-left px-6 py-4 font-bold text-gray-900">Ingredient</th>
+                  <th className="text-left px-6 py-4 font-bold text-gray-900">Operation</th>
+                  <th className="text-left px-6 py-4 font-bold text-gray-900">Amount</th>
+                  <th className="text-left px-6 py-4 font-bold text-gray-900">User</th>
+                  <th className="text-left px-6 py-4 font-bold text-gray-900">Tiamespho</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredLogs.map((log) => (
+                  <tr key={log.id} className="bg-white border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 font-semibold text-gray-900">{log.ingredient_name}</td>
+                    <td className="px-6 py-4 text-gray-700">{log.operation}</td>
+                    <td className="px-6 py-4 text-gray-700">
+                      {log.operation === 'Removed' ? log.operation : `${log.amount} ${log.operation === 'Added' ? 'kg' : 'L'}`}
+                    </td>
+                    <td className="px-6 py-4 text-gray-700">{log.user_name}</td>
+                    <td className="px-6 py-4 text-gray-700">
+                      {new Date(log.timestamp).toLocaleString()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            <div className="flex items-center justify-center gap-4 py-6 bg-white">
+              <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors">
+                <ChevronLeft size={20} />
+                <span className="font-medium">Prev</span>
+              </button>
+              <button className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 font-semibold">
+                {currentLogPage}
+              </button>
+              <button className="w-10 h-10 rounded-full hover:bg-gray-100 text-gray-600 font-semibold transition-colors">
+                3
+              </button>
+              <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors">
+                <span className="font-medium">Next</span>
+                <ChevronRight size={20} />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
