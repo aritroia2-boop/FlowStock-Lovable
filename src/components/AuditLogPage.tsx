@@ -25,7 +25,10 @@ export const AuditLogPage = () => {
   };
 
   const filteredLogs = logs.filter(log => {
-    const matchesIngredient = !filterIngredient || log.ingredient_name.toLowerCase().includes(filterIngredient.toLowerCase());
+    const ingredientName = log.table_name === 'ingredients' 
+      ? (log.new_values?.name || log.old_values?.name || '')
+      : '';
+    const matchesIngredient = !filterIngredient || ingredientName.toLowerCase().includes(filterIngredient.toLowerCase());
     const matchesOperation = filterOperation === 'Operation' || log.operation === filterOperation;
     const matchesUser = !filterUser || log.user_name.toLowerCase().includes(filterUser.toLowerCase());
     return matchesIngredient && matchesOperation && matchesUser;
@@ -111,19 +114,28 @@ export const AuditLogPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredLogs.map((log) => (
-                  <tr key={log.id} className="bg-white border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 font-semibold text-gray-900">{log.ingredient_name}</td>
-                    <td className="px-6 py-4 text-gray-700">{log.operation}</td>
-                    <td className="px-6 py-4 text-gray-700">
-                      {log.operation === 'Removed' ? log.operation : `${log.amount} ${log.operation === 'Added' ? 'kg' : 'L'}`}
-                    </td>
-                    <td className="px-6 py-4 text-gray-700">{log.user_name}</td>
-                    <td className="px-6 py-4 text-gray-700">
-                      {new Date(log.timestamp).toLocaleString()}
-                    </td>
-                  </tr>
-                ))}
+                {filteredLogs.map((log) => {
+                  const ingredientName = log.table_name === 'ingredients'
+                    ? (log.new_values?.name || log.old_values?.name || 'Unknown')
+                    : 'N/A';
+                  const oldQty = log.old_values?.quantity || 0;
+                  const newQty = log.new_values?.quantity || 0;
+                  const amount = Math.abs(newQty - oldQty);
+                  
+                  return (
+                    <tr key={log.id} className="bg-white border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-4 font-semibold text-gray-900">{ingredientName}</td>
+                      <td className="px-6 py-4 text-gray-700">{log.operation}</td>
+                      <td className="px-6 py-4 text-gray-700">
+                        {log.table_name === 'ingredients' ? `${amount} units` : 'N/A'}
+                      </td>
+                      <td className="px-6 py-4 text-gray-700">{log.user_name}</td>
+                      <td className="px-6 py-4 text-gray-700">
+                        {new Date(log.created_at).toLocaleString()}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
 

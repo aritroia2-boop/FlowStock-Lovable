@@ -95,13 +95,13 @@ export interface RecipeIngredient {
 
 export interface AuditLog {
   id: string;
-  ingredient_id?: string;
-  ingredient_name: string;
-  operation: string;
-  amount: number;
+  user_id: string;
   user_name: string;
-  user_id?: string;
-  timestamp: string;
+  operation: string;
+  table_name: string;
+  record_id?: string;
+  old_values?: Record<string, any>;
+  new_values?: Record<string, any>;
   created_at: string;
 }
 

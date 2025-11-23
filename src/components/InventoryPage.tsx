@@ -156,12 +156,13 @@ export const InventoryPage = () => {
         const change = editFormData.quantity - oldQuantity;
         const operation = change > 0 ? 'Added' : 'Removed';
         await auditLogsService.create({
-          ingredient_id: selectedIngredient.id,
-          ingredient_name: editFormData.name,
-          operation: operation,
-          amount: Math.abs(change),
+          user_id: currentUser?.id || '',
           user_name: currentUser?.name || 'User',
-          timestamp: new Date().toISOString(),
+          operation: operation,
+          table_name: 'ingredients',
+          record_id: selectedIngredient.id,
+          old_values: { quantity: oldQuantity, name: selectedIngredient.name },
+          new_values: { quantity: editFormData.quantity, name: editFormData.name }
         });
       }
 

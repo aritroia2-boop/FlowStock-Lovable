@@ -140,13 +140,13 @@ export const ingredientsService = {
     const updated = await this.update(id, { quantity: newQuantity });
 
     await auditLogsService.create({
-      ingredient_id: id,
-      ingredient_name: ingredient.name,
-      operation,
-      amount: Math.abs(change),
-      user_name: userName,
       user_id: user.id,
-      timestamp: new Date().toISOString(),
+      user_name: userName,
+      operation,
+      table_name: 'ingredients',
+      record_id: id,
+      old_values: { quantity: ingredient.quantity, name: ingredient.name },
+      new_values: { quantity: newQuantity, name: ingredient.name }
     });
 
     return updated;
@@ -306,7 +306,7 @@ export const auditLogsService = {
     const { data, error } = await supabase
       .from('audit_logs')
       .select('*')
-      .order('timestamp', { ascending: false })
+      .order('created_at', { ascending: false })
       .limit(limit);
 
     if (error) throw error;
