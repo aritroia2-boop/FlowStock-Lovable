@@ -290,13 +290,15 @@ export const RecipeDetailsModal = ({ recipe, onClose, onUpdate, permissions }: R
             quantity: ingredient.quantity, 
             name: ingredient.name,
             recipe: recipe.name,
-            amount_used: recipeIngredient.quantity
+            amount_used: recipeIngredient.quantity,
+            unit: recipeIngredient.unit
           },
           new_values: { 
             quantity: newQuantity, 
             name: ingredient.name,
             recipe: recipe.name,
-            amount_used: recipeIngredient.quantity
+            amount_used: recipeIngredient.quantity,
+            unit: recipeIngredient.unit
           }
         });
       }

@@ -4,6 +4,7 @@ import { useApp } from '../context/AppContext';
 import { ingredientsService, recipesService, recipeIngredientsService, notificationsService, teamMembersService, auditLogsService, Ingredient, Team, TeamMember, AuditLog } from '../lib/database';
 import { compareQuantities } from '../lib/unitConverter';
 import { NotificationsModal } from './NotificationsModal';
+import { WeeklyAnalytics } from './WeeklyAnalytics';
 import { supabase } from '../lib/supabase';
 import { usePermissions } from '../hooks/usePermissions';
 import { RoleBadge } from './RoleBadge';
@@ -752,49 +753,7 @@ export const Dashboard = () => {
             </div>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-xl rounded-xl shadow-lg border border-white/20 overflow-hidden">
-            <div className="relative h-0.5 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500"></div>
-
-            <div className="p-4 grid grid-cols-2 gap-6">
-              <div className="flex flex-col items-center">
-                <h3 className="text-sm font-bold text-gray-900 mb-3">Ingredient Usage</h3>
-                <div className="flex items-center justify-center">
-                  <div className="relative w-28 h-28">
-                    <svg className="w-full h-full transform -rotate-90">
-                      <circle cx="56" cy="56" r="48" stroke="#E5E7EB" strokeWidth="10" fill="none" />
-                      <circle cx="56" cy="56" r="48" stroke="url(#gradient1)" strokeWidth="10" fill="none" strokeDasharray="301.593" strokeDashoffset="60.319" strokeLinecap="round" />
-                      <defs>
-                        <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" stopColor="#06B6D4" />
-                          <stop offset="50%" stopColor="#EC4899" />
-                          <stop offset="100%" stopColor="#8B5CF6" />
-                        </linearGradient>
-                      </defs>
-                    </svg>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-3xl font-bold text-gray-900">78%</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="border-l border-gray-200 pl-4">
-                <h3 className="text-sm font-bold text-gray-900 mb-3">Order Frequency</h3>
-                <div className="h-24 flex items-end">
-                  <svg className="w-full h-full" viewBox="0 0 300 100">
-                    <defs>
-                      <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stopColor="#06B6D4" />
-                        <stop offset="100%" stopColor="#8B5CF6" />
-                      </linearGradient>
-                    </defs>
-                    <polyline points="0,80 50,70 100,75 150,60 200,50 250,40 300,30" fill="none" stroke="url(#lineGradient)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </div>
-                <p className="text-gray-500 text-xs mt-1 text-center">Orders per month</p>
-              </div>
-            </div>
-          </div>
+          <WeeklyAnalytics />
         </main>
       </div>
 
