@@ -12,11 +12,18 @@ export const Dashboard = () => {
   const { currentUser, setCurrentPage, logout, setInventoryFilter } = useApp();
   const { restaurantRole, permissions } = usePermissions();
   const [stats, setStats] = useState({
-    totalIngredients: 0,
-    totalRecipes: 0,
-    lowStockCount: 0,
-    lowStockItems: [] as string[],
-    unavailableRecipes: 0
+    personal: {
+      totalIngredients: 0,
+      totalRecipes: 0,
+      lowStockCount: 0,
+      unavailableRecipes: 0
+    },
+    restaurant: {
+      totalIngredients: 0,
+      totalRecipes: 0,
+      lowStockCount: 0,
+      unavailableRecipes: 0
+    }
   });
   const [showNotifications, setShowNotifications] = useState(false);
   const [notificationCount, setNotificationCount] = useState(0);
@@ -103,20 +110,22 @@ export const Dashboard = () => {
 
   const loadStats = async () => {
     try {
-      const ingredients = await ingredientsService.getAll();
-      const recipes = await recipesService.getAll();
-
-      const lowStockIngredients = ingredients.filter(
+      // Fetch personal items
+      const personalIngredients = await ingredientsService.getPersonal();
+      const personalRecipes = await recipesService.getPersonal();
+      
+      // Calculate personal stats
+      const personalLowStock = personalIngredients.filter(
         (ing: Ingredient) => ing.quantity <= ing.minimum_stock
       );
-
-      let unavailableCount = 0;
-      for (const recipe of recipes) {
+      
+      let personalUnavailableCount = 0;
+      for (const recipe of personalRecipes) {
         const recipeIngs = await recipeIngredientsService.getByRecipeId(recipe.id);
         let canMake = true;
 
         for (const ri of recipeIngs) {
-          const inventoryItem = ingredients.find(inv => inv.id === ri.ingredient_id);
+          const inventoryItem = personalIngredients.find(inv => inv.id === ri.ingredient_id);
           if (!inventoryItem) {
             canMake = false;
             break;
@@ -136,16 +145,73 @@ export const Dashboard = () => {
         }
 
         if (!canMake) {
-          unavailableCount++;
+          personalUnavailableCount++;
         }
       }
 
+      // Initialize restaurant stats
+      let restaurantStats = {
+        totalIngredients: 0,
+        totalRecipes: 0,
+        lowStockCount: 0,
+        unavailableRecipes: 0
+      };
+
+      // Fetch restaurant items if user is part of a restaurant
+      if (currentUser?.restaurant_id) {
+        const restaurantIngredients = await ingredientsService.getRestaurant(currentUser.restaurant_id);
+        const restaurantRecipes = await recipesService.getRestaurant(currentUser.restaurant_id);
+        
+        const restaurantLowStock = restaurantIngredients.filter(
+          (ing: Ingredient) => ing.quantity <= ing.minimum_stock
+        );
+        
+        let restaurantUnavailableCount = 0;
+        for (const recipe of restaurantRecipes) {
+          const recipeIngs = await recipeIngredientsService.getByRecipeId(recipe.id);
+          let canMake = true;
+
+          for (const ri of recipeIngs) {
+            const inventoryItem = restaurantIngredients.find(inv => inv.id === ri.ingredient_id);
+            if (!inventoryItem) {
+              canMake = false;
+              break;
+            }
+
+            const comparison = compareQuantities(
+              ri.quantity,
+              ri.unit,
+              inventoryItem.quantity,
+              inventoryItem.unit
+            );
+
+            if (!comparison.hasEnough) {
+              canMake = false;
+              break;
+            }
+          }
+
+          if (!canMake) {
+            restaurantUnavailableCount++;
+          }
+        }
+
+        restaurantStats = {
+          totalIngredients: restaurantIngredients.length,
+          totalRecipes: restaurantRecipes.length,
+          lowStockCount: restaurantLowStock.length,
+          unavailableRecipes: restaurantUnavailableCount
+        };
+      }
+
       setStats({
-        totalIngredients: ingredients.length,
-        totalRecipes: recipes.length,
-        lowStockCount: lowStockIngredients.length,
-        lowStockItems: lowStockIngredients.slice(0, 3).map((ing: Ingredient) => ing.name),
-        unavailableRecipes: unavailableCount
+        personal: {
+          totalIngredients: personalIngredients.length,
+          totalRecipes: personalRecipes.length,
+          lowStockCount: personalLowStock.length,
+          unavailableRecipes: personalUnavailableCount
+        },
+        restaurant: restaurantStats
       });
     } catch (error) {
       console.error('Error loading stats:', error);
@@ -442,10 +508,14 @@ export const Dashboard = () => {
                 </div>
                 <h3 className="text-white/80 text-xs font-medium mb-2 uppercase tracking-wide">Total Ingredients</h3>
                 <div className="flex-1 flex flex-col justify-center">
-                  <div className="flex items-end gap-2 mb-3">
-                    <p className="text-4xl font-bold tracking-tight">{stats.totalIngredients.toLocaleString()}</p>
-                    <div className="p-1.5 bg-green-400/30 backdrop-blur-sm rounded-lg mb-1">
-                      <TrendingUp size={16} className="text-green-100" />
+                  <div className="space-y-2 mb-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-white/70 font-medium">Personal:</span>
+                      <span className="text-2xl font-bold">{stats.personal.totalIngredients}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-white/70 font-medium">Restaurant:</span>
+                      <span className="text-2xl font-bold">{stats.restaurant.totalIngredients}</span>
                     </div>
                   </div>
                 </div>
@@ -470,15 +540,15 @@ export const Dashboard = () => {
                   </div>
                 </div>
 
-                <div className="flex-1 flex items-center justify-center">
-                  <div className="relative w-24 h-24">
-                    <svg className="w-full h-full transform -rotate-90">
-                      <circle cx="48" cy="48" r="40" stroke="rgba(255,255,255,0.2)" strokeWidth="6" fill="none" />
-                      <circle cx="48" cy="48" r="40" stroke="white" strokeWidth="6" fill="none" strokeDasharray="251.327" strokeDashoffset="62.832" strokeLinecap="round" className="drop-shadow-lg" />
-                    </svg>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <span className="text-3xl font-bold">{stats.totalRecipes}</span>
-                      <span className="text-xs text-white/70 mt-1">recipes</span>
+                <div className="flex-1 flex flex-col justify-center">
+                  <div className="space-y-2 mb-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-white/70 font-medium">Personal:</span>
+                      <span className="text-2xl font-bold">{stats.personal.totalRecipes}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-white/70 font-medium">Restaurant:</span>
+                      <span className="text-2xl font-bold">{stats.restaurant.totalRecipes}</span>
                     </div>
                   </div>
                 </div>
@@ -516,22 +586,19 @@ export const Dashboard = () => {
                 </div>
 
                 <div className="flex-1 flex flex-col justify-center mb-3">
-                  <div className="flex items-baseline gap-2 mb-2">
-                    <p className="text-5xl font-bold tracking-tighter">{stats.lowStockCount}</p>
-                    <span className="text-sm font-semibold text-white/70">items</span>
+                  <div className="space-y-2 mb-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-white/80 font-medium">Personal:</span>
+                      <span className="text-3xl font-bold">{stats.personal.lowStockCount}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-white/80 font-medium">Restaurant:</span>
+                      <span className="text-3xl font-bold">{stats.restaurant.lowStockCount}</span>
+                    </div>
                   </div>
                   <div className="h-1.5 bg-white/20 rounded-full overflow-hidden">
                     <div className="h-full bg-gradient-to-r from-yellow-300 to-red-400 rounded-full w-1/3 animate-pulse"></div>
                   </div>
-                </div>
-
-                <div className="space-y-1.5 p-2 bg-black/10 backdrop-blur-sm rounded-lg">
-                  {stats.lowStockItems.slice(0, 2).map((item, index) => (
-                    <div key={index} className="flex items-center gap-1.5">
-                      <div className="w-1 h-1 bg-yellow-300 rounded-full animate-pulse" style={{ animationDelay: `${index * 200}ms` }}></div>
-                      <span className="text-xs font-medium text-white/95 truncate">{item}</span>
-                    </div>
-                  ))}
                 </div>
               </div>
             </button>
@@ -556,12 +623,14 @@ export const Dashboard = () => {
                 <h3 className="text-white/80 text-xs font-medium mb-3 uppercase tracking-wide">Unavailable Recipes</h3>
 
                 <div className="flex-1 flex flex-col justify-center">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-end gap-2">
-                      <p className="text-5xl font-bold tracking-tight">{stats.unavailableRecipes}</p>
-                      <div className="mb-2 p-1.5 bg-red-900/40 backdrop-blur-sm rounded-lg">
-                        <AlertCircle size={16} className="text-red-200" />
-                      </div>
+                  <div className="space-y-2 mb-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-white/80 font-medium">Personal:</span>
+                      <span className="text-3xl font-bold">{stats.personal.unavailableRecipes}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-white/80 font-medium">Restaurant:</span>
+                      <span className="text-3xl font-bold">{stats.restaurant.unavailableRecipes}</span>
                     </div>
                   </div>
                 </div>
