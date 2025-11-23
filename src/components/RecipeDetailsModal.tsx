@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { X, Upload, AlertCircle, CheckCircle, Edit2, Save, AlertTriangle, Lock, Eye, ChefHat } from 'lucide-react';
 import { Recipe, Ingredient, RecipeIngredient, recipeIngredientsService, ingredientsService, recipesService, auditLogsService } from '../lib/database';
 import { uploadRecipeImage, supabase } from '../lib/supabase';
-import { compareQuantities, formatQuantity, normalizeToBaseUnit } from '../lib/unitConverter';
+import { compareQuantities, formatQuantity, normalizeToBaseUnit, calculateIngredientCost, formatPrice } from '../lib/unitConverter';
 import { PermissionFlags } from '../lib/permissions';
 
 interface RecipeDetailsModalProps {
@@ -60,7 +60,30 @@ export const RecipeDetailsModal = ({ recipe, onClose, onUpdate, permissions }: R
       const recipeIngs = await recipeIngredientsService.getByRecipeId(recipe.id);
 
       setAllIngredients(ingredients);
-      setRecipeIngredients(recipeIngs);
+      
+      // Calculate individual ingredient costs
+      const ingredientsWithCosts = recipeIngs.map((ri: RecipeIngredient) => {
+        const inventoryItem = ingredients.find(inv => inv.id === ri.ingredient_id);
+        
+        if (!inventoryItem) {
+          return { ...ri, cost: 0, priceWarning: 'Ingredient not found' };
+        }
+        
+        if (inventoryItem.price_per_unit === 0 || !inventoryItem.price_per_unit) {
+          return { ...ri, cost: 0, priceWarning: 'No price set' };
+        }
+        
+        const cost = calculateIngredientCost(
+          ri.quantity,
+          ri.unit,
+          inventoryItem.price_per_unit,
+          inventoryItem.unit
+        );
+        
+        return { ...ri, cost, priceWarning: null };
+      });
+
+      setRecipeIngredients(ingredientsWithCosts);
 
       const missing: string[] = [];
       const insufficient: Array<{ name: string; required: string; available: string }> = [];
@@ -130,10 +153,16 @@ export const RecipeDetailsModal = ({ recipe, onClose, onUpdate, permissions }: R
         imageUrl = await uploadRecipeImage(imageFile, recipe.id);
       }
 
+      // Calculate total cost from ingredients
+      const totalCost = recipeIngredients.reduce((sum: number, ri: any) => {
+        return sum + (ri.cost || 0);
+      }, 0);
+
       await recipesService.update(recipe.id, {
         name: editFormData.name,
         category: editFormData.category,
         description: editFormData.description,
+        cost: totalCost,
         image_url: imageUrl
       });
 
@@ -518,6 +547,16 @@ export const RecipeDetailsModal = ({ recipe, onClose, onUpdate, permissions }: R
                           <span className="text-gray-700">
                             {ri.ingredient?.name || 'Unknown'} ({ri.quantity} {ri.unit})
                           </span>
+                          {inventoryItem && inventoryItem.price_per_unit > 0 && (
+                            <span className="ml-2 text-blue-600 font-semibold">
+                              • {(ri as any).cost?.toFixed(2) || '0.00'} lei
+                            </span>
+                          )}
+                          {inventoryItem && inventoryItem.price_per_unit === 0 && (
+                            <span className="ml-2 text-orange-500 text-xs">
+                              ⚠️ No price
+                            </span>
+                          )}
                           {status === 'insufficient' && (
                             <div className="text-xs text-orange-600 mt-1">
                               {statusInfo}
@@ -589,28 +628,51 @@ export const RecipeDetailsModal = ({ recipe, onClose, onUpdate, permissions }: R
             </div>
 
             <div className="bg-gray-50 rounded-2xl p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Cost Breakdown</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Cost Analysis</h3>
               <div className="space-y-3">
-                <div className="flex justify-between text-gray-700">
-                  <span>Raw Ingredients:</span>
-                  <span className="font-semibold">${rawCost.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-gray-700">
-                  <span>Labor (Est.):</span>
-                  <span className="font-semibold">${laborCost.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-gray-700">
-                  <span>Overhead (Est.):</span>
-                  <span className="font-semibold">${overheadCost.toFixed(2)}</span>
-                </div>
-                <div className="pt-3 border-t border-gray-300">
-                  <div className="bg-gradient-to-r from-purple-100 to-blue-100 rounded-xl p-4">
+                {/* Individual ingredient costs */}
+                {recipeIngredients
+                  .filter((ri: any) => {
+                    const inv = allIngredients.find(i => i.id === ri.ingredient_id);
+                    return inv && inv.price_per_unit > 0;
+                  })
+                  .map((ri: any) => {
+                    const inv = allIngredients.find(i => i.id === ri.ingredient_id);
+                    return (
+                      <div key={ri.id} className="flex justify-between text-sm">
+                        <span className="text-gray-600">{inv?.name}</span>
+                        <span className="font-medium">{ri.cost?.toFixed(2) || '0.00'} lei</span>
+                      </div>
+                    );
+                  })}
+                
+                {/* Total cost */}
+                <div className="pt-3 mt-3 border-t-2 border-blue-300">
+                  <div className="bg-gradient-to-r from-blue-100 to-cyan-100 rounded-xl p-4">
                     <div className="flex justify-between items-center">
-                      <span className="text-lg font-bold text-gray-900">TOTAL COST:</span>
-                      <span className="text-2xl font-bold text-blue-600">${totalCost.toFixed(2)}</span>
+                      <span className="text-lg font-bold text-gray-900">Total Recipe Cost</span>
+                      <span className="text-2xl font-bold text-blue-600">
+                        {recipeIngredients
+                          .reduce((sum: number, ri: any) => sum + (ri.cost || 0), 0)
+                          .toFixed(2)
+                        } lei
+                      </span>
                     </div>
                   </div>
                 </div>
+                
+                {/* Warning if some ingredients have no price */}
+                {recipeIngredients.some((ri: any) => {
+                  const inv = allIngredients.find(i => i.id === ri.ingredient_id);
+                  return inv && (inv.price_per_unit === 0 || !inv.price_per_unit);
+                }) && (
+                  <div className="mt-3 p-2 bg-orange-50 border border-orange-200 rounded-lg">
+                    <p className="text-xs text-orange-700 flex items-center gap-2">
+                      <AlertCircle size={14} />
+                      Some ingredients don't have prices set. Total cost may be incomplete.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>

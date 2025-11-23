@@ -60,6 +60,7 @@ export type Database = {
           minimum_stock: number
           name: string
           owner_id: string | null
+          price_per_unit: number | null
           quantity: number
           restaurant_id: string | null
           supplier: string | null
@@ -75,6 +76,7 @@ export type Database = {
           minimum_stock?: number
           name: string
           owner_id?: string | null
+          price_per_unit?: number | null
           quantity?: number
           restaurant_id?: string | null
           supplier?: string | null
@@ -90,6 +92,7 @@ export type Database = {
           minimum_stock?: number
           name?: string
           owner_id?: string | null
+          price_per_unit?: number | null
           quantity?: number
           restaurant_id?: string | null
           supplier?: string | null

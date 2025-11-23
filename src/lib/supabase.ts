@@ -61,6 +61,7 @@ export interface Ingredient {
   quantity: number;
   unit: string;
   minimum_stock: number;
+  price_per_unit: number;
   category?: string;
   supplier?: string;
   owner_id?: string;

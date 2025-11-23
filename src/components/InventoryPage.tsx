@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Search, Plus, Minus, Edit2, Home, Settings, User, Building2, Eye, Lock } from 'lucide-react';
-import { ingredientsService, auditLogsService, Ingredient } from '../lib/database';
+import { ingredientsService, auditLogsService, Ingredient, recipesService, recipeIngredientsService } from '../lib/database';
 import { useApp } from '../context/AppContext';
 import { usePermissions } from '../hooks/usePermissions';
 import { RoleBadge } from './RoleBadge';
+import { supabase } from '../lib/supabase';
+import { calculateIngredientCost, formatPrice } from '../lib/unitConverter';
 
 export const InventoryPage = () => {
   const { currentUser, setCurrentPage, inventoryFilter, setInventoryFilter } = useApp();
@@ -25,6 +27,7 @@ export const InventoryPage = () => {
     quantity: 0,
     unit: 'kg',
     minimum_stock: 0,
+    price_per_unit: 0,
     category: '',
     supplier: '',
     is_shared: false,
@@ -35,6 +38,7 @@ export const InventoryPage = () => {
     quantity: 0,
     unit: 'kg',
     minimum_stock: 0,
+    price_per_unit: 0,
     category: '',
     supplier: ''
   });
@@ -67,6 +71,10 @@ export const InventoryPage = () => {
   };
 
   const handleAddIngredient = async () => {
+    if (newIngredient.price_per_unit < 0) {
+      alert('Price cannot be negative');
+      return;
+    }
     try {
       const ingredientData = {
         ...newIngredient,
@@ -80,6 +88,7 @@ export const InventoryPage = () => {
         quantity: 0,
         unit: 'kg',
         minimum_stock: 0,
+        price_per_unit: 0,
         category: '',
         supplier: '',
         is_shared: false,
@@ -110,6 +119,7 @@ export const InventoryPage = () => {
       quantity: ingredient.quantity,
       unit: ingredient.unit,
       minimum_stock: ingredient.minimum_stock,
+      price_per_unit: ingredient.price_per_unit || 0,
       category: ingredient.category || '',
       supplier: ingredient.supplier || ''
     });
@@ -144,11 +154,64 @@ export const InventoryPage = () => {
     }
   };
 
+  const updateRecipeCostsForIngredient = async (ingredientId: string) => {
+    try {
+      const { data: recipeIngs, error } = await supabase
+        .from('recipe_ingredients')
+        .select('recipe_id')
+        .eq('ingredient_id', ingredientId);
+      
+      if (error) throw error;
+      if (!recipeIngs || recipeIngs.length === 0) return;
+      
+      const recipeIds = [...new Set(recipeIngs.map(ri => ri.recipe_id))];
+      
+      for (const recipeId of recipeIds) {
+        await recalculateRecipeCost(recipeId);
+      }
+      
+      console.log(`Updated costs for ${recipeIds.length} recipe(s)`);
+    } catch (error) {
+      console.error('Error updating recipe costs:', error);
+    }
+  };
+
+  const recalculateRecipeCost = async (recipeId: string) => {
+    try {
+      const recipeIngs = await recipeIngredientsService.getByRecipeId(recipeId);
+      const allIngredients = await ingredientsService.getAll();
+      
+      let totalCost = 0;
+      for (const ri of recipeIngs) {
+        const ingredient = allIngredients.find(ing => ing.id === ri.ingredient_id);
+        if (ingredient && ingredient.price_per_unit > 0) {
+          const cost = calculateIngredientCost(
+            ri.quantity,
+            ri.unit,
+            ingredient.price_per_unit,
+            ingredient.unit
+          );
+          totalCost += cost;
+        }
+      }
+      
+      await recipesService.update(recipeId, { cost: totalCost });
+    } catch (error) {
+      console.error(`Error recalculating cost for recipe ${recipeId}:`, error);
+    }
+  };
+
   const handleEditIngredient = async () => {
     if (!selectedIngredient) return;
+    if (editFormData.price_per_unit < 0) {
+      alert('Price cannot be negative');
+      return;
+    }
     try {
       const quantityChanged = editFormData.quantity !== selectedIngredient.quantity;
       const oldQuantity = selectedIngredient.quantity;
+      const oldPrice = selectedIngredient.price_per_unit;
+      const newPrice = editFormData.price_per_unit;
 
       await ingredientsService.update(selectedIngredient.id, editFormData);
 
@@ -164,6 +227,11 @@ export const InventoryPage = () => {
           old_values: { quantity: oldQuantity, name: selectedIngredient.name },
           new_values: { quantity: editFormData.quantity, name: editFormData.name }
         });
+      }
+
+      if (oldPrice !== newPrice) {
+        console.log(`Price changed from ${oldPrice} to ${newPrice}, updating recipes...`);
+        await updateRecipeCostsForIngredient(selectedIngredient.id);
       }
 
       setShowEditModal(false);
@@ -330,6 +398,7 @@ export const InventoryPage = () => {
                     <th className="text-left px-6 py-4 font-bold text-slate-800">Item Name</th>
                     <th className="text-left px-6 py-4 font-bold text-slate-800">Quantity</th>
                     <th className="text-left px-6 py-4 font-bold text-slate-800">Unit</th>
+                    <th className="text-left px-6 py-4 font-bold text-slate-800">Price</th>
                     <th className="text-left px-6 py-4 font-bold text-slate-800">Minimum Stock</th>
                     <th className="text-left px-6 py-4 font-bold text-slate-800">Status</th>
                     <th className="text-left px-6 py-4 font-bold text-slate-800">Actions</th>
@@ -356,6 +425,15 @@ export const InventoryPage = () => {
                         </td>
                         <td className="px-6 py-4 text-slate-700 font-medium">{ingredient.quantity}</td>
                         <td className="px-6 py-4 text-slate-600">{ingredient.unit}</td>
+                        <td className="px-6 py-4">
+                          {ingredient.price_per_unit > 0 ? (
+                            <span className="text-blue-600 font-semibold">
+                              {formatPrice(ingredient.price_per_unit, ingredient.unit)}
+                            </span>
+                          ) : (
+                            <span className="text-orange-500 text-sm">⚠️ No price</span>
+                          )}
+                        </td>
                         <td className="px-6 py-4 text-slate-700 font-medium">{ingredient.minimum_stock}</td>
                         <td className="px-6 py-4">
                           <span className={`inline-flex items-center gap-1.5 px-4 py-1.5 ${status.color} text-white rounded-full text-sm font-semibold whitespace-nowrap shadow-md`}>
@@ -574,6 +652,27 @@ export const InventoryPage = () => {
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-400"
                 />
               </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Price Per Unit (lei/{editFormData.unit})
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={editFormData.price_per_unit}
+                  onChange={(e) => setEditFormData({ 
+                    ...editFormData, 
+                    price_per_unit: parseFloat(e.target.value) || 0 
+                  })}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-400"
+                  placeholder="Enter price (e.g., 4.50)"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Price in lei per {editFormData.unit}
+                </p>
+              </div>
             </div>
 
               <div className="flex gap-4 mt-6">
@@ -654,6 +753,27 @@ export const InventoryPage = () => {
                   onChange={(e) => setNewIngredient({ ...newIngredient, supplier: e.target.value })}
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-400"
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Price Per Unit (lei/{newIngredient.unit})
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={newIngredient.price_per_unit}
+                  onChange={(e) => setNewIngredient({ 
+                    ...newIngredient, 
+                    price_per_unit: parseFloat(e.target.value) || 0 
+                  })}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-400"
+                  placeholder="Enter price (e.g., 4.50)"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Price in lei per {newIngredient.unit}
+                </p>
               </div>
             </div>
 
