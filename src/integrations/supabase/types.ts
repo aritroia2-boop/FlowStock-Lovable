@@ -183,6 +183,110 @@ export type Database = {
           },
         ]
       }
+      order_items: {
+        Row: {
+          created_at: string | null
+          id: string
+          ingredient_name: string
+          is_new_ingredient: boolean | null
+          matched_ingredient_id: string | null
+          needs_confirmation: boolean | null
+          order_id: string
+          price_per_unit: number | null
+          quantity: number
+          unit: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          ingredient_name: string
+          is_new_ingredient?: boolean | null
+          matched_ingredient_id?: string | null
+          needs_confirmation?: boolean | null
+          order_id: string
+          price_per_unit?: number | null
+          quantity: number
+          unit: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          ingredient_name?: string
+          is_new_ingredient?: boolean | null
+          matched_ingredient_id?: string | null
+          needs_confirmation?: boolean | null
+          order_id?: string
+          price_per_unit?: number | null
+          quantity?: number
+          unit?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_matched_ingredient_id_fkey"
+            columns: ["matched_ingredient_id"]
+            isOneToOne: false
+            referencedRelation: "ingredients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          created_at: string | null
+          error_message: string | null
+          extracted_data: Json | null
+          file_name: string
+          file_url: string
+          id: string
+          restaurant_id: string | null
+          status: string
+          supplier: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          error_message?: string | null
+          extracted_data?: Json | null
+          file_name: string
+          file_url: string
+          id?: string
+          restaurant_id?: string | null
+          status?: string
+          supplier?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          error_message?: string | null
+          extracted_data?: Json | null
+          file_name?: string
+          file_url?: string
+          id?: string
+          restaurant_id?: string | null
+          status?: string
+          supplier?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string | null

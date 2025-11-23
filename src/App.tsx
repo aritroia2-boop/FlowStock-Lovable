@@ -5,6 +5,7 @@ import { InventoryPage } from './components/InventoryPage';
 import { RecipesPage } from './components/RecipesPage';
 import { AuditLogPage } from './components/AuditLogPage';
 import { SettingsPage } from './components/SettingsPage';
+import { OrdersPage } from './components/OrdersPage';
 
 function AppContent() {
   const { currentPage, isLoading, isAuthenticated } = useApp();
@@ -32,6 +33,7 @@ function AppContent() {
       {currentPage === 'recipes' && <RecipesPage />}
       {currentPage === 'audit-logs' && <AuditLogPage />}
       {currentPage === 'settings' && <SettingsPage />}
+      {currentPage === 'orders' && <OrdersPage />}
     </>
   );
 }
