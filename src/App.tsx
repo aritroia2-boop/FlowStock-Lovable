@@ -1,27 +1,47 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
+import { AppProvider, useApp } from './context/AppContext';
+import { LoginPage } from './components/LoginPage';
+import { Dashboard } from './components/Dashboard';
+import { InventoryPage } from './components/InventoryPage';
+import { RecipesPage } from './components/RecipesPage';
+import { AuditLogPage } from './components/AuditLogPage';
+import { SettingsPage } from './components/SettingsPage';
 
-const queryClient = new QueryClient();
+function AppContent() {
+  const { currentPage, isLoading, isAuthenticated } = useApp();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
+          <p className="text-gray-600 font-medium">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated && currentPage !== 'login') {
+    return <LoginPage />;
+  }
+
+  return (
+    <>
+      {currentPage === 'login' && <LoginPage />}
+      {currentPage === 'dashboard' && <Dashboard />}
+      {currentPage === 'inventory' && <InventoryPage />}
+      {currentPage === 'recipes' && <RecipesPage />}
+      {currentPage === 'audit-logs' && <AuditLogPage />}
+      {currentPage === 'settings' && <SettingsPage />}
+    </>
+  );
+}
+
+function App() {
+  return (
+    <AppProvider>
+      <AppContent />
+    </AppProvider>
+  );
+}
 
 export default App;
