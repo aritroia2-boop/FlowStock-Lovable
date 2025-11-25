@@ -2,3 +2,15 @@ project_id = "xrboxwuwzvlyizuupeya"
 
 [functions.process-invoice]
 verify_jwt = false
+
+[functions.create-checkout-session]
+verify_jwt = true
+
+[functions.stripe-webhook]
+verify_jwt = false
+
+[functions.get-subscription-status]
+verify_jwt = true
+
+[functions.cancel-subscription]
+verify_jwt = true
