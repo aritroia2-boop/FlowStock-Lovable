@@ -500,28 +500,28 @@ export const Dashboard = () => {
               <div className="absolute top-0 right-0 w-20 h-20 bg-white/5 rounded-full -mr-10 -mt-10"></div>
 
               <div className="relative z-10 h-full flex flex-col">
-                <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center gap-3 mb-6">
                   <div className="p-2.5 bg-white/20 backdrop-blur-sm rounded-xl">
-                    <Leaf size={20} className="text-white" />
+                    <Leaf size={24} className="text-white" />
                   </div>
-                  <h3 className="text-sm font-semibold text-white uppercase tracking-wide">Total Ingredients</h3>
+                  <h3 className="text-base font-bold text-white tracking-wide [text-shadow:_0_1px_3px_rgba(0,0,0,0.2)]">Total Ingredients</h3>
                 </div>
 
-                <div className="flex-1 flex flex-col justify-center space-y-3">
+                <div className="flex-1 flex flex-col justify-center space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-white/70">Personal</span>
-                    <span className="text-2xl font-bold">{stats.personal.totalIngredients}</span>
+                    <span className="text-xs font-medium text-white/80 bg-white/10 px-2.5 py-1 rounded-full">Personal</span>
+                    <span className="text-4xl font-black tracking-tight drop-shadow-lg [text-shadow:_0_2px_8px_rgba(0,0,0,0.25)]">{stats.personal.totalIngredients}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-white/70">Restaurant</span>
-                    <span className="text-2xl font-bold">{stats.restaurant.totalIngredients}</span>
+                    <span className="text-xs font-medium text-white/80 bg-white/10 px-2.5 py-1 rounded-full">Restaurant</span>
+                    <span className="text-4xl font-black tracking-tight drop-shadow-lg [text-shadow:_0_2px_8px_rgba(0,0,0,0.25)]">{stats.restaurant.totalIngredients}</span>
                   </div>
                 </div>
 
-                <div className="mt-auto pt-3 border-t border-white/20">
+                <div className="mt-auto pt-4 border-t-2 border-white/30">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-white/90">Total</span>
-                    <span className="text-xl font-bold">
+                    <span className="text-sm font-semibold text-white/90">Total</span>
+                    <span className="text-3xl font-black [text-shadow:_0_2px_12px_rgba(255,255,255,0.15)]">
                       {stats.personal.totalIngredients + stats.restaurant.totalIngredients}
                     </span>
                   </div>
@@ -537,28 +537,28 @@ export const Dashboard = () => {
               <div className="absolute top-0 left-0 w-24 h-24 bg-white/5 rounded-full blur-2xl -ml-12 -mt-12"></div>
 
               <div className="relative z-10 h-full flex flex-col">
-                <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center gap-3 mb-6">
                   <div className="p-2.5 bg-white/20 backdrop-blur-sm rounded-xl">
-                    <BookOpen size={20} className="text-white" />
+                    <BookOpen size={24} className="text-white" />
                   </div>
-                  <h3 className="text-sm font-semibold text-white uppercase tracking-wide">Total Recipes</h3>
+                  <h3 className="text-base font-bold text-white tracking-wide [text-shadow:_0_1px_3px_rgba(0,0,0,0.2)]">Total Recipes</h3>
                 </div>
 
-                <div className="flex-1 flex flex-col justify-center space-y-3">
+                <div className="flex-1 flex flex-col justify-center space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-white/70">Personal</span>
-                    <span className="text-2xl font-bold">{stats.personal.totalRecipes}</span>
+                    <span className="text-xs font-medium text-white/80 bg-white/10 px-2.5 py-1 rounded-full">Personal</span>
+                    <span className="text-4xl font-black tracking-tight drop-shadow-lg [text-shadow:_0_2px_8px_rgba(0,0,0,0.25)]">{stats.personal.totalRecipes}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-white/70">Restaurant</span>
-                    <span className="text-2xl font-bold">{stats.restaurant.totalRecipes}</span>
+                    <span className="text-xs font-medium text-white/80 bg-white/10 px-2.5 py-1 rounded-full">Restaurant</span>
+                    <span className="text-4xl font-black tracking-tight drop-shadow-lg [text-shadow:_0_2px_8px_rgba(0,0,0,0.25)]">{stats.restaurant.totalRecipes}</span>
                   </div>
                 </div>
 
-                <div className="mt-auto pt-3 border-t border-white/20">
+                <div className="mt-auto pt-4 border-t-2 border-white/30">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-white/90">Total</span>
-                    <span className="text-xl font-bold">
+                    <span className="text-sm font-semibold text-white/90">Total</span>
+                    <span className="text-3xl font-black [text-shadow:_0_2px_12px_rgba(255,255,255,0.15)]">
                       {stats.personal.totalRecipes + stats.restaurant.totalRecipes}
                     </span>
                   </div>
@@ -577,28 +577,28 @@ export const Dashboard = () => {
               <div className="absolute -top-8 -right-8 w-28 h-28 bg-yellow-300/10 rounded-full blur-xl"></div>
 
               <div className="relative z-10 h-full flex flex-col">
-                <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center gap-3 mb-6">
                   <div className="p-2.5 bg-white/20 backdrop-blur-sm rounded-xl">
-                    <AlertTriangle size={20} className="text-yellow-200" />
+                    <AlertTriangle size={24} className="text-yellow-200" />
                   </div>
-                  <h3 className="text-sm font-semibold text-white uppercase tracking-wide">Low Stock</h3>
+                  <h3 className="text-base font-bold text-white tracking-wide [text-shadow:_0_1px_3px_rgba(0,0,0,0.2)]">Low Stock</h3>
                 </div>
 
-                <div className="flex-1 flex flex-col justify-center space-y-3">
+                <div className="flex-1 flex flex-col justify-center space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-white/70">Personal</span>
-                    <span className="text-2xl font-bold">{stats.personal.lowStockCount}</span>
+                    <span className="text-xs font-medium text-white/80 bg-white/10 px-2.5 py-1 rounded-full">Personal</span>
+                    <span className="text-4xl font-black tracking-tight drop-shadow-lg [text-shadow:_0_2px_8px_rgba(0,0,0,0.25)]">{stats.personal.lowStockCount}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-white/70">Restaurant</span>
-                    <span className="text-2xl font-bold">{stats.restaurant.lowStockCount}</span>
+                    <span className="text-xs font-medium text-white/80 bg-white/10 px-2.5 py-1 rounded-full">Restaurant</span>
+                    <span className="text-4xl font-black tracking-tight drop-shadow-lg [text-shadow:_0_2px_8px_rgba(0,0,0,0.25)]">{stats.restaurant.lowStockCount}</span>
                   </div>
                 </div>
 
-                <div className="mt-auto pt-3 border-t border-white/20">
+                <div className="mt-auto pt-4 border-t-2 border-white/30">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-white/90">Total</span>
-                    <span className="text-xl font-bold">
+                    <span className="text-sm font-semibold text-white/90">Total</span>
+                    <span className="text-3xl font-black [text-shadow:_0_2px_12px_rgba(255,255,255,0.15)]">
                       {stats.personal.lowStockCount + stats.restaurant.lowStockCount}
                     </span>
                   </div>
@@ -614,28 +614,28 @@ export const Dashboard = () => {
               <div className="absolute top-0 right-0 w-32 h-32 bg-orange-400/10 rounded-full blur-2xl -mr-16 -mt-16"></div>
 
               <div className="relative z-10 h-full flex flex-col">
-                <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center gap-3 mb-6">
                   <div className="p-2.5 bg-white/20 backdrop-blur-sm rounded-xl">
-                    <XCircle size={20} className="text-white" />
+                    <XCircle size={24} className="text-white" />
                   </div>
-                  <h3 className="text-sm font-semibold text-white uppercase tracking-wide">Unavailable Recipes</h3>
+                  <h3 className="text-base font-bold text-white tracking-wide [text-shadow:_0_1px_3px_rgba(0,0,0,0.2)]">Unavailable Recipes</h3>
                 </div>
 
-                <div className="flex-1 flex flex-col justify-center space-y-3">
+                <div className="flex-1 flex flex-col justify-center space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-white/70">Personal</span>
-                    <span className="text-2xl font-bold">{stats.personal.unavailableRecipes}</span>
+                    <span className="text-xs font-medium text-white/80 bg-white/10 px-2.5 py-1 rounded-full">Personal</span>
+                    <span className="text-4xl font-black tracking-tight drop-shadow-lg [text-shadow:_0_2px_8px_rgba(0,0,0,0.25)]">{stats.personal.unavailableRecipes}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-white/70">Restaurant</span>
-                    <span className="text-2xl font-bold">{stats.restaurant.unavailableRecipes}</span>
+                    <span className="text-xs font-medium text-white/80 bg-white/10 px-2.5 py-1 rounded-full">Restaurant</span>
+                    <span className="text-4xl font-black tracking-tight drop-shadow-lg [text-shadow:_0_2px_8px_rgba(0,0,0,0.25)]">{stats.restaurant.unavailableRecipes}</span>
                   </div>
                 </div>
 
-                <div className="mt-auto pt-3 border-t border-white/20">
+                <div className="mt-auto pt-4 border-t-2 border-white/30">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-white/90">Total</span>
-                    <span className="text-xl font-bold">
+                    <span className="text-sm font-semibold text-white/90">Total</span>
+                    <span className="text-3xl font-black [text-shadow:_0_2px_12px_rgba(255,255,255,0.15)]">
                       {stats.personal.unavailableRecipes + stats.restaurant.unavailableRecipes}
                     </span>
                   </div>
