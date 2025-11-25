@@ -14,15 +14,14 @@ serve(async (req) => {
   try {
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      {
-        global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
-        },
-      }
+      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
     );
 
-    const { data: { user } } = await supabaseClient.auth.getUser();
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) throw new Error('No authorization header provided');
+    
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user } } = await supabaseClient.auth.getUser(token);
     if (!user) throw new Error('Not authenticated');
 
     // Get subscription
