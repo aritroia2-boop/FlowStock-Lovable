@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Search, Plus, Minus, Edit2, Home, Settings, User, Building2, Eye, Lock } from 'lucide-react';
-import { ingredientsService, auditLogsService, Ingredient, recipesService, recipeIngredientsService } from '../lib/database';
+import { ingredientsService, auditLogsService, Ingredient, recipeCostService } from '../lib/database';
 import { useApp } from '../context/AppContext';
 import { usePermissions } from '../hooks/usePermissions';
 import { RoleBadge } from './RoleBadge';
-import { supabase } from '../lib/supabase';
-import { calculateIngredientCost, formatPrice } from '../lib/unitConverter';
+import { formatPrice } from '../lib/unitConverter';
 
 export const InventoryPage = () => {
   const { currentUser, setCurrentPage, inventoryFilter, setInventoryFilter } = useApp();
@@ -154,53 +153,6 @@ export const InventoryPage = () => {
     }
   };
 
-  const updateRecipeCostsForIngredient = async (ingredientId: string) => {
-    try {
-      const { data: recipeIngs, error } = await supabase
-        .from('recipe_ingredients')
-        .select('recipe_id')
-        .eq('ingredient_id', ingredientId);
-      
-      if (error) throw error;
-      if (!recipeIngs || recipeIngs.length === 0) return;
-      
-      const recipeIds = [...new Set(recipeIngs.map(ri => ri.recipe_id))];
-      
-      for (const recipeId of recipeIds) {
-        await recalculateRecipeCost(recipeId);
-      }
-      
-      console.log(`Updated costs for ${recipeIds.length} recipe(s)`);
-    } catch (error) {
-      console.error('Error updating recipe costs:', error);
-    }
-  };
-
-  const recalculateRecipeCost = async (recipeId: string) => {
-    try {
-      const recipeIngs = await recipeIngredientsService.getByRecipeId(recipeId);
-      const allIngredients = await ingredientsService.getAll();
-      
-      let totalCost = 0;
-      for (const ri of recipeIngs) {
-        const ingredient = allIngredients.find(ing => ing.id === ri.ingredient_id);
-        if (ingredient && ingredient.price_per_unit > 0) {
-          const cost = calculateIngredientCost(
-            ri.quantity,
-            ri.unit,
-            ingredient.price_per_unit,
-            ingredient.unit
-          );
-          totalCost += cost;
-        }
-      }
-      
-      await recipesService.update(recipeId, { cost: totalCost });
-    } catch (error) {
-      console.error(`Error recalculating cost for recipe ${recipeId}:`, error);
-    }
-  };
-
   const handleEditIngredient = async () => {
     if (!selectedIngredient) return;
     if (editFormData.price_per_unit < 0) {
@@ -231,7 +183,7 @@ export const InventoryPage = () => {
 
       if (oldPrice !== newPrice) {
         console.log(`Price changed from ${oldPrice} to ${newPrice}, updating recipes...`);
-        await updateRecipeCostsForIngredient(selectedIngredient.id);
+        await recipeCostService.updateRecipesForIngredient(selectedIngredient.id);
       }
 
       setShowEditModal(false);
