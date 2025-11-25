@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 
 interface MatchedItem extends OrderItem {
   matchedIngredient: Ingredient | null;
+  alternativeMatches?: Array<{ ingredient: Ingredient; confidence: number }>;
   confidence: number;
   extractedName: string;
 }
@@ -451,13 +452,26 @@ export function OrdersPage() {
       {/* Confirmation Modal */}
       {showConfirmModal && selectedOrder && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-card border border-border/40 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+          <div className="bg-card border border-border/40 rounded-xl max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col">
             {/* Modal Header */}
-            <div className="border-b border-border/40 p-6">
-              <div className="flex items-center justify-between">
+            <div className="border-b border-border/40 p-6 bg-gradient-to-r from-primary/5 to-secondary/5">
+              <div className="flex items-center justify-between mb-4">
                 <div>
                   <h2 className="text-xl font-bold text-foreground">Confirm Order Items</h2>
-                  <p className="text-sm text-muted-foreground mt-1">{selectedOrder.file_name}</p>
+                  <div className="flex items-center gap-4 mt-2">
+                    <p className="text-sm text-muted-foreground">{selectedOrder.file_name}</p>
+                    {selectedOrder.supplier && (
+                      <>
+                        <span className="text-muted-foreground">•</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-medium text-muted-foreground">Supplier:</span>
+                          <span className="text-sm font-semibold text-primary">{selectedOrder.supplier}</span>
+                        </div>
+                      </>
+                    )}
+                    <span className="text-muted-foreground">•</span>
+                    <span className="text-sm text-muted-foreground">{orderItems.length} items</span>
+                  </div>
                 </div>
                 <button
                   onClick={() => setShowConfirmModal(false)}
@@ -470,98 +484,147 @@ export function OrdersPage() {
 
             {/* Modal Content */}
             <div className="flex-1 overflow-y-auto p-6">
-              <div className="space-y-4">
-                {orderItems.map((item, index) => (
-                  <div key={item.id} className="bg-background/50 border border-border/40 rounded-lg p-4">
-                    <div className="grid grid-cols-12 gap-4 items-center">
-                      {/* Extracted Name */}
-                      <div className="col-span-3">
-                        <label className="text-xs font-medium text-muted-foreground block mb-1">
-                          Extracted Name
-                        </label>
-                        <p className="text-sm font-medium text-foreground">{item.ingredient_name}</p>
-                      </div>
+              <div className="space-y-3">
+                {orderItems.map((item, index) => {
+                  const confidenceColor = 
+                    item.confidence >= 0.9 ? 'border-green-500/50 bg-green-500/5' :
+                    item.confidence >= 0.75 ? 'border-yellow-500/50 bg-yellow-500/5' :
+                    'border-red-500/50 bg-red-500/5';
+                  
+                  const hasMultipleMatches = (item.alternativeMatches?.length || 0) > 0;
 
-                      {/* Quantity */}
-                      <div className="col-span-2">
-                        <label className="text-xs font-medium text-muted-foreground block mb-1">
-                          Quantity
-                        </label>
-                        <input
-                          type="number"
-                          value={item.quantity}
-                          onChange={(e) => {
-                            const updated = [...orderItems];
-                            updated[index].quantity = parseFloat(e.target.value) || 0;
-                            setOrderItems(updated);
-                          }}
-                          className="w-full px-3 py-1.5 bg-background border border-border/40 rounded-lg text-sm text-foreground"
-                        />
-                      </div>
+                  return (
+                    <div 
+                      key={item.id} 
+                      className={`border rounded-lg p-4 transition-all ${confidenceColor}`}
+                    >
+                      <div className="flex items-start gap-4">
+                        {/* Left: Invoice Item */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-3">
+                            <div className="text-sm font-bold text-foreground/80">Invoice Item:</div>
+                            <div className="text-base font-bold text-foreground">{item.ingredient_name}</div>
+                            {hasMultipleMatches && (
+                              <div className="px-2 py-0.5 bg-yellow-500/20 text-yellow-400 text-xs font-medium rounded border border-yellow-500/30">
+                                ⚠️ Multiple matches
+                              </div>
+                            )}
+                          </div>
 
-                      {/* Unit */}
-                      <div className="col-span-2">
-                        <label className="text-xs font-medium text-muted-foreground block mb-1">
-                          Unit
-                        </label>
-                        <input
-                          type="text"
-                          value={item.unit}
-                          onChange={(e) => {
-                            const updated = [...orderItems];
-                            updated[index].unit = e.target.value;
-                            setOrderItems(updated);
-                          }}
-                          className="w-full px-3 py-1.5 bg-background border border-border/40 rounded-lg text-sm text-foreground"
-                        />
-                      </div>
+                          {/* Quantity & Unit Row */}
+                          <div className="grid grid-cols-2 gap-3 mb-3">
+                            <div>
+                              <label className="text-xs font-semibold text-muted-foreground block mb-1.5">
+                                Quantity
+                              </label>
+                              <input
+                                type="number"
+                                value={item.quantity}
+                                onChange={(e) => {
+                                  const updated = [...orderItems];
+                                  updated[index].quantity = parseFloat(e.target.value) || 0;
+                                  setOrderItems(updated);
+                                }}
+                                className="w-full px-3 py-2 bg-background border border-border/40 rounded-lg text-sm font-medium text-foreground focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                              />
+                            </div>
 
-                      {/* Match Ingredient */}
-                      <div className="col-span-4">
-                        <label className="text-xs font-medium text-muted-foreground block mb-1">
-                          Match with Ingredient
-                        </label>
-                        <div className="relative">
-                          <select
-                            value={item.is_new_ingredient ? 'NEW' : (item.matched_ingredient_id || '')}
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              if (value === 'NEW') {
-                                handleUpdateMatch(index, null, true);
-                              } else {
-                                handleUpdateMatch(index, value, false);
-                              }
-                            }}
-                            className="w-full px-3 py-1.5 bg-background border border-border/40 rounded-lg text-sm text-foreground appearance-none pr-8"
-                          >
-                            <option value="">Select ingredient...</option>
-                            <option value="NEW" className="font-semibold">+ Create New Ingredient</option>
-                            <option disabled>────────────</option>
-                            {allIngredients.map((ing) => (
-                              <option key={ing.id} value={ing.id}>
-                                {ing.name} ({ing.quantity} {ing.unit})
-                              </option>
-                            ))}
-                          </select>
-                          <ChevronDown size={16} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                            <div>
+                              <label className="text-xs font-semibold text-muted-foreground block mb-1.5">
+                                Unit
+                              </label>
+                              <input
+                                type="text"
+                                value={item.unit}
+                                onChange={(e) => {
+                                  const updated = [...orderItems];
+                                  updated[index].unit = e.target.value;
+                                  setOrderItems(updated);
+                                }}
+                                className="w-full px-3 py-2 bg-background border border-border/40 rounded-lg text-sm font-medium text-foreground focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Alternative Matches Warning */}
+                          {hasMultipleMatches && (
+                            <div className="mb-3 p-2 bg-yellow-500/10 border border-yellow-500/20 rounded text-xs text-yellow-400">
+                              <div className="font-semibold mb-1">Other possible matches:</div>
+                              <div className="space-y-0.5">
+                                {item.alternativeMatches?.map((alt, i) => (
+                                  <div key={i} className="flex items-center justify-between">
+                                    <span>{alt.ingredient.name}</span>
+                                    <span className="font-mono">{Math.round(alt.confidence * 100)}%</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Arrow */}
+                        <div className="flex items-center justify-center pt-8">
+                          <div className="text-2xl text-primary font-bold">→</div>
+                        </div>
+
+                        {/* Right: Matched Ingredient */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-3">
+                            <div className="text-sm font-bold text-foreground/80">Inventory Match:</div>
+                            {item.confidence > 0 && (
+                              <div className={`px-2.5 py-1 rounded-full text-xs font-black ${
+                                item.confidence >= 0.9 
+                                  ? 'bg-green-500/20 text-green-400 border border-green-500/40'
+                                  : item.confidence >= 0.75
+                                  ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/40'
+                                  : 'bg-red-500/20 text-red-400 border border-red-500/40'
+                              }`}>
+                                {Math.round(item.confidence * 100)}% match
+                              </div>
+                            )}
+                          </div>
+
+                          <div>
+                            <label className="text-xs font-semibold text-muted-foreground block mb-1.5">
+                              Select Ingredient
+                            </label>
+                            <div className="relative">
+                              <select
+                                value={item.is_new_ingredient ? 'NEW' : (item.matched_ingredient_id || '')}
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  if (value === 'NEW') {
+                                    handleUpdateMatch(index, null, true);
+                                  } else {
+                                    handleUpdateMatch(index, value, false);
+                                  }
+                                }}
+                                className="w-full px-3 py-2 bg-background border border-border/40 rounded-lg text-sm font-medium text-foreground appearance-none pr-8 focus:ring-2 focus:ring-primary/50 focus:border-primary cursor-pointer"
+                              >
+                                <option value="">Select ingredient...</option>
+                                <option disabled>────────────</option>
+                                {allIngredients.map((ing) => (
+                                  <option key={ing.id} value={ing.id}>
+                                    {ing.name} ({ing.quantity} {ing.unit})
+                                  </option>
+                                ))}
+                                <option disabled>────────────</option>
+                                <option value="NEW" className="font-bold">✨ Create as New Ingredient</option>
+                              </select>
+                              <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                            </div>
+                          </div>
+
+                          {item.is_new_ingredient && (
+                            <div className="mt-2 p-2 bg-blue-500/10 border border-blue-500/20 rounded text-xs text-blue-400">
+                              ✨ Will be created as new ingredient
+                            </div>
+                          )}
                         </div>
                       </div>
-
-                      {/* Confidence Badge */}
-                      <div className="col-span-1 flex justify-end">
-                        {item.confidence > 0 && (
-                          <div className={`px-2 py-1 rounded text-xs font-medium ${
-                            item.confidence >= 0.9 
-                              ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                              : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
-                          }`}>
-                            {Math.round(item.confidence * 100)}%
-                          </div>
-                        )}
-                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 

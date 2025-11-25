@@ -1,1 +1,4 @@
 project_id = "xrboxwuwzvlyizuupeya"
+
+[functions.process-invoice]
+verify_jwt = false
