@@ -199,6 +199,7 @@ export function OrdersPage() {
 
     try {
       setConfirming(true);
+      const ingredientsWithPriceUpdates: string[] = [];
 
       for (const item of orderItems) {
         if (item.is_new_ingredient) {
@@ -222,12 +223,24 @@ export function OrdersPage() {
             currentUser.name
           );
 
-          // Update price if provided
+          // Update price if provided and track for recipe recalculation
           if (item.price_per_unit > 0) {
             await ingredientsService.update(item.matchedIngredient.id, {
               price_per_unit: item.price_per_unit
             });
+            ingredientsWithPriceUpdates.push(item.matchedIngredient.id);
           }
+        }
+      }
+
+      // Recalculate recipe costs for ingredients with price updates
+      if (ingredientsWithPriceUpdates.length > 0) {
+        const { recipeCostService } = await import('../lib/database');
+        const result = await recipeCostService.updateRecipesForMultipleIngredients(
+          ingredientsWithPriceUpdates
+        );
+        if (result.totalRecipesUpdated > 0) {
+          toast.info(`Updated costs for ${result.totalRecipesUpdated} recipe(s)`);
         }
       }
 

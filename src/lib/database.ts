@@ -751,3 +751,74 @@ export const orderItemsService = {
     if (error) throw error;
   }
 };
+
+export const recipeCostService = {
+  // Calculate and update cost for a single recipe
+  async recalculateRecipeCost(recipeId: string) {
+    const { calculateIngredientCost } = await import('./unitConverter');
+    
+    const recipeIngs = await recipeIngredientsService.getByRecipeId(recipeId);
+    const allIngredients = await ingredientsService.getAll();
+    
+    let totalCost = 0;
+    for (const ri of recipeIngs) {
+      const ingredient = allIngredients.find(ing => ing.id === ri.ingredient_id);
+      if (ingredient && ingredient.price_per_unit > 0) {
+        const cost = calculateIngredientCost(
+          ri.quantity,
+          ri.unit,
+          ingredient.price_per_unit,
+          ingredient.unit
+        );
+        totalCost += cost;
+      }
+    }
+    
+    await recipesService.update(recipeId, { cost: totalCost });
+    return totalCost;
+  },
+
+  // Find and update all recipes using a specific ingredient
+  async updateRecipesForIngredient(ingredientId: string) {
+    const { data: recipeIngs, error } = await supabase
+      .from('recipe_ingredients')
+      .select('recipe_id')
+      .eq('ingredient_id', ingredientId);
+    
+    if (error) throw error;
+    if (!recipeIngs || recipeIngs.length === 0) return { updated: 0 };
+    
+    const recipeIds = [...new Set(recipeIngs.map(ri => ri.recipe_id))];
+    
+    for (const recipeId of recipeIds) {
+      await this.recalculateRecipeCost(recipeId);
+    }
+    
+    return { updated: recipeIds.length };
+  },
+
+  // Batch update for multiple ingredients (for invoice import)
+  async updateRecipesForMultipleIngredients(ingredientIds: string[]) {
+    const uniqueIds = [...new Set(ingredientIds)];
+    const affectedRecipeIds = new Set<string>();
+    
+    // Collect all affected recipes
+    for (const ingredientId of uniqueIds) {
+      const { data: recipeIngs } = await supabase
+        .from('recipe_ingredients')
+        .select('recipe_id')
+        .eq('ingredient_id', ingredientId);
+      
+      if (recipeIngs) {
+        recipeIngs.forEach(ri => affectedRecipeIds.add(ri.recipe_id));
+      }
+    }
+    
+    // Recalculate each recipe once
+    for (const recipeId of affectedRecipeIds) {
+      await this.recalculateRecipeCost(recipeId);
+    }
+    
+    return { totalRecipesUpdated: affectedRecipeIds.size };
+  }
+};
