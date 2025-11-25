@@ -16,7 +16,7 @@ interface MatchedItem extends OrderItem {
 }
 
 export function OrdersPage() {
-  const { currentUser, setCurrentPage } = useApp();
+  const { currentUser, setCurrentPage, hasFeature } = useApp();
   const [context, setContext] = useState<'personal' | 'restaurant'>('personal');
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -112,6 +112,13 @@ export function OrdersPage() {
 
   const handleProcessInvoice = async (order: Order) => {
     if (!currentUser) return;
+
+    // Feature gate check
+    if (!hasFeature('ai_invoice')) {
+      toast.error('AI invoice processing is a Pro feature. Upgrade your plan to unlock this feature.');
+      setTimeout(() => setCurrentPage('pricing'), 2000);
+      return;
+    }
 
     try {
       setProcessingId(order.id);

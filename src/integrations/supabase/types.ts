@@ -295,6 +295,7 @@ export type Database = {
           name: string
           restaurant_id: string | null
           role: string | null
+          subscription_tier: string
           updated_at: string | null
         }
         Insert: {
@@ -304,6 +305,7 @@ export type Database = {
           name: string
           restaurant_id?: string | null
           role?: string | null
+          subscription_tier?: string
           updated_at?: string | null
         }
         Update: {
@@ -313,6 +315,7 @@ export type Database = {
           name?: string
           restaurant_id?: string | null
           role?: string | null
+          subscription_tier?: string
           updated_at?: string | null
         }
         Relationships: [
@@ -464,6 +467,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      subscriptions: {
+        Row: {
+          cancel_at_period_end: boolean | null
+          created_at: string | null
+          current_period_end: string
+          current_period_start: string | null
+          customer_id: string
+          id: string
+          price_id: string | null
+          status: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          cancel_at_period_end?: boolean | null
+          created_at?: string | null
+          current_period_end: string
+          current_period_start?: string | null
+          customer_id: string
+          id: string
+          price_id?: string | null
+          status?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          cancel_at_period_end?: boolean | null
+          created_at?: string | null
+          current_period_end?: string
+          current_period_start?: string | null
+          customer_id?: string
+          id?: string
+          price_id?: string | null
+          status?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       team_members: {
         Row: {

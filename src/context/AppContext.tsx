@@ -1,7 +1,8 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { authService, User } from '../lib/auth';
+import { subscriptionService, hasFeatureAccess } from '../lib/subscriptionService';
 
-type Page = 'login' | 'signup' | 'dashboard' | 'inventory' | 'recipes' | 'audit-logs' | 'settings' | 'orders';
+type Page = 'login' | 'signup' | 'dashboard' | 'inventory' | 'recipes' | 'audit-logs' | 'settings' | 'orders' | 'pricing';
 type InventoryFilter = 'All' | 'Low Stock' | 'In Stock';
 
 interface AppContextType {
@@ -15,6 +16,9 @@ interface AppContextType {
   inventoryFilter: InventoryFilter;
   setInventoryFilter: (filter: InventoryFilter) => void;
   connectionError: string | null;
+  subscriptionTier: 'free' | 'pro' | 'enterprise';
+  hasFeature: (feature: string) => boolean;
+  checkSubscription: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -25,6 +29,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [inventoryFilter, setInventoryFilter] = useState<InventoryFilter>('All');
   const [connectionError, setConnectionError] = useState<string | null>(null);
+  const [subscriptionTier, setSubscriptionTier] = useState<'free' | 'pro' | 'enterprise'>('free');
 
   const isAuthenticated = currentUser !== null;
 
@@ -76,10 +81,30 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const checkSubscription = async () => {
+    try {
+      const status = await subscriptionService.getSubscriptionStatus();
+      setSubscriptionTier(status.tier);
+    } catch (error) {
+      console.error('Error checking subscription:', error);
+    }
+  };
+
+  const hasFeature = (feature: string) => {
+    return hasFeatureAccess(subscriptionTier, feature);
+  };
+
+  useEffect(() => {
+    if (currentUser) {
+      checkSubscription();
+    }
+  }, [currentUser]);
+
   const logout = async () => {
     try {
       await authService.logout();
       setCurrentUser(null);
+      setSubscriptionTier('free');
       setCurrentPage('login');
     } catch (error) {
       console.error('Error logging out:', error);
@@ -87,7 +112,21 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AppContext.Provider value={{ currentPage, setCurrentPage, currentUser, setCurrentUser, isAuthenticated, isLoading, logout, inventoryFilter, setInventoryFilter, connectionError }}>
+    <AppContext.Provider value={{ 
+      currentPage, 
+      setCurrentPage, 
+      currentUser, 
+      setCurrentUser, 
+      isAuthenticated, 
+      isLoading, 
+      logout, 
+      inventoryFilter, 
+      setInventoryFilter, 
+      connectionError,
+      subscriptionTier,
+      hasFeature,
+      checkSubscription
+    }}>
       {children}
     </AppContext.Provider>
   );
