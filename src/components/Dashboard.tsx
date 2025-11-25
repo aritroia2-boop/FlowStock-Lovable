@@ -500,29 +500,31 @@ export const Dashboard = () => {
               <div className="absolute top-0 right-0 w-20 h-20 bg-white/5 rounded-full -mr-10 -mt-10"></div>
 
               <div className="relative z-10 h-full flex flex-col">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="p-2 bg-white/20 backdrop-blur-sm rounded-xl">
-                    <Leaf size={18} className="text-white" />
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2.5 bg-white/20 backdrop-blur-sm rounded-xl">
+                    <Leaf size={20} className="text-white" />
                   </div>
-                  <div className="px-2 py-1 bg-white/20 backdrop-blur-sm rounded-full">
-                    <span className="text-xs font-semibold">Active</span>
+                  <h3 className="text-sm font-semibold text-white uppercase tracking-wide">Total Ingredients</h3>
+                </div>
+
+                <div className="flex-1 flex flex-col justify-center space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-white/70">Personal</span>
+                    <span className="text-2xl font-bold">{stats.personal.totalIngredients}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-white/70">Restaurant</span>
+                    <span className="text-2xl font-bold">{stats.restaurant.totalIngredients}</span>
                   </div>
                 </div>
-                <h3 className="text-white/80 text-xs font-medium mb-2 uppercase tracking-wide">Total Ingredients</h3>
-                <div className="flex-1 flex flex-col justify-center">
-                  <div className="space-y-2 mb-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-white/70 font-medium">Personal:</span>
-                      <span className="text-2xl font-bold">{stats.personal.totalIngredients}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-white/70 font-medium">Restaurant:</span>
-                      <span className="text-2xl font-bold">{stats.restaurant.totalIngredients}</span>
-                    </div>
+
+                <div className="mt-auto pt-3 border-t border-white/20">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-white/90">Total</span>
+                    <span className="text-xl font-bold">
+                      {stats.personal.totalIngredients + stats.restaurant.totalIngredients}
+                    </span>
                   </div>
-                </div>
-                <div className="h-1 bg-white/20 rounded-full overflow-hidden">
-                  <div className="h-full w-3/4 bg-white/60 rounded-full"></div>
                 </div>
               </div>
             </button>
@@ -535,33 +537,30 @@ export const Dashboard = () => {
               <div className="absolute top-0 left-0 w-24 h-24 bg-white/5 rounded-full blur-2xl -ml-12 -mt-12"></div>
 
               <div className="relative z-10 h-full flex flex-col">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-white/80 text-xs font-medium uppercase tracking-wide">Total Recipes</h3>
-                  <div className="p-2 bg-white/20 backdrop-blur-sm rounded-xl">
-                    <BookOpen size={18} className="text-white" />
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2.5 bg-white/20 backdrop-blur-sm rounded-xl">
+                    <BookOpen size={20} className="text-white" />
+                  </div>
+                  <h3 className="text-sm font-semibold text-white uppercase tracking-wide">Total Recipes</h3>
+                </div>
+
+                <div className="flex-1 flex flex-col justify-center space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-white/70">Personal</span>
+                    <span className="text-2xl font-bold">{stats.personal.totalRecipes}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-white/70">Restaurant</span>
+                    <span className="text-2xl font-bold">{stats.restaurant.totalRecipes}</span>
                   </div>
                 </div>
 
-                <div className="flex-1 flex flex-col justify-center">
-                  <div className="space-y-2 mb-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-white/70 font-medium">Personal:</span>
-                      <span className="text-2xl font-bold">{stats.personal.totalRecipes}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-white/70 font-medium">Restaurant:</span>
-                      <span className="text-2xl font-bold">{stats.restaurant.totalRecipes}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1.5 px-2 py-1.5 bg-white/10 backdrop-blur-sm rounded-lg flex-1">
-                    <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
-                    <span className="text-white/80 text-xs font-medium">Ready</span>
-                  </div>
-                  <div className="px-2 py-1.5 bg-white/10 backdrop-blur-sm rounded-lg">
-                    <div className="text-sm font-bold">75%</div>
+                <div className="mt-auto pt-3 border-t border-white/20">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-white/90">Total</span>
+                    <span className="text-xl font-bold">
+                      {stats.personal.totalRecipes + stats.restaurant.totalRecipes}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -578,28 +577,30 @@ export const Dashboard = () => {
               <div className="absolute -top-8 -right-8 w-28 h-28 bg-yellow-300/10 rounded-full blur-xl"></div>
 
               <div className="relative z-10 h-full flex flex-col">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="px-2 py-1 bg-white/20 backdrop-blur-sm rounded-full">
-                    <span className="text-xs font-bold uppercase tracking-wider">Low Stock</span>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2.5 bg-white/20 backdrop-blur-sm rounded-xl">
+                    <AlertTriangle size={20} className="text-yellow-200" />
                   </div>
-                  <div className="p-2 bg-white/20 backdrop-blur-sm rounded-lg animate-pulse">
-                    <AlertTriangle size={18} className="text-yellow-200" />
+                  <h3 className="text-sm font-semibold text-white uppercase tracking-wide">Low Stock</h3>
+                </div>
+
+                <div className="flex-1 flex flex-col justify-center space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-white/70">Personal</span>
+                    <span className="text-2xl font-bold">{stats.personal.lowStockCount}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-white/70">Restaurant</span>
+                    <span className="text-2xl font-bold">{stats.restaurant.lowStockCount}</span>
                   </div>
                 </div>
 
-                <div className="flex-1 flex flex-col justify-center mb-3">
-                  <div className="space-y-2 mb-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-white/80 font-medium">Personal:</span>
-                      <span className="text-3xl font-bold">{stats.personal.lowStockCount}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-white/80 font-medium">Restaurant:</span>
-                      <span className="text-3xl font-bold">{stats.restaurant.lowStockCount}</span>
-                    </div>
-                  </div>
-                  <div className="h-1.5 bg-white/20 rounded-full overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-yellow-300 to-red-400 rounded-full w-1/3 animate-pulse"></div>
+                <div className="mt-auto pt-3 border-t border-white/20">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-white/90">Total</span>
+                    <span className="text-xl font-bold">
+                      {stats.personal.lowStockCount + stats.restaurant.lowStockCount}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -613,33 +614,31 @@ export const Dashboard = () => {
               <div className="absolute top-0 right-0 w-32 h-32 bg-orange-400/10 rounded-full blur-2xl -mr-16 -mt-16"></div>
 
               <div className="relative z-10 h-full flex flex-col">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="p-2 bg-white/20 backdrop-blur-sm rounded-xl">
-                    <XCircle size={18} className="text-white" />
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2.5 bg-white/20 backdrop-blur-sm rounded-xl">
+                    <XCircle size={20} className="text-white" />
                   </div>
-                  <div className="px-2 py-1 bg-red-900/30 backdrop-blur-sm rounded-full border border-red-400/30">
-                    <span className="text-xs font-semibold">Alert</span>
+                  <h3 className="text-sm font-semibold text-white uppercase tracking-wide">Unavailable Recipes</h3>
+                </div>
+
+                <div className="flex-1 flex flex-col justify-center space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-white/70">Personal</span>
+                    <span className="text-2xl font-bold">{stats.personal.unavailableRecipes}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-white/70">Restaurant</span>
+                    <span className="text-2xl font-bold">{stats.restaurant.unavailableRecipes}</span>
                   </div>
                 </div>
 
-                <h3 className="text-white/80 text-xs font-medium mb-3 uppercase tracking-wide">Unavailable Recipes</h3>
-
-                <div className="flex-1 flex flex-col justify-center">
-                  <div className="space-y-2 mb-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-white/80 font-medium">Personal:</span>
-                      <span className="text-3xl font-bold">{stats.personal.unavailableRecipes}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-white/80 font-medium">Restaurant:</span>
-                      <span className="text-3xl font-bold">{stats.restaurant.unavailableRecipes}</span>
-                    </div>
+                <div className="mt-auto pt-3 border-t border-white/20">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-white/90">Total</span>
+                    <span className="text-xl font-bold">
+                      {stats.personal.unavailableRecipes + stats.restaurant.unavailableRecipes}
+                    </span>
                   </div>
-                </div>
-
-                <div className="flex items-center gap-2 px-2 py-2 bg-red-900/20 backdrop-blur-sm rounded-lg border border-red-400/20">
-                  <div className="w-1.5 h-1.5 bg-red-300 rounded-full"></div>
-                  <span className="text-white/80 text-xs font-medium">Cannot be prepared</span>
                 </div>
               </div>
             </button>
