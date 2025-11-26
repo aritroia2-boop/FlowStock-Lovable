@@ -10,12 +10,12 @@ export const ResponsiveSidebar = () => {
   const [open, setOpen] = useState(false);
 
   const navItems = [
-    { page: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    { page: 'inventory', icon: Package, label: 'Inventory' },
-    { page: 'recipes', icon: ChefHat, label: 'Recipes' },
-    { page: 'orders', icon: ShoppingCart, label: 'Orders' },
-    { page: 'audit-logs', icon: FileText, label: 'Audit Logs' },
-    { page: 'settings', icon: Settings, label: 'Settings' },
+    { page: 'dashboard' as const, icon: LayoutDashboard, label: 'Dashboard' },
+    { page: 'inventory' as const, icon: Package, label: 'Inventory' },
+    { page: 'recipes' as const, icon: ChefHat, label: 'Recipes' },
+    { page: 'orders' as const, icon: ShoppingCart, label: 'Orders' },
+    { page: 'audit-logs' as const, icon: FileText, label: 'Audit Logs' },
+    { page: 'settings' as const, icon: Settings, label: 'Settings' },
   ];
 
   const SidebarContent = () => (
@@ -31,7 +31,7 @@ export const ResponsiveSidebar = () => {
         {navItems.map(({ page, icon: Icon, label }) => (
           <NavLink
             key={page}
-            to={`/${page}`}
+            to={page}
             className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors text-muted-foreground hover:text-foreground hover:bg-accent"
             activeClassName="bg-primary text-primary-foreground font-medium"
             onClick={() => setOpen(false)}
