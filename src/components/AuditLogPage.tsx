@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Calendar, ChevronLeft, ChevronRight, Home, Settings } from 'lucide-react';
 import { auditLogsService, AuditLog } from '../lib/database';
 import { useApp } from '../context/AppContext';
+import { AppLayout } from './AppLayout';
 
 export const AuditLogPage = () => {
   const { setCurrentPage: navigateTo } = useApp();
@@ -35,17 +36,15 @@ export const AuditLogPage = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="bg-white rounded-3xl shadow-xl p-8">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-4">
-              <h1 className="text-2xl font-bold">
-                <span className="text-gray-900">Flow</span>
-                <span className="text-cyan-400">Stock</span>
-              </h1>
+    <AppLayout>
+      <div className="p-4 sm:p-6 lg:p-8">
+        <div className="bg-card rounded-2xl sm:rounded-3xl shadow-lg border border-border p-4 sm:p-6 lg:p-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
+            <div>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-1">Audit Logs</h1>
+              <p className="text-sm sm:text-base text-muted-foreground">Track all changes and activities</p>
             </div>
-            <div className="flex items-center gap-3">
+          </div>
               <button
                 onClick={() => navigateTo('settings')}
                 className="group p-3 bg-slate-100 hover:bg-slate-200 rounded-2xl transition-all duration-300"
@@ -158,6 +157,6 @@ export const AuditLogPage = () => {
           </div>
         </div>
       </div>
-    </div>
+    </AppLayout>
   );
 };

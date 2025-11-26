@@ -33,42 +33,42 @@ export const PricingPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 pb-20 md:pb-0">
       {/* Header */}
       <div className="bg-card/50 border-b border-border/40 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center gap-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-3 sm:gap-4">
           <button
             onClick={() => setCurrentPage('dashboard')}
-            className="p-2 hover:bg-accent/50 rounded-lg transition-colors"
+            className="p-2 hover:bg-accent/50 rounded-lg transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
           >
             <ArrowLeft className="w-5 h-5 text-foreground" />
           </button>
-          <h1 className="text-2xl font-bold text-foreground">Choose Your Plan</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground">Choose Your Plan</h1>
         </div>
       </div>
 
       {/* Pricing Cards */}
-      <div className="max-w-7xl mx-auto px-4 py-16">
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 bg-primary/10 rounded-full">
-            <Shield className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium text-primary">Simple, Transparent Pricing</span>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 lg:py-16">
+        <div className="text-center mb-8 sm:mb-12">
+          <div className="inline-flex items-center gap-2 mb-3 sm:mb-4 px-3 sm:px-4 py-1.5 sm:py-2 bg-primary/10 rounded-full">
+            <Shield className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
+            <span className="text-xs sm:text-sm font-medium text-primary">Simple, Transparent Pricing</span>
           </div>
-          <h2 className="text-4xl font-bold text-foreground mb-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-3 sm:mb-4 px-4">
             Choose the plan that's right for your restaurant
           </h2>
-          <p className="text-xl text-muted-foreground">
+          <p className="text-base sm:text-lg lg:text-xl text-muted-foreground px-4">
             Start free, upgrade as you grow
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
           {PLANS.map((plan) => (
             <div
               key={plan.id}
-              className={`relative bg-card rounded-2xl shadow-lg border-2 transition-all ${
+              className={`relative bg-card rounded-xl sm:rounded-2xl shadow-lg border-2 transition-all ${
                 plan.popular
-                  ? 'border-primary scale-105'
+                  ? 'border-primary md:scale-105'
                   : 'border-border/40 hover:border-border'
               } ${isCurrentPlan(plan.id) ? 'ring-2 ring-primary/50' : ''}`}
             >
@@ -89,12 +89,12 @@ export const PricingPage = () => {
                 </div>
               )}
 
-              <div className="p-8">
-                <div className="mb-6">
-                  <h3 className="text-2xl font-bold text-foreground mb-2">{plan.name}</h3>
+              <div className="p-6 sm:p-8">
+                <div className="mb-4 sm:mb-6">
+                  <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-2">{plan.name}</h3>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-5xl font-bold text-foreground">{plan.price}</span>
-                    <span className="text-muted-foreground">/{plan.period}</span>
+                    <span className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground">{plan.price}</span>
+                    <span className="text-sm sm:text-base text-muted-foreground">/{plan.period}</span>
                   </div>
                 </div>
 
