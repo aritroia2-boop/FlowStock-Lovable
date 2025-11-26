@@ -1,4 +1,5 @@
 import { AppProvider, useApp } from './context/AppContext';
+import { ThemeProvider } from './components/ThemeProvider';
 import { LoginPage } from './components/LoginPage';
 import { Dashboard } from './components/Dashboard';
 import { InventoryPage } from './components/InventoryPage';
@@ -42,9 +43,11 @@ function AppContent() {
 
 function App() {
   return (
-    <AppProvider>
-      <AppContent />
-    </AppProvider>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <AppProvider>
+        <AppContent />
+      </AppProvider>
+    </ThemeProvider>
   );
 }
 
