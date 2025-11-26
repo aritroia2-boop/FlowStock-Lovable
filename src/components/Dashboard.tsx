@@ -212,7 +212,7 @@ export function Dashboard() {
             {/* Total Ingredients Card */}
             <button 
               onClick={() => setCurrentPage('inventory')}
-              className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all text-left"
+              className="bg-card rounded-xl p-5 shadow-sm border border-border hover:shadow-md transition-all text-left"
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -232,7 +232,7 @@ export function Dashboard() {
             {/* Total Recipes Card */}
             <button 
               onClick={() => setCurrentPage('recipes')}
-              className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all text-left"
+              className="bg-card rounded-xl p-5 shadow-sm border border-border hover:shadow-md transition-all text-left"
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -252,7 +252,7 @@ export function Dashboard() {
             {/* Low Stock Card */}
             <button 
               onClick={() => { setInventoryFilter('Low Stock'); setCurrentPage('inventory'); }}
-              className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all text-left"
+              className="bg-card rounded-xl p-5 shadow-sm border border-border hover:shadow-md transition-all text-left"
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -279,7 +279,7 @@ export function Dashboard() {
             {/* Unavailable Recipes Card */}
             <button 
               onClick={() => setCurrentPage('recipes')}
-              className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all text-left"
+              className="bg-card rounded-xl p-5 shadow-sm border border-border hover:shadow-md transition-all text-left"
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -309,7 +309,7 @@ export function Dashboard() {
             {/* Active Users Card */}
             <button 
               onClick={() => setCurrentPage('settings')}
-              className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all text-left"
+              className="bg-card rounded-xl p-5 shadow-sm border border-border hover:shadow-md transition-all text-left"
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -326,7 +326,7 @@ export function Dashboard() {
             {/* Inventory Value Card */}
             <button 
               onClick={() => setCurrentPage('inventory')}
-              className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all text-left"
+              className="bg-card rounded-xl p-5 shadow-sm border border-border hover:shadow-md transition-all text-left"
             >
               <div className="flex items-center justify-between">
                 <div>
