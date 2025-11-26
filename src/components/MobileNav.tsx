@@ -6,11 +6,11 @@ export const MobileNav = () => {
   const { currentPage } = useApp();
 
   const navItems = [
-    { page: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    { page: 'inventory', icon: Package, label: 'Inventory' },
-    { page: 'recipes', icon: ChefHat, label: 'Recipes' },
-    { page: 'orders', icon: ShoppingCart, label: 'Orders' },
-    { page: 'settings', icon: Settings, label: 'Settings' },
+    { page: 'dashboard' as const, icon: LayoutDashboard, label: 'Dashboard' },
+    { page: 'inventory' as const, icon: Package, label: 'Inventory' },
+    { page: 'recipes' as const, icon: ChefHat, label: 'Recipes' },
+    { page: 'orders' as const, icon: ShoppingCart, label: 'Orders' },
+    { page: 'settings' as const, icon: Settings, label: 'Settings' },
   ];
 
   return (
@@ -19,7 +19,7 @@ export const MobileNav = () => {
         {navItems.map(({ page, icon: Icon, label }) => (
           <NavLink
             key={page}
-            to={`/${page}`}
+            to={page}
             className="flex flex-col items-center justify-center min-w-[56px] min-h-[48px] px-2 py-1 rounded-xl transition-colors text-muted-foreground hover:text-foreground hover:bg-accent"
             activeClassName="text-primary bg-primary/10"
           >

@@ -1,24 +1,35 @@
-import { NavLink as RouterNavLink, NavLinkProps } from "react-router-dom";
-import { forwardRef } from "react";
+import { forwardRef, ButtonHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
+import { useApp } from "@/context/AppContext";
 
-interface NavLinkCompatProps extends Omit<NavLinkProps, "className"> {
+type Page = 'login' | 'signup' | 'dashboard' | 'inventory' | 'recipes' | 'audit-logs' | 'settings' | 'orders' | 'pricing';
+
+interface NavLinkProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  to: Page;
   className?: string;
   activeClassName?: string;
-  pendingClassName?: string;
+  children: React.ReactNode;
 }
 
-const NavLink = forwardRef<HTMLAnchorElement, NavLinkCompatProps>(
-  ({ className, activeClassName, pendingClassName, to, ...props }, ref) => {
+const NavLink = forwardRef<HTMLButtonElement, NavLinkProps>(
+  ({ className, activeClassName, to, children, onClick, ...props }, ref) => {
+    const { currentPage, setCurrentPage } = useApp();
+    const isActive = currentPage === to;
+
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+      setCurrentPage(to);
+      onClick?.(e);
+    };
+
     return (
-      <RouterNavLink
+      <button
         ref={ref}
-        to={to}
-        className={({ isActive, isPending }) =>
-          cn(className, isActive && activeClassName, isPending && pendingClassName)
-        }
+        onClick={handleClick}
+        className={cn(className, isActive && activeClassName)}
         {...props}
-      />
+      >
+        {children}
+      </button>
     );
   },
 );
