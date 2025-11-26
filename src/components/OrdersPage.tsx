@@ -7,6 +7,7 @@ import type { Order, OrderItem, Ingredient } from '../lib/supabase';
 import { matchIngredients } from '../lib/ingredientMatcher';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { AppLayout } from './AppLayout';
 
 interface MatchedItem extends OrderItem {
   matchedIngredient: Ingredient | null;
@@ -677,6 +678,7 @@ export function OrdersPage() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </AppLayout>
   );
 }

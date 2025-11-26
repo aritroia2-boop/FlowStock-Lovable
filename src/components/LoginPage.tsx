@@ -74,30 +74,30 @@ export const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-cyan-100 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-cyan-100 flex items-center justify-center p-4 sm:p-6">
       <div className="relative w-full max-w-5xl">
-        <div className="absolute -top-4 -left-4 w-64 h-64 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full opacity-20 blur-3xl"></div>
-        <div className="absolute -bottom-4 -right-4 w-64 h-64 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full opacity-20 blur-3xl"></div>
+        <div className="absolute -top-4 -left-4 w-32 h-32 sm:w-64 sm:h-64 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full opacity-20 blur-3xl"></div>
+        <div className="absolute -bottom-4 -right-4 w-32 h-32 sm:w-64 sm:h-64 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full opacity-20 blur-3xl"></div>
 
-        <div className="relative bg-white rounded-3xl shadow-2xl p-16 flex items-center gap-16">
-          <div className="flex-1 flex flex-col items-center">
-            <div className="relative mb-8">
+        <div className="relative bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-8 lg:p-16 flex flex-col lg:flex-row items-center gap-8 lg:gap-16">
+          <div className="flex-1 flex flex-col items-center lg:block">
+            <div className="relative mb-6 sm:mb-8">
               <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full blur-xl opacity-50"></div>
-              <div className="relative bg-gradient-to-br from-blue-500 to-cyan-400 p-8 rounded-full">
-                <ShoppingCart size={64} className="text-white" strokeWidth={2.5} />
+              <div className="relative bg-gradient-to-br from-blue-500 to-cyan-400 p-6 sm:p-8 rounded-full">
+                <ShoppingCart size={48} className="text-white sm:w-16 sm:h-16" strokeWidth={2.5} />
               </div>
             </div>
 
-            <h1 className="text-5xl font-bold mb-2">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2 text-center lg:text-left">
               <span className="text-gray-900">Flow</span>
               <span className="bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent">Stock</span>
             </h1>
           </div>
 
-          <div className="flex-1">
-            <h2 className="text-4xl font-bold text-gray-900 mb-8">Welcome Back!</h2>
+          <div className="flex-1 w-full">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-6 sm:mb-8 text-center lg:text-left">Welcome Back!</h2>
 
-            <form onSubmit={handleLogin} className="space-y-6">
+            <form onSubmit={handleLogin} className="space-y-4 sm:space-y-6">
               {connectionError && (
                 <div className="flex items-center gap-2 p-4 bg-yellow-50 border border-yellow-200 rounded-2xl">
                   <AlertCircle size={20} className="text-yellow-600 flex-shrink-0" />
