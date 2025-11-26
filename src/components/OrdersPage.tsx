@@ -678,7 +678,6 @@ export function OrdersPage() {
           </div>
         </div>
       )}
-      </div>
-    </AppLayout>
+    </div>
   );
 }
