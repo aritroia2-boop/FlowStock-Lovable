@@ -1,5 +1,5 @@
 import { useApp } from '../context/AppContext';
-import { Leaf, BookOpen, AlertTriangle, XCircle, Users, Plus, Minus, Edit3, FileText, TrendingUp, ChefHat, AlertCircle } from 'lucide-react';
+import { Leaf, BookOpen, AlertTriangle, XCircle, Users, Plus, Minus, Edit3, FileText, TrendingUp, ChefHat, AlertCircle, DollarSign } from 'lucide-react';
 import { WeeklyAnalytics } from './WeeklyAnalytics';
 import { AppLayout } from './AppLayout';
 import { useState, useEffect } from 'react';
@@ -19,7 +19,9 @@ export function Dashboard() {
     totalRecipes: 0,
     lowStockCount: 0,
     lowStockItems: [] as string[],
-    unavailableRecipes: 0
+    unavailableRecipes: 0,
+    activeUsers: 0,
+    inventoryValue: 0
   });
   const [recentActivities, setRecentActivities] = useState<AuditLog[]>([]);
   const [myTeams, setMyTeams] = useState<TeamMember[]>([]);
@@ -84,12 +86,24 @@ export function Dashboard() {
         }
       }
 
+      // Get active team members count
+      const { count: activeUsersCount } = await supabase
+        .from('team_members')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'active');
+
+      // Calculate total inventory value
+      const inventoryValue = ingredients?.reduce((sum, i) => 
+        sum + ((i.price_per_unit || 0) * i.quantity), 0) || 0;
+
       setStats({
         totalIngredients,
         totalRecipes,
         lowStockCount,
         lowStockItems,
-        unavailableRecipes: unavailableCount
+        unavailableRecipes: unavailableCount,
+        activeUsers: activeUsersCount || 0,
+        inventoryValue
       });
     } catch (error) {
       console.error('Error loading stats:', error);
@@ -193,8 +207,8 @@ export function Dashboard() {
             </p>
           </header>
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6">
+          {/* Stats Grid - First Row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-4">
             {/* Total Ingredients Card */}
             <button 
               onClick={() => setCurrentPage('inventory')}
@@ -285,6 +299,48 @@ export function Dashboard() {
                 </div>
                 <div className="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center flex-shrink-0">
                   <XCircle size={24} className="text-white" />
+                </div>
+              </div>
+            </button>
+          </div>
+
+          {/* Stats Grid - Second Row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 mb-6">
+            {/* Active Users Card */}
+            <button 
+              onClick={() => setCurrentPage('settings')}
+              className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all text-left"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Active Users</p>
+                  <p className="text-3xl font-bold text-foreground mt-1">{stats.activeUsers}</p>
+                  <p className="text-sm text-blue-600 mt-1">Team members</p>
+                </div>
+                <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Users size={24} className="text-white" />
+                </div>
+              </div>
+            </button>
+
+            {/* Inventory Value Card */}
+            <button 
+              onClick={() => setCurrentPage('inventory')}
+              className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all text-left"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Inventory Value</p>
+                  <p className="text-3xl font-bold text-foreground mt-1">
+                    ${stats.inventoryValue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                  </p>
+                  <p className="text-sm text-green-600 mt-1 flex items-center gap-1">
+                    <TrendingUp size={14} />
+                    Total stock value
+                  </p>
+                </div>
+                <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <DollarSign size={24} className="text-white" />
                 </div>
               </div>
             </button>
