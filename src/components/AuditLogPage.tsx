@@ -45,26 +45,8 @@ export const AuditLogPage = () => {
               <p className="text-sm sm:text-base text-muted-foreground">Track all changes and activities</p>
             </div>
           </div>
-              <button
-                onClick={() => navigateTo('settings')}
-                className="group p-3 bg-slate-100 hover:bg-slate-200 rounded-2xl transition-all duration-300"
-                title="Settings"
-              >
-                <Settings size={24} className="text-slate-600 group-hover:text-blue-600 group-hover:rotate-90 transition-all duration-300" />
-              </button>
-              <button
-                onClick={() => navigateTo('dashboard')}
-                className="p-3 hover:bg-gray-50 rounded-xl transition-colors"
-                title="Go to Dashboard"
-              >
-                <Home size={28} className="text-gray-600" />
-              </button>
-            </div>
-          </div>
 
-          <h2 className="text-4xl font-bold text-gray-900 mb-8">Audit Log</h2>
-
-          <div className="flex items-center gap-4 mb-8">
+          <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
             <input
               type="text"
               placeholder="Ingredient"
