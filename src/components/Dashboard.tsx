@@ -1,10 +1,11 @@
 import { useApp } from '../context/AppContext';
-import { Leaf, BookOpen, AlertTriangle, XCircle, Users, Plus, Minus, Edit3, FileText } from 'lucide-react';
+import { Leaf, BookOpen, AlertTriangle, XCircle, Users, Plus, Minus, Edit3, FileText, TrendingUp, ChefHat, AlertCircle } from 'lucide-react';
 import { WeeklyAnalytics } from './WeeklyAnalytics';
 import { AppLayout } from './AppLayout';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Tables } from '@/integrations/supabase/types';
+import { compareQuantities } from '@/lib/unitConverter';
 
 type AuditLog = Tables<'audit_logs'>;
 type TeamMember = Tables<'team_members'> & {
@@ -54,7 +55,7 @@ export function Dashboard() {
   const loadStats = async () => {
     try {
       const { data: ingredients } = await supabase.from('ingredients').select('*');
-      const { data: recipes } = await supabase.from('recipes').select('*, recipe_ingredients(ingredient_id)');
+      const { data: recipes } = await supabase.from('recipes').select('*, recipe_ingredients(ingredient_id, quantity, unit)');
 
       const totalIngredients = ingredients?.length || 0;
       const totalRecipes = recipes?.length || 0;
@@ -67,11 +68,19 @@ export function Dashboard() {
       if (recipes && ingredients) {
         for (const recipe of recipes) {
           const recipeIngredients = recipe.recipe_ingredients || [];
-          const hasUnavailableIngredient = recipeIngredients.some((ri: any) => {
+          const isUnavailable = recipeIngredients.some((ri: any) => {
             const ingredient = ingredients.find(i => i.id === ri.ingredient_id);
-            return ingredient && ingredient.quantity <= 0;
+            if (!ingredient) return true; // Missing ingredient
+            
+            const comparison = compareQuantities(
+              ri.quantity,
+              ri.unit,
+              ingredient.quantity,
+              ingredient.unit
+            );
+            return !comparison.hasEnough;
           });
-          if (hasUnavailableIngredient) unavailableCount++;
+          if (isUnavailable) unavailableCount++;
         }
       }
 
@@ -185,89 +194,98 @@ export function Dashboard() {
           </header>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-6 mb-6 md:mb-8">
-            {/* Total Ingredients - Purple to Pink */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6">
+            {/* Total Ingredients Card */}
             <button 
               onClick={() => setCurrentPage('inventory')}
-              className="group relative bg-gradient-to-br from-purple-500 via-purple-600 to-pink-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-white shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all overflow-hidden"
+              className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all text-left"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              <div className="relative z-10">
-                <div className="flex items-center justify-between mb-2">
-                  <Leaf size={20} className="text-white" />
-                  <span className="text-xs bg-white/20 px-2 py-1 rounded-full">Active</span>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Total Ingredients</p>
+                  <p className="text-3xl font-bold text-foreground mt-1">{stats.totalIngredients}</p>
+                  <p className="text-sm text-blue-600 mt-1 flex items-center gap-1">
+                    <TrendingUp size={14} />
+                    In stock & tracked
+                  </p>
                 </div>
-                <p className="text-sm font-medium opacity-90 mb-1">Total Ingredients</p>
-                <p className="text-3xl sm:text-4xl font-bold mb-2">{stats.totalIngredients}</p>
-                <div className="w-full bg-white/20 rounded-full h-1.5 mb-1">
-                  <div className="bg-white rounded-full h-1.5" style={{ width: '85%' }}></div>
+                <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Leaf size={24} className="text-white" />
                 </div>
-                <p className="text-xs opacity-75">In stock & ready</p>
               </div>
             </button>
 
-            {/* Total Recipes - Cyan to Blue */}
+            {/* Total Recipes Card */}
             <button 
               onClick={() => setCurrentPage('recipes')}
-              className="group relative bg-gradient-to-br from-cyan-400 via-blue-500 to-blue-600 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-white shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all overflow-hidden"
+              className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all text-left"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              <div className="relative z-10">
-                <div className="flex items-center justify-between mb-2">
-                  <BookOpen size={20} className="text-white" />
-                  <div className="relative w-12 h-12">
-                    <svg className="w-12 h-12 transform -rotate-90">
-                      <circle cx="24" cy="24" r="20" stroke="white" strokeOpacity="0.2" strokeWidth="3" fill="none" />
-                      <circle cx="24" cy="24" r="20" stroke="white" strokeWidth="3" fill="none" strokeDasharray="125.6" strokeDashoffset="31.4" />
-                    </svg>
-                    <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold">75%</span>
-                  </div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Total Recipes</p>
+                  <p className="text-3xl font-bold text-foreground mt-1">{stats.totalRecipes}</p>
+                  <p className="text-sm text-purple-600 mt-1 flex items-center gap-1">
+                    <ChefHat size={14} />
+                    Ready to prepare
+                  </p>
                 </div>
-                <p className="text-sm font-medium opacity-90 mb-1">Total Recipes</p>
-                <p className="text-2xl sm:text-3xl font-bold mb-1">{stats.totalRecipes}</p>
-                <p className="text-xs opacity-75">Ready to prepare</p>
+                <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <BookOpen size={24} className="text-white" />
+                </div>
               </div>
             </button>
 
-            {/* Low Stock - Orange to Red */}
+            {/* Low Stock Card */}
             <button 
               onClick={() => { setInventoryFilter('Low Stock'); setCurrentPage('inventory'); }}
-              className="group relative bg-gradient-to-br from-orange-400 via-orange-500 to-red-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-white shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all overflow-hidden"
+              className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all text-left"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              <div className="relative z-10">
-                <div className="flex items-center justify-between mb-2">
-                  <AlertTriangle size={20} className="text-yellow-200 animate-pulse" />
-                  <span className="text-xs bg-yellow-200/20 px-2 py-1 rounded-full">Alert</span>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Low Stock Items</p>
+                  <p className="text-3xl font-bold text-foreground mt-1">{stats.lowStockCount}</p>
+                  {stats.lowStockCount > 0 ? (
+                    <p className="text-sm text-orange-600 mt-1 flex items-center gap-1">
+                      <AlertTriangle size={14} />
+                      Needs attention
+                    </p>
+                  ) : (
+                    <p className="text-sm text-green-600 mt-1 flex items-center gap-1">
+                      <TrendingUp size={14} />
+                      All stocked
+                    </p>
+                  )}
                 </div>
-                <p className="text-sm font-medium opacity-90 mb-1">Low Stock Items</p>
-                <p className="text-3xl sm:text-5xl font-bold mb-2">{stats.lowStockCount}</p>
-                {stats.lowStockItems.length > 0 && (
-                  <div className="flex flex-wrap gap-1">
-                    {stats.lowStockItems.map((item, idx) => (
-                      <span key={idx} className="text-[10px] bg-white/20 px-2 py-0.5 rounded-full truncate max-w-[80px]">
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                )}
+                <div className="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <AlertTriangle size={24} className="text-white" />
+                </div>
               </div>
             </button>
 
-            {/* Unavailable Recipes - Red to Pink */}
+            {/* Unavailable Recipes Card */}
             <button 
               onClick={() => setCurrentPage('recipes')}
-              className="group relative bg-gradient-to-br from-red-500 via-rose-600 to-pink-600 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-white shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all overflow-hidden"
+              className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all text-left"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              <div className="relative z-10">
-                <div className="flex items-center justify-between mb-2">
-                  <XCircle size={20} className="text-white" />
-                  <span className="text-xs bg-white/20 px-2 py-1 rounded-full">Warning</span>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Unavailable Recipes</p>
+                  <p className="text-3xl font-bold text-foreground mt-1">{stats.unavailableRecipes}</p>
+                  {stats.unavailableRecipes > 0 ? (
+                    <p className="text-sm text-red-600 mt-1 flex items-center gap-1">
+                      <AlertCircle size={14} />
+                      Cannot be prepared
+                    </p>
+                  ) : (
+                    <p className="text-sm text-green-600 mt-1 flex items-center gap-1">
+                      <TrendingUp size={14} />
+                      All available
+                    </p>
+                  )}
                 </div>
-                <p className="text-sm font-medium opacity-90 mb-1">Unavailable Recipes</p>
-                <p className="text-3xl sm:text-5xl font-bold mb-2">{stats.unavailableRecipes}</p>
-                <p className="text-xs opacity-75">Cannot be prepared</p>
+                <div className="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <XCircle size={24} className="text-white" />
+                </div>
               </div>
             </button>
           </div>
