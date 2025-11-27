@@ -1188,18 +1188,18 @@ export const SettingsPage = () => {
                         <UserPlus size={20} className="text-purple-600" />
                         Invite New Employee
                       </h3>
-                      <div className="flex gap-3">
+                      <div className="flex flex-col sm:flex-row gap-3">
                         <input
                           type="email"
                           value={employeeEmail}
                           onChange={(e) => setEmployeeEmail(e.target.value)}
                           placeholder="employee@example.com"
-                          className="flex-1 px-4 py-3 border-2 border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                          className="w-full sm:flex-1 px-4 py-3 border-2 border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
                         />
                         <button
                           onClick={handleAddEmployee}
                           disabled={isAddingEmployee || !employeeEmail}
-                          className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-400 text-white rounded-xl font-semibold shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                          className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-400 text-white rounded-xl font-semibold shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                         >
                           {isAddingEmployee ? 'Adding...' : 'Send Invite'}
                         </button>
@@ -1253,7 +1253,7 @@ export const SettingsPage = () => {
               {restaurant && teams.length >= 0 && permissions.canManageTeam && (
                 <div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 overflow-hidden">
                   <div className="bg-gradient-to-r from-orange-500 to-amber-400 px-6 py-4">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-white/20 backdrop-blur-sm rounded-lg">
                           <Folder size={24} className="text-white" />
@@ -1265,7 +1265,7 @@ export const SettingsPage = () => {
                       </div>
                       <button
                         onClick={() => setShowCreateTeam(!showCreateTeam)}
-                        className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white rounded-xl font-semibold transition-all"
+                        className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white rounded-xl font-semibold transition-all"
                       >
                         <Plus size={18} />
                         Create Team
@@ -1487,7 +1487,7 @@ export const SettingsPage = () => {
                                         }
                                       }}
                                       disabled={addingToTeamId === team.id}
-                                      className="px-4 py-2 bg-gradient-to-r from-orange-500 to-amber-400 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-lg"
+                                      className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-orange-500 to-amber-400 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-lg"
                                     >
                                       {addingToTeamId === team.id ? 'Adding...' : 'Add to Team'}
                                     </button>

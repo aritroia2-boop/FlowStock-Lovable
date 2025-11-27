@@ -211,7 +211,7 @@ export const InventoryPage = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 p-8 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 p-4 md:p-8 relative overflow-hidden">
       <div className="absolute top-0 right-0 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl"></div>
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-cyan-400/10 rounded-full blur-3xl"></div>
 
@@ -220,15 +220,15 @@ export const InventoryPage = () => {
           <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-cyan-50/50"></div>
           <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500 animate-pulse"></div>
 
-          <div className="relative z-10 p-8">
-            <div className="flex items-center justify-between mb-8">
+          <div className="relative z-10 p-4 md:p-6 lg:p-8">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6 md:mb-8">
               <div className="flex items-center gap-4">
                 <div className="bg-gradient-to-br from-blue-500 to-cyan-400 p-3 rounded-2xl shadow-lg">
                   <Search size={28} className="text-white" />
                 </div>
                 <div>
                   <div className="flex items-center gap-3">
-                    <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">Inventory Overview</h1>
+                    <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">Inventory Overview</h1>
                     {currentUser?.restaurant_id && <RoleBadge role={restaurantRole} size="sm" />}
                   </div>
                   <p className="text-sm text-slate-500 mt-1">
@@ -236,7 +236,7 @@ export const InventoryPage = () => {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 w-full md:w-auto">
                 <button
                   onClick={() => setCurrentPage('settings')}
                   className="group p-3 bg-slate-100 hover:bg-slate-200 rounded-2xl transition-all duration-300"
@@ -281,7 +281,7 @@ export const InventoryPage = () => {
               </div>
             )}
 
-            <div className="flex items-center gap-4 mb-8">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 md:gap-4 mb-6 md:mb-8">
               <div className="flex-1 relative group">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={20} />
                 <input
@@ -344,7 +344,8 @@ export const InventoryPage = () => {
             </div>
 
             <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-b-2xl overflow-hidden shadow-inner">
-              <table className="w-full">
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[800px]">
                 <thead>
                   <tr className="bg-gradient-to-r from-slate-100 to-slate-50 border-b-2 border-slate-200">
                     <th className="text-left px-6 py-4 font-bold text-slate-800">Item Name</th>
@@ -436,6 +437,7 @@ export const InventoryPage = () => {
                   })}
                 </tbody>
               </table>
+              </div>
             </div>
           </div>
         </div>
