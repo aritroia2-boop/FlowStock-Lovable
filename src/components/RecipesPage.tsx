@@ -94,7 +94,7 @@ export const RecipesPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 p-8 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 p-4 md:p-8 relative overflow-hidden">
       <div className="absolute top-0 right-0 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl"></div>
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-cyan-400/10 rounded-full blur-3xl"></div>
 
@@ -102,7 +102,7 @@ export const RecipesPage = () => {
         <div className="relative bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500 rounded-3xl p-0.5 mb-8 shadow-2xl">
           <div className="bg-white/90 backdrop-blur-xl rounded-3xl overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-cyan-50/50"></div>
-            <div className="relative z-10 p-8 flex items-center justify-between">
+            <div className="relative z-10 p-4 md:p-6 lg:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => setCurrentPage('dashboard')}
@@ -113,7 +113,7 @@ export const RecipesPage = () => {
                 </button>
                 <div>
                   <div className="flex items-center gap-3">
-                    <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">Recipes</h1>
+                    <h1 className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">Recipes</h1>
                     {currentUser?.restaurant_id && <RoleBadge role={restaurantRole} size="sm" />}
                   </div>
                   <p className="text-sm text-slate-500 mt-1">
@@ -121,7 +121,7 @@ export const RecipesPage = () => {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 w-full md:w-auto">
                 <button
                   onClick={() => setCurrentPage('settings')}
                   className="group p-3 bg-slate-100 hover:bg-slate-200 rounded-2xl transition-all duration-300"
@@ -179,7 +179,7 @@ export const RecipesPage = () => {
           </div>
         )}
 
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {recipes.map((recipe) => (
             <div
               key={recipe.id}
