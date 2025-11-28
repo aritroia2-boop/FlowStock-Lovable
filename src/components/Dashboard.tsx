@@ -212,19 +212,21 @@ export function Dashboard() {
             {/* Total Ingredients Card */}
             <button 
               onClick={() => setCurrentPage('inventory')}
-              className="bg-card rounded-xl p-5 shadow-sm border border-border hover:shadow-md transition-all text-left"
+              className="group relative p-[3px] rounded-xl bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-600 hover:from-blue-600 hover:via-cyan-600 hover:to-blue-700 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-blue-500/20 text-left"
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Total Ingredients</p>
-                  <p className="text-3xl font-bold text-foreground mt-1">{stats.totalIngredients}</p>
-                  <p className="text-sm text-blue-600 mt-1 flex items-center gap-1">
-                    <TrendingUp size={14} />
-                    In stock & tracked
-                  </p>
-                </div>
-                <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Leaf size={24} className="text-white" />
+              <div className="bg-card rounded-[10px] p-5 h-full transition-all duration-300">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Total Ingredients</p>
+                    <p className="text-3xl font-bold text-foreground mt-1">{stats.totalIngredients}</p>
+                    <p className="text-sm text-blue-600 mt-1 flex items-center gap-1">
+                      <TrendingUp size={14} />
+                      In stock & tracked
+                    </p>
+                  </div>
+                  <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:animate-icon-pulse transition-transform duration-300">
+                    <Leaf size={24} className="text-white" />
+                  </div>
                 </div>
               </div>
             </button>
@@ -232,19 +234,21 @@ export function Dashboard() {
             {/* Total Recipes Card */}
             <button 
               onClick={() => setCurrentPage('recipes')}
-              className="bg-card rounded-xl p-5 shadow-sm border border-border hover:shadow-md transition-all text-left"
+              className="group relative p-[3px] rounded-xl bg-gradient-to-r from-purple-500 via-violet-500 to-purple-600 hover:from-purple-600 hover:via-violet-600 hover:to-purple-700 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-purple-500/20 text-left"
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Total Recipes</p>
-                  <p className="text-3xl font-bold text-foreground mt-1">{stats.totalRecipes}</p>
-                  <p className="text-sm text-purple-600 mt-1 flex items-center gap-1">
-                    <ChefHat size={14} />
-                    Ready to prepare
-                  </p>
-                </div>
-                <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <BookOpen size={24} className="text-white" />
+              <div className="bg-card rounded-[10px] p-5 h-full transition-all duration-300">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Total Recipes</p>
+                    <p className="text-3xl font-bold text-foreground mt-1">{stats.totalRecipes}</p>
+                    <p className="text-sm text-purple-600 mt-1 flex items-center gap-1">
+                      <ChefHat size={14} />
+                      Ready to prepare
+                    </p>
+                  </div>
+                  <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:animate-icon-pulse transition-transform duration-300">
+                    <BookOpen size={24} className="text-white" />
+                  </div>
                 </div>
               </div>
             </button>
@@ -252,26 +256,28 @@ export function Dashboard() {
             {/* Low Stock Card */}
             <button 
               onClick={() => { setInventoryFilter('Low Stock'); setCurrentPage('inventory'); }}
-              className="bg-card rounded-xl p-5 shadow-sm border border-border hover:shadow-md transition-all text-left"
+              className="group relative p-[3px] rounded-xl bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 hover:from-orange-600 hover:via-amber-600 hover:to-orange-700 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-orange-500/20 text-left"
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Low Stock Items</p>
-                  <p className="text-3xl font-bold text-foreground mt-1">{stats.lowStockCount}</p>
-                  {stats.lowStockCount > 0 ? (
-                    <p className="text-sm text-orange-600 mt-1 flex items-center gap-1">
-                      <AlertTriangle size={14} />
-                      Needs attention
-                    </p>
-                  ) : (
-                    <p className="text-sm text-green-600 mt-1 flex items-center gap-1">
-                      <TrendingUp size={14} />
-                      All stocked
-                    </p>
-                  )}
-                </div>
-                <div className="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <AlertTriangle size={24} className="text-white" />
+              <div className="bg-card rounded-[10px] p-5 h-full transition-all duration-300">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Low Stock Items</p>
+                    <p className="text-3xl font-bold text-foreground mt-1">{stats.lowStockCount}</p>
+                    {stats.lowStockCount > 0 ? (
+                      <p className="text-sm text-orange-600 mt-1 flex items-center gap-1">
+                        <AlertTriangle size={14} />
+                        Needs attention
+                      </p>
+                    ) : (
+                      <p className="text-sm text-green-600 mt-1 flex items-center gap-1">
+                        <TrendingUp size={14} />
+                        All stocked
+                      </p>
+                    )}
+                  </div>
+                  <div className="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:animate-bounce-subtle transition-transform duration-300">
+                    <AlertTriangle size={24} className="text-white" />
+                  </div>
                 </div>
               </div>
             </button>
@@ -279,26 +285,28 @@ export function Dashboard() {
             {/* Unavailable Recipes Card */}
             <button 
               onClick={() => setCurrentPage('recipes')}
-              className="bg-card rounded-xl p-5 shadow-sm border border-border hover:shadow-md transition-all text-left"
+              className="group relative p-[3px] rounded-xl bg-gradient-to-r from-red-500 via-rose-500 to-red-600 hover:from-red-600 hover:via-rose-600 hover:to-red-700 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-red-500/20 text-left"
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Unavailable Recipes</p>
-                  <p className="text-3xl font-bold text-foreground mt-1">{stats.unavailableRecipes}</p>
-                  {stats.unavailableRecipes > 0 ? (
-                    <p className="text-sm text-red-600 mt-1 flex items-center gap-1">
-                      <AlertCircle size={14} />
-                      Cannot be prepared
-                    </p>
-                  ) : (
-                    <p className="text-sm text-green-600 mt-1 flex items-center gap-1">
-                      <TrendingUp size={14} />
-                      All available
-                    </p>
-                  )}
-                </div>
-                <div className="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <XCircle size={24} className="text-white" />
+              <div className="bg-card rounded-[10px] p-5 h-full transition-all duration-300">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Unavailable Recipes</p>
+                    <p className="text-3xl font-bold text-foreground mt-1">{stats.unavailableRecipes}</p>
+                    {stats.unavailableRecipes > 0 ? (
+                      <p className="text-sm text-red-600 mt-1 flex items-center gap-1">
+                        <AlertCircle size={14} />
+                        Cannot be prepared
+                      </p>
+                    ) : (
+                      <p className="text-sm text-green-600 mt-1 flex items-center gap-1">
+                        <TrendingUp size={14} />
+                        All available
+                      </p>
+                    )}
+                  </div>
+                  <div className="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:animate-icon-pulse transition-transform duration-300">
+                    <XCircle size={24} className="text-white" />
+                  </div>
                 </div>
               </div>
             </button>
@@ -309,16 +317,18 @@ export function Dashboard() {
             {/* Active Users Card */}
             <button 
               onClick={() => setCurrentPage('settings')}
-              className="bg-card rounded-xl p-5 shadow-sm border border-border hover:shadow-md transition-all text-left"
+              className="group relative p-[3px] rounded-xl bg-gradient-to-r from-blue-500 via-indigo-500 to-blue-600 hover:from-blue-600 hover:via-indigo-600 hover:to-blue-700 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-blue-500/20 text-left"
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Active Users</p>
-                  <p className="text-3xl font-bold text-foreground mt-1">{stats.activeUsers}</p>
-                  <p className="text-sm text-blue-600 mt-1">Team members</p>
-                </div>
-                <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Users size={24} className="text-white" />
+              <div className="bg-card rounded-[10px] p-5 h-full transition-all duration-300">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Active Users</p>
+                    <p className="text-3xl font-bold text-foreground mt-1">{stats.activeUsers}</p>
+                    <p className="text-sm text-blue-600 mt-1">Team members</p>
+                  </div>
+                  <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:animate-icon-pulse transition-transform duration-300">
+                    <Users size={24} className="text-white" />
+                  </div>
                 </div>
               </div>
             </button>
@@ -326,21 +336,23 @@ export function Dashboard() {
             {/* Inventory Value Card */}
             <button 
               onClick={() => setCurrentPage('inventory')}
-              className="bg-card rounded-xl p-5 shadow-sm border border-border hover:shadow-md transition-all text-left"
+              className="group relative p-[3px] rounded-xl bg-gradient-to-r from-green-500 via-emerald-500 to-green-600 hover:from-green-600 hover:via-emerald-600 hover:to-green-700 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-green-500/20 text-left"
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Inventory Value</p>
-                  <p className="text-3xl font-bold text-foreground mt-1">
-                    ${stats.inventoryValue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                  </p>
-                  <p className="text-sm text-green-600 mt-1 flex items-center gap-1">
-                    <TrendingUp size={14} />
-                    Total stock value
-                  </p>
-                </div>
-                <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <DollarSign size={24} className="text-white" />
+              <div className="bg-card rounded-[10px] p-5 h-full transition-all duration-300">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Inventory Value</p>
+                    <p className="text-3xl font-bold text-foreground mt-1">
+                      ${stats.inventoryValue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                    </p>
+                    <p className="text-sm text-green-600 mt-1 flex items-center gap-1">
+                      <TrendingUp size={14} />
+                      Total stock value
+                    </p>
+                  </div>
+                  <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:animate-icon-pulse transition-transform duration-300">
+                    <DollarSign size={24} className="text-white" />
+                  </div>
                 </div>
               </div>
             </button>
