@@ -88,12 +88,17 @@ export default {
           "0%, 100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-2px)" },
         },
+        "shimmer": {
+          "0%": { backgroundPosition: "200% 0" },
+          "100%": { backgroundPosition: "-200% 0" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "icon-pulse": "icon-pulse 2s ease-in-out infinite",
         "bounce-subtle": "bounce-subtle 2s ease-in-out infinite",
+        "shimmer": "shimmer 3s ease-in-out infinite",
       },
     },
   },
