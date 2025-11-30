@@ -292,9 +292,14 @@ export type Database = {
           created_at: string | null
           email: string
           id: string
+          is_admin: boolean | null
+          is_subscribed: boolean | null
           name: string
           restaurant_id: string | null
           role: string | null
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          subscription_status: string | null
           subscription_tier: string
           updated_at: string | null
         }
@@ -302,9 +307,14 @@ export type Database = {
           created_at?: string | null
           email: string
           id: string
+          is_admin?: boolean | null
+          is_subscribed?: boolean | null
           name: string
           restaurant_id?: string | null
           role?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_status?: string | null
           subscription_tier?: string
           updated_at?: string | null
         }
@@ -312,9 +322,14 @@ export type Database = {
           created_at?: string | null
           email?: string
           id?: string
+          is_admin?: boolean | null
+          is_subscribed?: boolean | null
           name?: string
           restaurant_id?: string | null
           role?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_status?: string | null
           subscription_tier?: string
           updated_at?: string | null
         }

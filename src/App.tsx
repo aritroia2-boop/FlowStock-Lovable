@@ -8,6 +8,8 @@ import { AuditLogPage } from './components/AuditLogPage';
 import { SettingsPage } from './components/SettingsPage';
 import { OrdersPage } from './components/OrdersPage';
 import { PricingPage } from './components/PricingPage';
+import { SuccessPage } from './components/SuccessPage';
+import { CancelPage } from './components/CancelPage';
 
 function AppContent() {
   const { currentPage, isLoading, isAuthenticated } = useApp();
@@ -37,6 +39,8 @@ function AppContent() {
       {currentPage === 'settings' && <SettingsPage />}
       {currentPage === 'orders' && <OrdersPage />}
       {currentPage === 'pricing' && <PricingPage />}
+      {currentPage === 'success' && <SuccessPage />}
+      {currentPage === 'cancel' && <CancelPage />}
     </>
   );
 }

@@ -6,7 +6,10 @@ import { usePermissions } from '../hooks/usePermissions';
 import { RoleBadge } from './RoleBadge';
 import { formatPrice } from '../lib/unitConverter';
 
+import { useSubscriptionGuard } from '../hooks/useSubscriptionGuard';
+
 export const InventoryPage = () => {
+  useSubscriptionGuard();
   const { currentUser, setCurrentPage, inventoryFilter, setInventoryFilter } = useApp();
   const { restaurantRole, getPermissionsForContext } = usePermissions();
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
