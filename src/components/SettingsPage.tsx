@@ -27,7 +27,7 @@ interface Employee {
 }
 
 export const SettingsPage = () => {
-  const { currentUser, setCurrentUser, setCurrentPage, subscriptionTier, checkSubscription } = useAppContext();
+  const { currentUser, setCurrentUser, setCurrentPage, isSubscribed, isAdmin, canAccessRestaurantFeatures } = useAppContext();
   const { restaurantRole, permissions } = usePermissions();
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -36,8 +36,6 @@ export const SettingsPage = () => {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [subscriptionStatus, setSubscriptionStatus] = useState<any>(null);
-  const [loadingSubscription, setLoadingSubscription] = useState(false);
 
   const [restaurantFormData, setRestaurantFormData] = useState({
     name: '',
@@ -68,7 +66,6 @@ export const SettingsPage = () => {
 
   useEffect(() => {
     loadRestaurant();
-    loadSubscriptionStatus();
     if (currentUser?.role === 'owner') {
       loadEmployees();
       if (currentUser?.restaurant_id) {
@@ -109,35 +106,6 @@ export const SettingsPage = () => {
       setError(err.message);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const loadSubscriptionStatus = async () => {
-    try {
-      setLoadingSubscription(true);
-      const status = await subscriptionService.getSubscriptionStatus();
-      setSubscriptionStatus(status);
-    } catch (error) {
-      console.error('Error loading subscription:', error);
-    } finally {
-      setLoadingSubscription(false);
-    }
-  };
-
-  const handleCancelSubscription = async () => {
-    if (!confirm('Are you sure you want to cancel your subscription? You will still have access until the end of your billing period.')) {
-      return;
-    }
-
-    try {
-      await subscriptionService.cancelSubscription();
-      await loadSubscriptionStatus();
-      await checkSubscription();
-      setSuccess('Subscription will be canceled at the end of the billing period');
-      setTimeout(() => setSuccess(''), 3000);
-    } catch (error: any) {
-      setError(error.message || 'Failed to cancel subscription');
-      setTimeout(() => setError(''), 3000);
     }
   };
 
@@ -835,84 +803,51 @@ export const SettingsPage = () => {
             </div>
 
             <div className="p-6">
-              {loadingSubscription ? (
-                <div className="flex items-center justify-center py-8">
-                  <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
-                </div>
-              ) : subscriptionStatus ? (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-100">
-                    <div>
-                      <p className="text-sm text-slate-600 font-medium uppercase tracking-wide mb-1">Current Plan</p>
-                      <p className="text-3xl font-bold text-slate-900 capitalize">
-                        {subscriptionStatus.tier}
-                      </p>
+              <div className="space-y-4">
+                {isAdmin ? (
+                  <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-100">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Shield className="w-5 h-5 text-purple-600" />
+                      <p className="text-sm text-slate-600 font-medium uppercase tracking-wide">Admin Access</p>
                     </div>
-                    <div className={`px-4 py-2 rounded-full text-sm font-bold ${
-                      subscriptionStatus.status === 'active' 
-                        ? 'bg-green-100 text-green-700'
-                        : subscriptionStatus.status === 'past_due'
-                        ? 'bg-yellow-100 text-yellow-700'
-                        : 'bg-slate-100 text-slate-700'
-                    }`}>
-                      {subscriptionStatus.status === 'active' ? 'Active' : subscriptionStatus.status}
-                    </div>
+                    <p className="text-xl font-bold text-slate-900">
+                      Full Access Granted
+                    </p>
                   </div>
+                ) : isSubscribed ? (
+                  <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-100">
+                    <p className="text-sm text-slate-600 font-medium uppercase tracking-wide mb-1">Current Plan</p>
+                    <p className="text-3xl font-bold text-slate-900">
+                      FlowStock Pro
+                    </p>
+                  </div>
+                ) : (
+                  <div className="p-4 bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl border border-slate-200">
+                    <p className="text-sm text-slate-600 font-medium uppercase tracking-wide mb-1">Current Plan</p>
+                    <p className="text-3xl font-bold text-slate-900">
+                      Free
+                    </p>
+                  </div>
+                )}
 
-                  {subscriptionStatus.expires && (
-                    <div className="p-4 border-2 border-slate-200 rounded-xl">
-                      <p className="text-sm text-slate-600 font-medium uppercase tracking-wide mb-1">
-                        {subscriptionStatus.cancelAtPeriodEnd ? 'Expires on' : 'Renews on'}
-                      </p>
-                      <p className="text-lg font-bold text-slate-900">
-                        {new Date(subscriptionStatus.expires).toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                        })}
-                      </p>
-                    </div>
+                <div className="flex gap-3 pt-2">
+                  {!canAccessRestaurantFeatures ? (
+                    <button
+                      onClick={() => setCurrentPage('pricing')}
+                      className="flex-1 px-6 py-4 bg-gradient-to-r from-purple-500 to-pink-400 text-white rounded-xl font-bold shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 transition-all"
+                    >
+                      Subscribe Now
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setCurrentPage('pricing')}
+                      className="flex-1 px-6 py-4 bg-gradient-to-r from-purple-500 to-pink-400 text-white rounded-xl font-bold shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 transition-all"
+                    >
+                      View Subscription
+                    </button>
                   )}
-
-                  <div className="flex gap-3 pt-2">
-                    {subscriptionStatus.tier === 'free' ? (
-                      <button
-                        onClick={() => setCurrentPage('pricing')}
-                        className="flex-1 px-6 py-4 bg-gradient-to-r from-purple-500 to-pink-400 text-white rounded-xl font-bold shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 transition-all"
-                      >
-                        Upgrade Plan
-                      </button>
-                    ) : (
-                      <>
-                        {!subscriptionStatus.cancelAtPeriodEnd && (
-                          <button
-                            onClick={handleCancelSubscription}
-                            className="flex-1 px-4 py-3 border-2 border-slate-300 text-slate-700 rounded-xl hover:bg-slate-50 transition-all font-semibold"
-                          >
-                            Cancel Subscription
-                          </button>
-                        )}
-                        <button
-                          onClick={() => setCurrentPage('pricing')}
-                          className="flex-1 px-6 py-4 bg-gradient-to-r from-purple-500 to-pink-400 text-white rounded-xl font-bold shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 transition-all"
-                        >
-                          {subscriptionStatus.tier === 'pro' ? 'Upgrade to Enterprise' : 'View Plans'}
-                        </button>
-                      </>
-                    )}
-                  </div>
                 </div>
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-slate-600 mb-4 font-medium">No subscription information available</p>
-                  <button
-                    onClick={() => setCurrentPage('pricing')}
-                    className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-400 text-white rounded-xl font-bold shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 transition-all"
-                  >
-                    View Plans
-                  </button>
-                </div>
-              )}
+              </div>
             </div>
           </div>
 

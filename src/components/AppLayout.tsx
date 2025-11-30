@@ -8,7 +8,7 @@ interface AppLayoutProps {
   children: ReactNode;
 }
 
-type Page = 'login' | 'signup' | 'dashboard' | 'inventory' | 'recipes' | 'audit-logs' | 'settings' | 'orders' | 'pricing';
+type Page = 'login' | 'signup' | 'dashboard' | 'inventory' | 'recipes' | 'audit-logs' | 'settings' | 'orders' | 'pricing' | 'success' | 'cancel';
 
 // Define page navigation order
 const PAGE_ORDER: Page[] = ['dashboard', 'inventory', 'recipes', 'orders', 'audit-logs', 'settings'];

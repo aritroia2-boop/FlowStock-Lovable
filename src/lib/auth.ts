@@ -17,6 +17,10 @@ export interface User {
   name: string;
   role?: string;
   restaurant_id?: string;
+  is_subscribed?: boolean;
+  is_admin?: boolean;
+  subscription_status?: string;
+  stripe_customer_id?: string;
 }
 
 export const authService = {
@@ -58,7 +62,7 @@ export const authService = {
 
       const { data: profile, error } = await supabase
         .from('profiles')
-        .select('name, role, restaurant_id')
+        .select('name, role, restaurant_id, is_subscribed, is_admin, subscription_status, stripe_customer_id')
         .eq('id', user.id)
         .maybeSingle();
 
@@ -84,6 +88,10 @@ export const authService = {
         name: profile?.name || 'User',
         role: profile?.role || 'none',
         restaurant_id: profile?.restaurant_id || undefined,
+        is_subscribed: profile?.is_subscribed || false,
+        is_admin: profile?.is_admin || false,
+        subscription_status: profile?.subscription_status || 'none',
+        stripe_customer_id: profile?.stripe_customer_id || undefined,
       };
     } catch (error) {
       console.error('Unexpected error in getCurrentUser:', error);

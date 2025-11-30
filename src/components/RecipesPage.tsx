@@ -7,7 +7,10 @@ import { compareQuantities } from '../lib/unitConverter';
 import { usePermissions } from '../hooks/usePermissions';
 import { RoleBadge } from './RoleBadge';
 
+import { useSubscriptionGuard } from '../hooks/useSubscriptionGuard';
+
 export const RecipesPage = () => {
+  useSubscriptionGuard();
   const { currentUser, setCurrentPage } = useApp();
   const { restaurantRole, getPermissionsForContext } = usePermissions();
   const [recipes, setRecipes] = useState<Recipe[]>([]);

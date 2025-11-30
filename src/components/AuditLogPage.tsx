@@ -4,7 +4,10 @@ import { auditLogsService, AuditLog } from '../lib/database';
 import { useApp } from '../context/AppContext';
 import { AppLayout } from './AppLayout';
 
+import { useSubscriptionGuard } from '../hooks/useSubscriptionGuard';
+
 export const AuditLogPage = () => {
+  useSubscriptionGuard();
   const { setCurrentPage: navigateTo } = useApp();
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [filterIngredient, setFilterIngredient] = useState('');
