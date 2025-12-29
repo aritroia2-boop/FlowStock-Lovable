@@ -14,7 +14,7 @@ export const MobileNav = () => {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-border z-50 md:hidden safe-area-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50 md:hidden safe-area-bottom">
       <div className="flex justify-around items-center px-2 py-2">
         {navItems.map(({ page, icon: Icon, label }) => (
           <NavLink

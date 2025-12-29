@@ -104,7 +104,7 @@ export const NotificationsModal = ({ isOpen, onClose, onNotificationUpdate }: No
       case 'team_invite':
         return <Users size={20} className="text-blue-500" />;
       default:
-        return <Clock size={20} className="text-gray-400" />;
+        return <Clock size={20} className="text-muted-foreground" />;
     }
   };
 
@@ -114,12 +114,12 @@ export const NotificationsModal = ({ isOpen, onClose, onNotificationUpdate }: No
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-start justify-center z-50 pt-20 px-4">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[80vh] flex flex-col">
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-start justify-center z-50 pt-20 px-4">
+      <div className="bg-card rounded-3xl shadow-2xl max-w-2xl w-full max-h-[80vh] flex flex-col border border-border">
+        <div className="flex items-center justify-between p-6 border-b border-border">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Notifications</h2>
-            <p className="text-sm text-gray-500 mt-1">
+            <h2 className="text-2xl font-bold text-foreground">Notifications</h2>
+            <p className="text-sm text-muted-foreground mt-1">
               {pendingNotifications.length} pending invitation{pendingNotifications.length !== 1 ? 's' : ''}
             </p>
           </div>
@@ -127,16 +127,16 @@ export const NotificationsModal = ({ isOpen, onClose, onNotificationUpdate }: No
             {notifications.some(n => !n.read_at) && (
               <button
                 onClick={handleMarkAllAsRead}
-                className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
+                className="text-sm text-primary hover:text-primary/80 font-medium transition-colors"
               >
                 Mark all read
               </button>
             )}
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
+              className="p-2 hover:bg-muted rounded-xl transition-colors"
             >
-              <X size={24} className="text-gray-500" />
+              <X size={24} className="text-muted-foreground" />
             </button>
           </div>
         </div>
@@ -144,26 +144,26 @@ export const NotificationsModal = ({ isOpen, onClose, onNotificationUpdate }: No
         <div className="flex-1 overflow-y-auto p-6">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>
           ) : notifications.length === 0 ? (
             <div className="text-center py-12">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
-                <CheckCircle2 size={32} className="text-gray-400" />
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-muted rounded-full mb-4">
+                <CheckCircle2 size={32} className="text-muted-foreground" />
               </div>
-              <p className="text-gray-500 font-medium">No notifications</p>
-              <p className="text-sm text-gray-400 mt-1">You're all caught up!</p>
+              <p className="text-foreground font-medium">No notifications</p>
+              <p className="text-sm text-muted-foreground mt-1">You're all caught up!</p>
             </div>
           ) : (
             <div className="space-y-4">
               {pendingNotifications.length > 0 && (
                 <>
-                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Pending</h3>
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Pending</h3>
                   {pendingNotifications.map((notification) => (
                     <div
                       key={notification.id}
-                      className={`bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl p-4 border-2 border-blue-200 ${
-                        !notification.read_at ? 'ring-2 ring-blue-300' : ''
+                      className={`bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-2xl p-4 border-2 border-blue-200 dark:border-blue-800 ${
+                        !notification.read_at ? 'ring-2 ring-blue-300 dark:ring-blue-700' : ''
                       }`}
                     >
                       <div className="flex items-start gap-3">
@@ -173,14 +173,14 @@ export const NotificationsModal = ({ isOpen, onClose, onNotificationUpdate }: No
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2">
                             <div>
-                              <h4 className="font-semibold text-gray-900">{notification.title}</h4>
-                              <p className="text-sm text-gray-700 mt-1">{notification.message}</p>
+                              <h4 className="font-semibold text-foreground">{notification.title}</h4>
+                              <p className="text-sm text-muted-foreground mt-1">{notification.message}</p>
                               {notification.metadata && (
-                                <div className="mt-2 flex items-center gap-3 text-xs text-gray-600">
-                                  <span className="bg-white/80 px-2 py-1 rounded-lg">
+                                <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
+                                  <span className="bg-background/80 px-2 py-1 rounded-lg">
                                     Role: {notification.metadata.role}
                                   </span>
-                                  <span className="text-gray-400">{formatTime(notification.created_at)}</span>
+                                  <span className="text-muted-foreground">{formatTime(notification.created_at)}</span>
                                 </div>
                               )}
                             </div>
@@ -205,7 +205,7 @@ export const NotificationsModal = ({ isOpen, onClose, onNotificationUpdate }: No
                             {!notification.read_at && (
                               <button
                                 onClick={() => handleMarkAsRead(notification.id)}
-                                className="ml-auto text-xs text-gray-500 hover:text-gray-700 transition-colors"
+                                className="ml-auto text-xs text-muted-foreground hover:text-foreground transition-colors"
                               >
                                 Mark as read
                               </button>
@@ -221,18 +221,18 @@ export const NotificationsModal = ({ isOpen, onClose, onNotificationUpdate }: No
               {otherNotifications.length > 0 && (
                 <>
                   {pendingNotifications.length > 0 && (
-                    <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mt-6">Recent</h3>
+                    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mt-6">Recent</h3>
                   )}
                   {otherNotifications.map((notification) => (
                     <div
                       key={notification.id}
-                      className={`bg-white border rounded-2xl p-4 ${
+                      className={`bg-card border rounded-2xl p-4 ${
                         notification.status === 'accepted'
-                          ? 'border-green-200 bg-green-50/50'
+                          ? 'border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-900/20'
                           : notification.status === 'declined'
-                          ? 'border-red-200 bg-red-50/50'
-                          : 'border-gray-200'
-                      } ${!notification.read_at ? 'ring-2 ring-blue-200' : 'opacity-75'}`}
+                          ? 'border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-900/20'
+                          : 'border-border'
+                      } ${!notification.read_at ? 'ring-2 ring-blue-200 dark:ring-blue-800' : 'opacity-75'}`}
                     >
                       <div className="flex items-start gap-3">
                         <div className="flex-shrink-0 mt-1">
@@ -245,23 +245,23 @@ export const NotificationsModal = ({ isOpen, onClose, onNotificationUpdate }: No
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-semibold text-gray-900">{notification.title}</h4>
-                          <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
+                          <h4 className="font-semibold text-foreground">{notification.title}</h4>
+                          <p className="text-sm text-muted-foreground mt-1">{notification.message}</p>
                           <div className="flex items-center gap-3 mt-2">
                             <span className={`text-xs px-2 py-1 rounded-lg font-medium ${
                               notification.status === 'accepted'
-                                ? 'bg-green-100 text-green-700'
+                                ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400'
                                 : notification.status === 'declined'
-                                ? 'bg-red-100 text-red-700'
-                                : 'bg-gray-100 text-gray-700'
+                                ? 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-400'
+                                : 'bg-muted text-foreground'
                             }`}>
                               {notification.status.charAt(0).toUpperCase() + notification.status.slice(1)}
                             </span>
-                            <span className="text-xs text-gray-400">{formatTime(notification.created_at)}</span>
+                            <span className="text-xs text-muted-foreground">{formatTime(notification.created_at)}</span>
                             {!notification.read_at && (
                               <button
                                 onClick={() => handleMarkAsRead(notification.id)}
-                                className="ml-auto text-xs text-blue-600 hover:text-blue-700 transition-colors"
+                                className="ml-auto text-xs text-primary hover:text-primary/80 transition-colors"
                               >
                                 Mark as read
                               </button>

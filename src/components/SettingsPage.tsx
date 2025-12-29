@@ -622,22 +622,22 @@ export const SettingsPage = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50">
+      <div className="flex items-center justify-center h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
-          <p className="text-gray-600 font-medium">Loading settings...</p>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+          <p className="text-muted-foreground font-medium">Loading settings...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="relative z-50 min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50">
+    <div className="relative z-50 min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="mb-8">
           <button
             onClick={() => setCurrentPage('dashboard')}
-            className="group flex items-center gap-2 px-4 py-2 text-slate-600 hover:text-blue-600 hover:bg-white/50 rounded-xl transition-all duration-300"
+            className="group flex items-center gap-2 px-4 py-2 text-muted-foreground hover:text-primary hover:bg-card/50 rounded-xl transition-all duration-300"
           >
             <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
             <span className="font-medium">Back to Dashboard</span>
@@ -651,7 +651,7 @@ export const SettingsPage = () => {
             </h1>
             {currentUser?.restaurant_id && <RoleBadge role={restaurantRole} size="md" />}
           </div>
-          <p className="text-slate-600 text-lg">Manage your profile, restaurant, and team</p>
+          <p className="text-muted-foreground text-lg">Manage your profile, restaurant, and team</p>
         </div>
 
         {error && (
@@ -675,7 +675,7 @@ export const SettingsPage = () => {
         )}
 
         <div className="space-y-6">
-          <div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+          <div className="bg-card/90 backdrop-blur-xl rounded-2xl shadow-xl border border-border overflow-hidden">
             <div className="bg-gradient-to-r from-green-500 to-emerald-400 px-6 py-4">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-white/20 backdrop-blur-sm rounded-lg">
