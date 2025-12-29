@@ -55,13 +55,13 @@ export const AuditLogPage = () => {
               placeholder="Ingredient"
               value={filterIngredient}
               onChange={(e) => setFilterIngredient(e.target.value)}
-              className="px-6 py-3 border-2 border-blue-300 rounded-2xl focus:outline-none focus:border-blue-400 transition-colors"
+              className="px-6 py-3 border-2 border-border bg-background text-foreground placeholder:text-muted-foreground rounded-2xl focus:outline-none focus:border-primary transition-colors"
             />
 
             <select
               value={filterOperation}
               onChange={(e) => setFilterOperation(e.target.value)}
-              className="px-6 py-3 border-2 border-cyan-400 bg-cyan-50 text-gray-700 rounded-2xl focus:outline-none appearance-none cursor-pointer font-medium"
+              className="px-6 py-3 border-2 border-primary/50 bg-primary/10 text-foreground rounded-2xl focus:outline-none appearance-none cursor-pointer font-medium"
             >
               <option>Operation</option>
               <option>Added</option>
@@ -74,27 +74,27 @@ export const AuditLogPage = () => {
               placeholder="User"
               value={filterUser}
               onChange={(e) => setFilterUser(e.target.value)}
-              className="px-6 py-3 border-2 border-blue-300 rounded-2xl focus:outline-none focus:border-blue-400 transition-colors"
+              className="px-6 py-3 border-2 border-border bg-background text-foreground placeholder:text-muted-foreground rounded-2xl focus:outline-none focus:border-primary transition-colors"
             />
 
-            <div className="flex items-center gap-3 px-6 py-3 border-2 border-cyan-400 bg-cyan-50 rounded-2xl">
-              <Calendar size={20} className="text-gray-600" />
-              <span className="text-gray-700 font-medium">Tiamestopp</span>
-              <Calendar size={20} className="text-gray-600" />
+            <div className="flex items-center gap-3 px-6 py-3 border-2 border-primary/50 bg-primary/10 rounded-2xl">
+              <Calendar size={20} className="text-muted-foreground" />
+              <span className="text-foreground font-medium">Timestamp</span>
+              <Calendar size={20} className="text-muted-foreground" />
             </div>
           </div>
 
           <div className="bg-gradient-to-r from-purple-400 via-blue-400 to-cyan-400 rounded-t-2xl p-4"></div>
 
-          <div className="bg-gray-50 rounded-b-2xl overflow-hidden">
+          <div className="bg-muted rounded-b-2xl overflow-hidden">
             <table className="w-full">
               <thead>
-                <tr className="bg-white border-b-2 border-gray-100">
-                  <th className="text-left px-6 py-4 font-bold text-gray-900">Ingredient</th>
-                  <th className="text-left px-6 py-4 font-bold text-gray-900">Operation</th>
-                  <th className="text-left px-6 py-4 font-bold text-gray-900">Amount</th>
-                  <th className="text-left px-6 py-4 font-bold text-gray-900">User</th>
-                  <th className="text-left px-6 py-4 font-bold text-gray-900">Tiamespho</th>
+                <tr className="bg-card border-b-2 border-border">
+                  <th className="text-left px-6 py-4 font-bold text-foreground">Ingredient</th>
+                  <th className="text-left px-6 py-4 font-bold text-foreground">Operation</th>
+                  <th className="text-left px-6 py-4 font-bold text-foreground">Amount</th>
+                  <th className="text-left px-6 py-4 font-bold text-foreground">User</th>
+                  <th className="text-left px-6 py-4 font-bold text-foreground">Timestamp</th>
                 </tr>
               </thead>
               <tbody>
@@ -107,14 +107,14 @@ export const AuditLogPage = () => {
                   const amount = Math.abs(newQty - oldQty);
                   
                   return (
-                    <tr key={log.id} className="bg-white border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 font-semibold text-gray-900">{ingredientName}</td>
-                      <td className="px-6 py-4 text-gray-700">{log.operation}</td>
-                      <td className="px-6 py-4 text-gray-700">
+                    <tr key={log.id} className="bg-card border-b border-border hover:bg-muted transition-colors">
+                      <td className="px-6 py-4 font-semibold text-foreground">{ingredientName}</td>
+                      <td className="px-6 py-4 text-muted-foreground">{log.operation}</td>
+                      <td className="px-6 py-4 text-muted-foreground">
                         {log.table_name === 'ingredients' ? `${amount} units` : 'N/A'}
                       </td>
-                      <td className="px-6 py-4 text-gray-700">{log.user_name}</td>
-                      <td className="px-6 py-4 text-gray-700">
+                      <td className="px-6 py-4 text-muted-foreground">{log.user_name}</td>
+                      <td className="px-6 py-4 text-muted-foreground">
                         {new Date(log.created_at).toLocaleString()}
                       </td>
                     </tr>
@@ -123,18 +123,18 @@ export const AuditLogPage = () => {
               </tbody>
             </table>
 
-            <div className="flex items-center justify-center gap-4 py-6 bg-white">
-              <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors">
+            <div className="flex items-center justify-center gap-4 py-6 bg-card">
+              <button className="flex items-center gap-2 px-4 py-2 text-muted-foreground hover:text-foreground transition-colors">
                 <ChevronLeft size={20} />
                 <span className="font-medium">Prev</span>
               </button>
-              <button className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 font-semibold">
+              <button className="w-10 h-10 rounded-full bg-primary/20 text-primary font-semibold">
                 {currentLogPage}
               </button>
-              <button className="w-10 h-10 rounded-full hover:bg-gray-100 text-gray-600 font-semibold transition-colors">
+              <button className="w-10 h-10 rounded-full hover:bg-muted text-muted-foreground font-semibold transition-colors">
                 3
               </button>
-              <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors">
+              <button className="flex items-center gap-2 px-4 py-2 text-muted-foreground hover:text-foreground transition-colors">
                 <span className="font-medium">Next</span>
                 <ChevronRight size={20} />
               </button>

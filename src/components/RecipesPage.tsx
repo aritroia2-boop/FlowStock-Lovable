@@ -97,29 +97,29 @@ export const RecipesPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 p-4 md:p-8 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-slate-900 dark:to-slate-800 p-4 md:p-8 relative overflow-hidden">
       <div className="absolute top-0 right-0 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl"></div>
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-cyan-400/10 rounded-full blur-3xl"></div>
 
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="relative bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500 rounded-3xl p-0.5 mb-8 shadow-2xl">
-          <div className="bg-white/90 backdrop-blur-xl rounded-3xl overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-cyan-50/50"></div>
+          <div className="bg-card/90 backdrop-blur-xl rounded-3xl overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-cyan-50/50 dark:from-blue-900/10 dark:to-cyan-900/10"></div>
             <div className="relative z-10 p-4 md:p-6 lg:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => setCurrentPage('dashboard')}
-                  className="group p-3 bg-gradient-to-br from-slate-100 to-slate-50 hover:from-blue-100 hover:to-cyan-100 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg"
+                  className="group p-3 bg-muted hover:bg-primary/10 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg"
                   title="Go to Dashboard"
                 >
-                  <Home size={28} className="text-slate-600 group-hover:text-blue-600 transition-colors" />
+                  <Home size={28} className="text-muted-foreground group-hover:text-primary transition-colors" />
                 </button>
                 <div>
                   <div className="flex items-center gap-3">
                     <h1 className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">Recipes</h1>
                     {currentUser?.restaurant_id && <RoleBadge role={restaurantRole} size="sm" />}
                   </div>
-                  <p className="text-sm text-slate-500 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     {permissions.isReadOnly ? 'View your culinary creations' : 'Discover and manage your culinary creations'}
                   </p>
                 </div>
@@ -127,10 +127,10 @@ export const RecipesPage = () => {
               <div className="flex items-center gap-3 w-full md:w-auto">
                 <button
                   onClick={() => setCurrentPage('settings')}
-                  className="group p-3 bg-slate-100 hover:bg-slate-200 rounded-2xl transition-all duration-300"
+                  className="group p-3 bg-muted hover:bg-muted/80 rounded-2xl transition-all duration-300"
                   title="Settings"
                 >
-                  <Settings size={24} className="text-slate-600 group-hover:text-blue-600 group-hover:rotate-90 transition-all duration-300" />
+                  <Settings size={24} className="text-muted-foreground group-hover:text-primary group-hover:rotate-90 transition-all duration-300" />
                 </button>
                 {permissions.canAddRecipes ? (
                   <button
@@ -143,7 +143,7 @@ export const RecipesPage = () => {
                 ) : (
                   <button
                     disabled
-                    className="flex items-center gap-3 px-8 py-4 bg-slate-200 text-slate-400 rounded-2xl font-semibold text-lg shadow-sm cursor-not-allowed"
+                    className="flex items-center gap-3 px-8 py-4 bg-muted text-muted-foreground rounded-2xl font-semibold text-lg shadow-sm cursor-not-allowed"
                     title="Manager or Supervisor access required"
                   >
                     <Lock size={24} />
@@ -156,13 +156,13 @@ export const RecipesPage = () => {
         </div>
 
         {currentUser?.restaurant_id && (
-          <div className="mb-6 flex items-center gap-3 bg-white/60 backdrop-blur-sm rounded-2xl p-2 border border-slate-200 w-fit shadow-lg">
+          <div className="mb-6 flex items-center gap-3 bg-card/60 backdrop-blur-sm rounded-2xl p-2 border border-border w-fit shadow-lg">
             <button
               onClick={() => setViewContext('personal')}
               className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-medium transition-all duration-300 ${
                 viewContext === 'personal'
                   ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg'
-                  : 'text-slate-600 hover:bg-slate-100'
+                  : 'text-muted-foreground hover:bg-muted'
               }`}
             >
               <User size={18} />
@@ -173,7 +173,7 @@ export const RecipesPage = () => {
               className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-medium transition-all duration-300 ${
                 viewContext === 'restaurant'
                   ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg'
-                  : 'text-slate-600 hover:bg-slate-100'
+                  : 'text-muted-foreground hover:bg-muted'
               }`}
             >
               <Building2 size={18} />
@@ -187,9 +187,9 @@ export const RecipesPage = () => {
             <div
               key={recipe.id}
               onClick={() => setSelectedRecipe(recipe)}
-              className="group relative bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg hover:shadow-2xl border border-white/20 p-6 transform hover:-translate-y-2 transition-all duration-300 cursor-pointer overflow-hidden"
+              className="group relative bg-card/70 backdrop-blur-xl rounded-2xl shadow-lg hover:shadow-2xl border border-border p-6 transform hover:-translate-y-2 transition-all duration-300 cursor-pointer overflow-hidden"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-cyan-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-cyan-50/50 dark:from-blue-900/10 dark:to-cyan-900/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
 
               <div className="relative z-10 flex items-center justify-center mb-6">
@@ -223,19 +223,19 @@ export const RecipesPage = () => {
 
               <div className="relative z-10">
                 <div className="flex items-center gap-2 mb-2">
-                  <h3 className="text-xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors">{recipe.name}</h3>
+                  <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">{recipe.name}</h3>
                   {recipe.is_shared ? (
-                    <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-medium rounded-md whitespace-nowrap">
+                    <span className="px-2 py-0.5 bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400 text-xs font-medium rounded-md whitespace-nowrap">
                       Restaurant
                     </span>
                   ) : (
-                    <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-medium rounded-md whitespace-nowrap">
+                    <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-400 text-xs font-medium rounded-md whitespace-nowrap">
                       Personal
                     </span>
                   )}
                 </div>
-                <div className="inline-flex items-center px-3 py-1 bg-gradient-to-r from-slate-100 to-slate-50 rounded-full mb-4">
-                  <p className="text-sm text-slate-600 font-medium">{recipe.category}</p>
+                <div className="inline-flex items-center px-3 py-1 bg-muted rounded-full mb-4">
+                  <p className="text-sm text-muted-foreground font-medium">{recipe.category}</p>
                 </div>
 
                 <div className="flex items-center justify-between">

@@ -74,12 +74,12 @@ export const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-cyan-100 flex items-center justify-center p-4 sm:p-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-cyan-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex items-center justify-center p-4 sm:p-6">
       <div className="relative w-full max-w-5xl">
         <div className="absolute -top-4 -left-4 w-32 h-32 sm:w-64 sm:h-64 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full opacity-20 blur-3xl"></div>
         <div className="absolute -bottom-4 -right-4 w-32 h-32 sm:w-64 sm:h-64 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full opacity-20 blur-3xl"></div>
 
-        <div className="relative bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-8 lg:p-16 flex flex-col lg:flex-row items-center gap-8 lg:gap-16">
+        <div className="relative bg-card rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-8 lg:p-16 flex flex-col lg:flex-row items-center gap-8 lg:gap-16">
           <div className="flex-1 flex flex-col items-center lg:block">
             <div className="relative mb-6 sm:mb-8">
               <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full blur-xl opacity-50"></div>
@@ -89,53 +89,53 @@ export const LoginPage = () => {
             </div>
 
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2 text-center lg:text-left">
-              <span className="text-gray-900">Flow</span>
+              <span className="text-foreground">Flow</span>
               <span className="bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent">Stock</span>
             </h1>
           </div>
 
           <div className="flex-1 w-full">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-6 sm:mb-8 text-center lg:text-left">Welcome Back!</h2>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-6 sm:mb-8 text-center lg:text-left">Welcome Back!</h2>
 
             <form onSubmit={handleLogin} className="space-y-4 sm:space-y-6">
               {connectionError && (
-                <div className="flex items-center gap-2 p-4 bg-yellow-50 border border-yellow-200 rounded-2xl">
-                  <AlertCircle size={20} className="text-yellow-600 flex-shrink-0" />
-                  <p className="text-yellow-700 text-sm">{connectionError}</p>
+                <div className="flex items-center gap-2 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-2xl">
+                  <AlertCircle size={20} className="text-yellow-600 dark:text-yellow-500 flex-shrink-0" />
+                  <p className="text-yellow-700 dark:text-yellow-400 text-sm">{connectionError}</p>
                 </div>
               )}
               {loginError && (
-                <div className="flex items-center gap-2 p-4 bg-red-50 border border-red-200 rounded-2xl">
+                <div className="flex items-center gap-2 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl">
                   <AlertCircle size={20} className="text-red-500 flex-shrink-0" />
-                  <p className="text-red-700 text-sm">{loginError}</p>
+                  <p className="text-red-700 dark:text-red-400 text-sm">{loginError}</p>
                 </div>
               )}
 
               <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
                 <input
                   type="email"
                   placeholder="Email Address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-12 pr-4 py-4 bg-white border-2 border-blue-200 rounded-2xl focus:outline-none focus:border-purple-400 transition-colors text-gray-700 placeholder-gray-400"
+                  className="w-full pl-12 pr-4 py-4 bg-background border-2 border-border rounded-2xl focus:outline-none focus:border-primary transition-colors text-foreground placeholder:text-muted-foreground"
                   required
                   disabled={isLoginLoading}
                 />
               </div>
 
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
                 <input
                   type="password"
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-12 pr-4 py-4 bg-white border-2 border-blue-200 rounded-2xl focus:outline-none focus:border-purple-400 transition-colors text-gray-700 placeholder-gray-400"
+                  className="w-full pl-12 pr-4 py-4 bg-background border-2 border-border rounded-2xl focus:outline-none focus:border-primary transition-colors text-foreground placeholder:text-muted-foreground"
                   required
                   disabled={isLoginLoading}
                 />
-                <Lock className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                <Lock className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
               </div>
 
               <button
@@ -146,12 +146,12 @@ export const LoginPage = () => {
                 {isLoginLoading ? 'Logging in...' : 'Log In'}
               </button>
 
-              <p className="text-center text-gray-600">
+              <p className="text-center text-muted-foreground">
                 Don't have you account?{' '}
                 <button
                   type="button"
                   onClick={() => setShowSignUpModal(true)}
-                  className="text-blue-500 font-semibold hover:underline"
+                  className="text-primary font-semibold hover:underline"
                 >
                   Sign Up
                 </button>
@@ -162,8 +162,8 @@ export const LoginPage = () => {
       </div>
 
       {showSignUpModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-6">
-          <div className="relative bg-white rounded-3xl shadow-2xl p-12 max-w-2xl w-full">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-6">
+          <div className="relative bg-card rounded-3xl shadow-2xl p-12 max-w-2xl w-full">
             <div className="absolute -top-4 -left-4 w-48 h-48 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full opacity-20 blur-3xl"></div>
             <div className="absolute -bottom-4 -right-4 w-48 h-48 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full opacity-20 blur-3xl"></div>
 
@@ -177,51 +177,51 @@ export const LoginPage = () => {
                 </div>
               </div>
 
-              <h2 className="text-3xl font-bold text-gray-900 text-center mb-2">Create Account</h2>
-              <p className="text-center text-gray-600 mb-8">Join FlowStock today!</p>
+              <h2 className="text-3xl font-bold text-foreground text-center mb-2">Create Account</h2>
+              <p className="text-center text-muted-foreground mb-8">Join FlowStock today!</p>
 
               <form onSubmit={handleSignUp} className="space-y-5">
                 {signUpError && (
-                  <div className="flex items-center gap-2 p-4 bg-red-50 border border-red-200 rounded-2xl">
+                  <div className="flex items-center gap-2 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl">
                     <AlertCircle size={20} className="text-red-500 flex-shrink-0" />
-                    <p className="text-red-700 text-sm">{signUpError}</p>
+                    <p className="text-red-700 dark:text-red-400 text-sm">{signUpError}</p>
                   </div>
                 )}
 
                 <div className="relative">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
                   <input
                     type="text"
                     placeholder="Full Name"
                     value={signUpData.name}
                     onChange={(e) => setSignUpData({ ...signUpData, name: e.target.value })}
-                    className="w-full pl-12 pr-4 py-4 bg-white border-2 border-blue-200 rounded-2xl focus:outline-none focus:border-purple-400 transition-colors text-gray-700 placeholder-gray-400"
+                    className="w-full pl-12 pr-4 py-4 bg-background border-2 border-border rounded-2xl focus:outline-none focus:border-primary transition-colors text-foreground placeholder:text-muted-foreground"
                     required
                     disabled={isSignUpLoading}
                   />
                 </div>
 
                 <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
                   <input
                     type="email"
                     placeholder="Email Address"
                     value={signUpData.email}
                     onChange={(e) => setSignUpData({ ...signUpData, email: e.target.value })}
-                    className="w-full pl-12 pr-4 py-4 bg-white border-2 border-blue-200 rounded-2xl focus:outline-none focus:border-purple-400 transition-colors text-gray-700 placeholder-gray-400"
+                    className="w-full pl-12 pr-4 py-4 bg-background border-2 border-border rounded-2xl focus:outline-none focus:border-primary transition-colors text-foreground placeholder:text-muted-foreground"
                     required
                     disabled={isSignUpLoading}
                   />
                 </div>
 
                 <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
                   <input
                     type="password"
                     placeholder="Password (min 6 characters)"
                     value={signUpData.password}
                     onChange={(e) => setSignUpData({ ...signUpData, password: e.target.value })}
-                    className="w-full pl-12 pr-4 py-4 bg-white border-2 border-blue-200 rounded-2xl focus:outline-none focus:border-purple-400 transition-colors text-gray-700 placeholder-gray-400"
+                    className="w-full pl-12 pr-4 py-4 bg-background border-2 border-border rounded-2xl focus:outline-none focus:border-primary transition-colors text-foreground placeholder:text-muted-foreground"
                     required
                     minLength={6}
                     disabled={isSignUpLoading}
@@ -229,25 +229,25 @@ export const LoginPage = () => {
                 </div>
 
                 <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
                   <input
                     type="password"
                     placeholder="Confirm Password"
                     value={signUpData.confirmPassword}
                     onChange={(e) => setSignUpData({ ...signUpData, confirmPassword: e.target.value })}
-                    className="w-full pl-12 pr-4 py-4 bg-white border-2 border-blue-200 rounded-2xl focus:outline-none focus:border-purple-400 transition-colors text-gray-700 placeholder-gray-400"
+                    className="w-full pl-12 pr-4 py-4 bg-background border-2 border-border rounded-2xl focus:outline-none focus:border-primary transition-colors text-foreground placeholder:text-muted-foreground"
                     required
                     minLength={6}
                     disabled={isSignUpLoading}
                   />
-                  <Lock className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                  <Lock className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
                 </div>
 
                 <div className="flex gap-4 pt-2">
                   <button
                     type="button"
                     onClick={() => setShowSignUpModal(false)}
-                    className="flex-1 py-4 border-2 border-gray-300 text-gray-700 rounded-2xl font-semibold text-lg hover:bg-gray-50 transition-colors"
+                    className="flex-1 py-4 border-2 border-border text-foreground rounded-2xl font-semibold text-lg hover:bg-muted transition-colors"
                   >
                     Cancel
                   </button>
@@ -261,12 +261,12 @@ export const LoginPage = () => {
                 </div>
               </form>
 
-              <p className="text-center text-gray-600 mt-6">
+              <p className="text-center text-muted-foreground mt-6">
                 Already have an account?{' '}
                 <button
                   type="button"
                   onClick={() => setShowSignUpModal(false)}
-                  className="text-blue-500 font-semibold hover:underline"
+                  className="text-primary font-semibold hover:underline"
                 >
                   Log In
                 </button>

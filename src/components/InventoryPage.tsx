@@ -214,13 +214,13 @@ export const InventoryPage = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 p-4 md:p-8 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-slate-900 dark:to-slate-800 p-4 md:p-8 relative overflow-hidden">
       <div className="absolute top-0 right-0 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl"></div>
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-cyan-400/10 rounded-full blur-3xl"></div>
 
       <div className="max-w-7xl mx-auto relative z-10">
-        <div className="relative bg-white/70 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-cyan-50/50"></div>
+        <div className="relative bg-card/70 backdrop-blur-xl rounded-3xl shadow-2xl border border-border overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-cyan-50/50 dark:from-blue-900/10 dark:to-cyan-900/10"></div>
           <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500 animate-pulse"></div>
 
           <div className="relative z-10 p-4 md:p-6 lg:p-8">
@@ -234,7 +234,7 @@ export const InventoryPage = () => {
                     <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">Inventory Overview</h1>
                     {currentUser?.restaurant_id && <RoleBadge role={restaurantRole} size="sm" />}
                   </div>
-                  <p className="text-sm text-slate-500 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     {permissions.isReadOnly ? 'View ingredients' : 'Manage and track your ingredients'}
                   </p>
                 </div>
@@ -242,14 +242,14 @@ export const InventoryPage = () => {
               <div className="flex items-center gap-3 w-full md:w-auto">
                 <button
                   onClick={() => setCurrentPage('settings')}
-                  className="group p-3 bg-slate-100 hover:bg-slate-200 rounded-2xl transition-all duration-300"
+                  className="group p-3 bg-muted hover:bg-muted/80 rounded-2xl transition-all duration-300"
                   title="Settings"
                 >
-                  <Settings size={20} className="text-slate-600 group-hover:text-blue-600 group-hover:rotate-90 transition-all duration-300" />
+                  <Settings size={20} className="text-muted-foreground group-hover:text-primary group-hover:rotate-90 transition-all duration-300" />
                 </button>
                 <button
                   onClick={() => setCurrentPage('dashboard')}
-                  className="group flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-slate-100 to-slate-50 hover:from-slate-200 hover:to-slate-100 border border-slate-200 text-slate-700 rounded-2xl font-medium shadow-sm hover:shadow-md transition-all duration-300"
+                  className="group flex items-center gap-2 px-6 py-3 bg-muted hover:bg-muted/80 border border-border text-foreground rounded-2xl font-medium shadow-sm hover:shadow-md transition-all duration-300"
                 >
                   <Home size={20} className="group-hover:-translate-x-0.5 transition-transform" />
                   Home
@@ -258,13 +258,13 @@ export const InventoryPage = () => {
             </div>
 
             {currentUser?.restaurant_id && (
-              <div className="mb-6 flex items-center gap-3 bg-white/60 backdrop-blur-sm rounded-2xl p-2 border border-slate-200 w-fit">
+              <div className="mb-6 flex items-center gap-3 bg-card/60 backdrop-blur-sm rounded-2xl p-2 border border-border w-fit">
                 <button
                   onClick={() => setViewContext('personal')}
                   className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-medium transition-all duration-300 ${
                     viewContext === 'personal'
                       ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg'
-                      : 'text-slate-600 hover:bg-slate-100'
+                      : 'text-muted-foreground hover:bg-muted'
                   }`}
                 >
                   <User size={18} />
@@ -275,7 +275,7 @@ export const InventoryPage = () => {
                   className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-medium transition-all duration-300 ${
                     viewContext === 'restaurant'
                       ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg'
-                      : 'text-slate-600 hover:bg-slate-100'
+                      : 'text-muted-foreground hover:bg-muted'
                   }`}
                 >
                   <Building2 size={18} />
@@ -286,13 +286,13 @@ export const InventoryPage = () => {
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 md:gap-4 mb-6 md:mb-8">
               <div className="flex-1 relative group">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={20} />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={20} />
                 <input
                   type="text"
                   placeholder="Search ingredients..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3.5 bg-white/80 backdrop-blur-sm border-2 border-slate-200 rounded-2xl focus:outline-none focus:border-blue-400 focus:bg-white shadow-sm hover:shadow-md transition-all duration-300"
+                  className="w-full pl-12 pr-4 py-3.5 bg-card/80 backdrop-blur-sm border-2 border-border rounded-2xl focus:outline-none focus:border-primary text-foreground placeholder:text-muted-foreground shadow-sm hover:shadow-md transition-all duration-300"
                 />
               </div>
 
@@ -301,7 +301,7 @@ export const InventoryPage = () => {
                 className={`px-6 py-3.5 rounded-2xl font-medium transition-all duration-300 shadow-sm hover:shadow-md ${
                   filterStatus === 'In Stock'
                     ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-green-500/30'
-                    : 'bg-white/80 backdrop-blur-sm border-2 border-slate-200 text-slate-700 hover:border-green-400'
+                    : 'bg-card/80 backdrop-blur-sm border-2 border-border text-foreground hover:border-green-400'
                 }`}
               >
                 In Stock
@@ -312,7 +312,7 @@ export const InventoryPage = () => {
                 className={`px-6 py-3.5 rounded-2xl font-medium transition-all duration-300 shadow-sm hover:shadow-md ${
                   filterStatus === 'Low Stock'
                     ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-orange-500/30'
-                    : 'bg-white/80 backdrop-blur-sm border-2 border-slate-200 text-slate-700 hover:border-orange-400'
+                    : 'bg-card/80 backdrop-blur-sm border-2 border-border text-foreground hover:border-orange-400'
                 }`}
               >
                 Low Stock
@@ -330,7 +330,7 @@ export const InventoryPage = () => {
                 <div className="group relative">
                   <button
                     disabled
-                    className="flex items-center gap-2 px-6 py-3.5 bg-slate-200 text-slate-400 rounded-2xl font-medium shadow-sm cursor-not-allowed"
+                    className="flex items-center gap-2 px-6 py-3.5 bg-muted text-muted-foreground rounded-2xl font-medium shadow-sm cursor-not-allowed"
                     title="Manager or Supervisor access required"
                   >
                     <Lock size={20} />
@@ -341,56 +341,56 @@ export const InventoryPage = () => {
             </div>
 
             <div className="relative bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500 rounded-t-2xl p-0.5">
-              <div className="bg-white/90 backdrop-blur-sm rounded-t-2xl">
+              <div className="bg-card/90 backdrop-blur-sm rounded-t-2xl">
                 <div className="h-3 bg-gradient-to-r from-blue-400/20 via-cyan-400/20 to-blue-400/20"></div>
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-b-2xl overflow-hidden shadow-inner">
+            <div className="bg-muted/50 rounded-b-2xl overflow-hidden shadow-inner">
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[800px]">
                 <thead>
-                  <tr className="bg-gradient-to-r from-slate-100 to-slate-50 border-b-2 border-slate-200">
-                    <th className="text-left px-6 py-4 font-bold text-slate-800">Item Name</th>
-                    <th className="text-left px-6 py-4 font-bold text-slate-800">Quantity</th>
-                    <th className="text-left px-6 py-4 font-bold text-slate-800">Unit</th>
-                    <th className="text-left px-6 py-4 font-bold text-slate-800">Price</th>
-                    <th className="text-left px-6 py-4 font-bold text-slate-800">Minimum Stock</th>
-                    <th className="text-left px-6 py-4 font-bold text-slate-800">Status</th>
-                    <th className="text-left px-6 py-4 font-bold text-slate-800">Actions</th>
+                  <tr className="bg-muted border-b-2 border-border">
+                    <th className="text-left px-6 py-4 font-bold text-foreground">Item Name</th>
+                    <th className="text-left px-6 py-4 font-bold text-foreground">Quantity</th>
+                    <th className="text-left px-6 py-4 font-bold text-foreground">Unit</th>
+                    <th className="text-left px-6 py-4 font-bold text-foreground">Price</th>
+                    <th className="text-left px-6 py-4 font-bold text-foreground">Minimum Stock</th>
+                    <th className="text-left px-6 py-4 font-bold text-foreground">Status</th>
+                    <th className="text-left px-6 py-4 font-bold text-foreground">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredIngredients.map((ingredient) => {
                     const status = getStatus(ingredient);
                     return (
-                      <tr key={ingredient.id} className="group bg-white/50 backdrop-blur-sm border-b border-slate-200 hover:bg-white hover:shadow-md transition-all duration-300">
+                      <tr key={ingredient.id} className="group bg-card/50 backdrop-blur-sm border-b border-border hover:bg-card hover:shadow-md transition-all duration-300">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-2">
-                            <span className="font-semibold text-slate-900">{ingredient.name}</span>
+                            <span className="font-semibold text-foreground">{ingredient.name}</span>
                             {ingredient.is_shared ? (
-                              <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-medium rounded-md whitespace-nowrap">
+                              <span className="px-2 py-0.5 bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400 text-xs font-medium rounded-md whitespace-nowrap">
                                 Restaurant
                               </span>
                             ) : (
-                              <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-medium rounded-md whitespace-nowrap">
+                              <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-400 text-xs font-medium rounded-md whitespace-nowrap">
                                 Personal
                               </span>
                             )}
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-slate-700 font-medium">{ingredient.quantity}</td>
-                        <td className="px-6 py-4 text-slate-600">{ingredient.unit}</td>
+                        <td className="px-6 py-4 text-foreground font-medium">{ingredient.quantity}</td>
+                        <td className="px-6 py-4 text-muted-foreground">{ingredient.unit}</td>
                         <td className="px-6 py-4">
                           {ingredient.price_per_unit > 0 ? (
-                            <span className="text-blue-600 font-semibold">
+                            <span className="text-blue-600 dark:text-blue-400 font-semibold">
                               {formatPrice(ingredient.price_per_unit, ingredient.unit)}
                             </span>
                           ) : (
                             <span className="text-orange-500 text-sm">⚠️ No price</span>
                           )}
                         </td>
-                        <td className="px-6 py-4 text-slate-700 font-medium">{ingredient.minimum_stock}</td>
+                        <td className="px-6 py-4 text-foreground font-medium">{ingredient.minimum_stock}</td>
                         <td className="px-6 py-4">
                           <span className={`inline-flex items-center gap-1.5 px-4 py-1.5 ${status.color} text-white rounded-full text-sm font-semibold whitespace-nowrap shadow-md`}>
                             <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
@@ -400,7 +400,7 @@ export const InventoryPage = () => {
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-2">
                             {permissions.isReadOnly ? (
-                              <div className="flex items-center gap-2 text-slate-400">
+                              <div className="flex items-center gap-2 text-muted-foreground">
                                 <Eye size={16} />
                                 <span className="text-xs font-medium">View Only</span>
                               </div>
@@ -448,26 +448,26 @@ export const InventoryPage = () => {
 
       {showIncreaseModal && selectedIngredient && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-6">
-          <div className="relative bg-white/95 backdrop-blur-xl rounded-3xl p-8 max-w-md w-full shadow-2xl border border-white/20 overflow-hidden">
+          <div className="relative bg-card/95 backdrop-blur-xl rounded-3xl p-8 max-w-md w-full shadow-2xl border border-border overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500"></div>
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-transparent to-cyan-50/30 pointer-events-none"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-transparent to-cyan-50/30 dark:from-blue-900/10 dark:to-cyan-900/10 pointer-events-none"></div>
             <div className="relative z-10">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Increase Quantity</h2>
-            <p className="text-gray-600 mb-6">{selectedIngredient.name}</p>
+            <h2 className="text-2xl font-bold text-foreground mb-2">Increase Quantity</h2>
+            <p className="text-muted-foreground mb-6">{selectedIngredient.name}</p>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Amount to Add</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Amount to Add</label>
                 <input
                   type="number"
                   min="0"
                   value={quantityChange}
                   onChange={(e) => setQuantityChange(Number(e.target.value))}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-400"
+                  className="w-full px-4 py-3 border-2 border-border bg-background text-foreground rounded-xl focus:outline-none focus:border-primary"
                   placeholder="Enter quantity"
                 />
               </div>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-muted-foreground">
                 Current: {selectedIngredient.quantity} {selectedIngredient.unit}
               </p>
             </div>
@@ -475,7 +475,7 @@ export const InventoryPage = () => {
               <div className="flex gap-4 mt-6">
                 <button
                   onClick={() => setShowIncreaseModal(false)}
-                  className="flex-1 px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium shadow-sm hover:shadow-md transition-all duration-300"
+                  className="flex-1 px-6 py-3 bg-muted hover:bg-muted/80 text-foreground rounded-xl font-medium shadow-sm hover:shadow-md transition-all duration-300"
                 >
                   Cancel
                 </button>
