@@ -208,11 +208,11 @@ export function Dashboard() {
   return (
     <AppLayout>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-        <div className="p-4 sm:p-6 lg:p-8">
+        <div className="p-3 sm:p-4 md:p-6 lg:p-8">
           {/* Header */}
-          <header className="mb-6 md:mb-8">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground">Dashboard</h1>
-            <p className="text-sm sm:text-base text-muted-foreground mt-1">
+          <header className="mb-4 md:mb-8">
+            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-foreground">Dashboard</h1>
+            <p className="text-xs sm:text-sm md:text-base text-muted-foreground mt-1">
               Welcome back, {currentUser?.name || 'User'}!
               {restaurantInfo && (
                 <span className="ml-2 text-xs sm:text-sm">
@@ -223,7 +223,7 @@ export function Dashboard() {
           </header>
 
           {/* Stats Grid - First Row */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 md:gap-6 mb-3 sm:mb-4">
             {/* Total Ingredients Card */}
             <button 
               onClick={() => setCurrentPage('inventory')}
