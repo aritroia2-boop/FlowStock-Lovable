@@ -124,7 +124,7 @@ export const AuditLogPage = () => {
                   <th className="text-left px-6 py-4 font-bold text-foreground">Operation</th>
                   <th className="text-left px-6 py-4 font-bold text-foreground">Amount</th>
                   <th className="text-left px-6 py-4 font-bold text-foreground">User</th>
-                  <th className="text-left px-6 py-4 font-bold text-foreground">Timestamp</th>
+                  <th className="text-left px-6 py-4 font-bold text-foreground">Date</th>
                 </tr>
               </thead>
               <tbody>
