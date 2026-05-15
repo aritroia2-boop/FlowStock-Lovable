@@ -6,6 +6,7 @@ import { RecipeDetailsModal } from './RecipeDetailsModal';
 import { compareQuantities } from '../lib/unitConverter';
 import { usePermissions } from '../hooks/usePermissions';
 import { RoleBadge } from './RoleBadge';
+import { formatMoney } from '../lib/currency';
 
 import { useSubscriptionGuard } from '../hooks/useSubscriptionGuard';
 
@@ -240,7 +241,7 @@ export const RecipesPage = () => {
 
                 <div className="flex items-center justify-between">
                   <span className="px-6 py-2 bg-gradient-to-r from-blue-500 to-cyan-400 text-white rounded-full font-semibold text-sm shadow-md shadow-blue-500/30 group-hover:shadow-lg group-hover:shadow-blue-500/40 transition-all">
-                    ${recipe.cost.toFixed(2)}
+                    {formatMoney(recipe.cost)}
                   </span>
                   {recipeMissingIngredients[recipe.id] > 0 && (
                     <div className="flex items-center gap-1.5 px-3 py-1 bg-red-100 rounded-full">

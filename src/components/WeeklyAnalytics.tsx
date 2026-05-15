@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { TrendingUp, DollarSign, ChefHat, Loader2 } from 'lucide-react';
+import { TrendingUp, Banknote, ChefHat, Loader2 } from 'lucide-react';
 import { calculateWeeklyAnalytics, type WeeklyAnalytics as WeeklyAnalyticsData } from '../lib/analytics';
 import { useApp } from '../context/AppContext';
+import { formatMoney } from '../lib/currency';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
@@ -100,10 +101,10 @@ export const WeeklyAnalytics = () => {
             {analytics.totalSpending > 0 && (
               <div className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-green-500/10 to-emerald-500/10 dark:from-green-500/20 dark:to-emerald-500/20 rounded-xl border border-green-500/30 shadow-sm">
                 <div className="p-1.5 bg-green-500 rounded-lg">
-                  <DollarSign size={14} className="text-white" />
+                  <Banknote size={14} className="text-white" />
                 </div>
                 <span className="font-bold text-green-600 dark:text-green-400">
-                  Total: {analytics.totalSpending.toFixed(2)} lei
+                  Total: {formatMoney(analytics.totalSpending)}
                 </span>
               </div>
             )}
@@ -211,7 +212,7 @@ export const WeeklyAnalytics = () => {
               <div className="bg-card rounded-[10px] p-4 h-full">
                 <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
                   <div className="p-1.5 bg-green-500 rounded-lg group-hover:animate-icon-pulse">
-                    <DollarSign size={14} className="text-white" />
+                    <Banknote size={14} className="text-white" />
                   </div>
                   Spending Breakdown
                 </h3>
@@ -240,7 +241,7 @@ export const WeeklyAnalytics = () => {
                           <div className="bg-card p-3 rounded-lg shadow-xl border border-border backdrop-blur-xl">
                             <p className="font-semibold text-foreground">{data.fullName}</p>
                             <p className="text-green-500 font-medium">
-                              {data.value.toFixed(2)} lei
+                              {formatMoney(data.value)}
                             </p>
                           </div>
                         );
