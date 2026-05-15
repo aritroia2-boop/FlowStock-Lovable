@@ -1259,7 +1259,7 @@ export const SettingsPage = () => {
                     ) : (
                       <div className="space-y-4">
                         {teams.map((team) => (
-                          <div key={team.id} className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl border border-border overflow-hidden">
+                          <div key={team.id} className="bg-muted/40 rounded-xl border border-border overflow-hidden">
                             <div className="p-4 bg-card/50 border-b border-border">
                               {editingTeamId === team.id ? (
                                 <div className="flex items-center gap-3">
