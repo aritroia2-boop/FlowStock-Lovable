@@ -275,6 +275,10 @@ export const InventoryPage = () => {
               </div>
             )}
 
+            {viewContext === 'personal' && !canUsePersonal ? (
+              <PersonalPaywall feature="Personal" />
+            ) : (
+            <>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 md:gap-4 mb-6 md:mb-8">
               <div className="flex-1 relative group">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={20} />
