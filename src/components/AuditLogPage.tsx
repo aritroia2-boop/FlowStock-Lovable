@@ -37,7 +37,12 @@ export const AuditLogPage = () => {
     const matchesIngredient = !filterIngredient || ingredientName.toLowerCase().includes(filterIngredient.toLowerCase());
     const matchesOperation = filterOperation === 'Operation' || log.operation === filterOperation;
     const matchesUser = !filterUser || log.user_name.toLowerCase().includes(filterUser.toLowerCase());
-    return matchesIngredient && matchesOperation && matchesUser;
+
+    const logTime = new Date(log.created_at).getTime();
+    const matchesFrom = !filterDateFrom || logTime >= new Date(filterDateFrom + 'T00:00:00').getTime();
+    const matchesTo = !filterDateTo || logTime <= new Date(filterDateTo + 'T23:59:59').getTime();
+
+    return matchesIngredient && matchesOperation && matchesUser && matchesFrom && matchesTo;
   });
 
   return (
