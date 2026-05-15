@@ -21,6 +21,7 @@ export interface User {
   is_admin?: boolean;
   subscription_status?: string;
   stripe_customer_id?: string;
+  subscription_source?: 'self' | 'restaurant' | 'none';
 }
 
 export const authService = {
