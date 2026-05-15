@@ -1,11 +1,12 @@
 import { useApp } from '../context/AppContext';
-import { Leaf, BookOpen, AlertTriangle, XCircle, Users, Plus, Minus, Edit3, FileText, TrendingUp, ChefHat, AlertCircle, DollarSign } from 'lucide-react';
+import { Leaf, BookOpen, AlertTriangle, XCircle, Users, Plus, Minus, Edit3, FileText, TrendingUp, ChefHat, AlertCircle, Banknote } from 'lucide-react';
 import { WeeklyAnalytics } from './WeeklyAnalytics';
 import { AppLayout } from './AppLayout';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Tables } from '@/integrations/supabase/types';
 import { compareQuantities } from '@/lib/unitConverter';
+import { formatMoney } from '@/lib/currency';
 
 type AuditLog = Tables<'audit_logs'>;
 type TeamMember = Tables<'team_members'> & {
@@ -86,11 +87,25 @@ export function Dashboard() {
         }
       }
 
-      // Get active team members count
-      const { count: activeUsersCount } = await supabase
-        .from('team_members')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'active');
+      // Get active members of the current user's restaurant only.
+      // Counts everyone (owner + employees) who belongs to the restaurant.
+      // Falls back to 1 (just you) when the user has no restaurant.
+      const { data: { user } } = await supabase.auth.getUser();
+      let activeUsersCount = 1;
+      if (user) {
+        const { data: myProfile } = await supabase
+          .from('profiles')
+          .select('restaurant_id')
+          .eq('id', user.id)
+          .single();
+        if (myProfile?.restaurant_id) {
+          const { count } = await supabase
+            .from('profiles')
+            .select('*', { count: 'exact', head: true })
+            .eq('restaurant_id', myProfile.restaurant_id);
+          activeUsersCount = count ?? 1;
+        }
+      }
 
       // Calculate total inventory value
       const inventoryValue = ingredients?.reduce((sum, i) => 
