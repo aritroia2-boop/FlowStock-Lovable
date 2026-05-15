@@ -5,7 +5,9 @@ import { subscriptionService, SUBSCRIPTION_PRICE_ID, SUBSCRIPTION_PRICE } from '
 import { toast } from 'sonner';
 
 export const PricingPage = () => {
-  const { setCurrentPage, currentUser, isSubscribed, isAdmin, canAccessRestaurantFeatures } = useAppContext();
+  const { setCurrentPage, currentUser, isSubscribed, isAdmin, canAccessRestaurantFeatures, subscriptionSource } = useAppContext();
+  const isOwner = (currentUser?.role || 'owner') === 'owner';
+  const isEmployee = !isOwner;
   const [loading, setLoading] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
 
