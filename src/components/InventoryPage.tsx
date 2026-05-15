@@ -4,7 +4,7 @@ import { ingredientsService, auditLogsService, Ingredient, recipeCostService, in
 import { useApp } from '../context/AppContext';
 import { usePermissions } from '../hooks/usePermissions';
 import { RoleBadge } from './RoleBadge';
-import { formatPrice } from '../lib/unitConverter';
+
 import { AppLayout } from './AppLayout';
 
 import { useSubscriptionGuard } from '../hooks/useSubscriptionGuard';
