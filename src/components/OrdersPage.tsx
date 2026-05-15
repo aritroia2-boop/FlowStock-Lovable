@@ -487,6 +487,7 @@ export function OrdersPage() {
             </div>
           )}
         </div>
+        </>)}
       </div>
 
       {/* Confirmation Modal */}
