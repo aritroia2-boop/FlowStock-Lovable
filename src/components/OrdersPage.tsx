@@ -341,6 +341,9 @@ export function OrdersPage() {
       </div>
 
       <div className="container mx-auto px-6 py-8">
+        {context === 'personal' && !canUsePersonal ? (
+          <PersonalPaywall feature="Personal" />
+        ) : (<>
         {/* Upload Section */}
         <div className="mb-8">
           <div className="bg-card border border-border/40 rounded-xl p-6 backdrop-blur-sm">
