@@ -16,6 +16,8 @@ export const InventoryPage = () => {
   const { restaurantRole, getPermissionsForContext } = usePermissions();
   const canUsePersonal = isAdmin || subscriptionSource === 'self';
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+  const [batches, setBatches] = useState<InventoryBatch[]>([]);
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('All');
   const [viewContext, setViewContext] = useState<'personal' | 'restaurant'>(
