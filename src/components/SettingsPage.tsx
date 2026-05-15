@@ -1447,11 +1447,11 @@ export const SettingsPage = () => {
                   <Building2 size={24} className="text-white" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-blue-900 text-lg mb-2">Employee Account</h3>
-                  <p className="text-blue-800">
+                  <h3 className="font-bold text-blue-900 dark:text-blue-200 text-lg mb-2">Employee Account</h3>
+                  <p className="text-blue-800 dark:text-blue-300">
                     You are currently working as an employee{restaurant && ` at ${restaurant.name}`}.
                   </p>
-                  <p className="text-blue-700 text-sm mt-2">
+                  <p className="text-blue-700 dark:text-blue-400 text-sm mt-2">
                     Restaurant and team management features are only available to restaurant owners.
                   </p>
                 </div>
