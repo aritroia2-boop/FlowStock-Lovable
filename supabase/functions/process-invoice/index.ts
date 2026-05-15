@@ -173,6 +173,34 @@ serve(async (req) => {
       throw new Error(`Failed to sign invoice URL: ${signErr?.message || 'unknown'}`);
     }
 
+    // Fetch file bytes and convert to a base64 data URL with the proper MIME.
+    // Gemini rejects remote .pdf URLs but accepts inline data URLs.
+    const ext = storagePath.split('.').pop()?.toLowerCase() || '';
+    const mimeMap: Record<string, string> = {
+      pdf: 'application/pdf',
+      png: 'image/png',
+      jpg: 'image/jpeg',
+      jpeg: 'image/jpeg',
+      webp: 'image/webp',
+      gif: 'image/gif',
+    };
+    const mime = mimeMap[ext] || 'application/octet-stream';
+
+    const fileRes = await fetch(signed.signedUrl);
+    if (!fileRes.ok) throw new Error(`Failed to download invoice: ${fileRes.status}`);
+    const fileBuf = new Uint8Array(await fileRes.arrayBuffer());
+    const MAX_BYTES = 15 * 1024 * 1024;
+    if (fileBuf.byteLength > MAX_BYTES) {
+      throw new Error(`Invoice file too large (${(fileBuf.byteLength / 1024 / 1024).toFixed(1)}MB). Please upload a file under 15MB.`);
+    }
+    // Encode in chunks to avoid call-stack overflow on large files
+    let binary = '';
+    const CHUNK = 0x8000;
+    for (let i = 0; i < fileBuf.length; i += CHUNK) {
+      binary += String.fromCharCode(...fileBuf.subarray(i, i + CHUNK));
+    }
+    const dataUrl = `data:${mime};base64,${btoa(binary)}`;
+
     // Catalog hint: include attributes for better semantic matching
     const { data: orderRow } = await supabase
       .from('orders')
@@ -202,11 +230,11 @@ serve(async (req) => {
     console.log('Calling fast model...');
     let extracted: any;
     try {
-      extracted = await callAI(lovableApiKey, 'google/gemini-3-flash-preview', signed.signedUrl, catalogHint);
+      extracted = await callAI(lovableApiKey, 'google/gemini-3-flash-preview', dataUrl, catalogHint);
       if (!extracted?.items?.length) throw new Error('flash returned 0 items');
     } catch (flashErr) {
       console.warn('Flash failed, falling back to pro:', flashErr);
-      extracted = await callAI(lovableApiKey, 'google/gemini-2.5-pro', signed.signedUrl, catalogHint);
+      extracted = await callAI(lovableApiKey, 'google/gemini-2.5-pro', dataUrl, catalogHint);
     }
 
     const cleaned = cleanItems(extracted.items || []);
