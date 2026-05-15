@@ -268,11 +268,11 @@ serve(async (req) => {
     console.log('Calling fast model...');
     let extracted: any;
     try {
-      extracted = await callAI(lovableApiKey, 'google/gemini-3-flash-preview', dataUrl, catalogHint);
+      extracted = await callAIWithRetry(lovableApiKey, 'google/gemini-3-flash-preview', dataUrl, catalogHint);
       if (!extracted?.items?.length) throw new Error('flash returned 0 items');
     } catch (flashErr) {
       console.warn('Flash failed, falling back to pro:', flashErr);
-      extracted = await callAI(lovableApiKey, 'google/gemini-2.5-pro', dataUrl, catalogHint);
+      extracted = await callAIWithRetry(lovableApiKey, 'google/gemini-2.5-pro', dataUrl, catalogHint);
     }
 
     const cleaned = cleanItems(extracted.items || []);
