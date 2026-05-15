@@ -178,6 +178,9 @@ export const RecipesPage = () => {
           </div>
         )}
 
+        {viewContext === 'personal' && !canUsePersonal ? (
+          <PersonalPaywall feature="Personal" />
+        ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {recipes.map((recipe) => (
             <div
@@ -251,6 +254,7 @@ export const RecipesPage = () => {
             </div>
           ))}
         </div>
+        )}
       </div>
 
       {showAddModal && (
