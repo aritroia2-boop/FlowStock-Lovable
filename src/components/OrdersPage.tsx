@@ -536,6 +536,23 @@ export function OrdersPage() {
                           </button>
                         )}
 
+                        {order.status === 'error' && (
+                          <button
+                            onClick={() => handleProcessInvoice(order, true)}
+                            disabled={processingId === order.id}
+                            className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium flex items-center gap-2"
+                          >
+                            {processingId === order.id ? (
+                              <Loader2 size={16} className="animate-spin" />
+                            ) : (
+                              <>
+                                <RefreshCw size={14} />
+                                Retry
+                              </>
+                            )}
+                          </button>
+                        )}
+
                         {order.status === 'processed' && (
                           <button
                             onClick={() => handleViewDetails(order)}
