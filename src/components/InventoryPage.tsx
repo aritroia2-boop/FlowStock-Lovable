@@ -378,21 +378,46 @@ export const InventoryPage = () => {
               </div>
             </div>
 
-            {/* Mobile card list */}
-            <div className="md:hidden space-y-3 mt-2">
+            {/* Grouped product list with expandable batches (FIFO order) */}
+            <div className="space-y-3 mt-2">
               {filteredIngredients.length === 0 && (
                 <div className="text-center text-sm text-muted-foreground py-10">
                   No ingredients found.
                 </div>
               )}
               {filteredIngredients.map((ingredient) => {
-                const status = getStatus(ingredient);
+                const ingBatches = batchesFor(ingredient.id);
+                const totalQty = totalRemaining(ingredient.id);
+                const computedStatus = totalQty >= ingredient.minimum_stock
+                  ? { text: 'In Stock', color: 'bg-green-500' }
+                  : { text: 'Low Stock', color: 'bg-orange-500' };
+                const isOpen = expanded.has(ingredient.id);
+                const firstActiveBatchId = ingBatches.find(b => Number(b.remaining_quantity) > 0)?.id;
+
                 return (
-                  <div key={ingredient.id} className="bg-card/80 backdrop-blur-sm border border-border rounded-2xl p-4 shadow-sm">
-                    <div className="flex items-start justify-between gap-2">
+                  <div key={ingredient.id} className="bg-card/80 backdrop-blur-sm border border-border rounded-2xl shadow-sm overflow-hidden">
+                    {/* Product header row */}
+                    <div className="flex items-center gap-3 p-4">
+                      <button
+                        onClick={() => toggleExpanded(ingredient.id)}
+                        className="p-1.5 rounded-lg hover:bg-muted transition-colors shrink-0"
+                        aria-label={isOpen ? 'Collapse' : 'Expand'}
+                      >
+                        {isOpen ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+                      </button>
+
+                      <div className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 p-2 rounded-xl shrink-0">
+                        <Package size={20} className="text-blue-600 dark:text-blue-400" />
+                      </div>
+
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
                           <h3 className="font-semibold text-foreground truncate">{ingredient.name}</h3>
+                          {ingredient.category && (
+                            <span className="px-2 py-0.5 bg-muted text-muted-foreground text-[10px] font-medium rounded-md">
+                              {ingredient.category}
+                            </span>
+                          )}
                           {ingredient.is_shared ? (
                             <span className="px-2 py-0.5 bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400 text-[10px] font-medium rounded-md">
                               Restaurant
@@ -403,154 +428,154 @@ export const InventoryPage = () => {
                             </span>
                           )}
                         </div>
-                        <div className="flex items-baseline gap-1 mt-1">
-                          <span className="text-2xl font-bold text-foreground">{ingredient.quantity}</span>
-                          <span className="text-sm text-muted-foreground">{ingredient.unit}</span>
-                        </div>
-                        <div className="text-xs text-muted-foreground mt-1">
-                          Min: {ingredient.minimum_stock} {ingredient.unit}
-                          {ingredient.price_per_unit > 0 && (
-                            <span className="ml-2 text-blue-600 dark:text-blue-400 font-medium">
-                              {formatPrice(ingredient.price_per_unit, ingredient.unit)}
-                            </span>
-                          )}
+                        <div className="text-xs text-muted-foreground mt-0.5">
+                          {ingBatches.length} batch{ingBatches.length === 1 ? '' : 'es'} · Min: {ingredient.minimum_stock} {ingredient.unit}
                         </div>
                       </div>
-                      <span className={`shrink-0 inline-flex items-center gap-1 px-2.5 py-1 ${status.color} text-white rounded-full text-[10px] font-semibold shadow`}>
-                        <span className="w-1 h-1 bg-white rounded-full animate-pulse"></span>
-                        {status.text}
-                      </span>
+
+                      <div className="text-right shrink-0">
+                        <div className="text-xl md:text-2xl font-bold text-foreground tabular-nums">
+                          {totalQty} <span className="text-sm font-normal text-muted-foreground">{ingredient.unit}</span>
+                        </div>
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 ${computedStatus.color} text-white rounded-full text-[10px] font-semibold mt-1`}>
+                          <span className="w-1 h-1 bg-white rounded-full animate-pulse"></span>
+                          {computedStatus.text}
+                        </span>
+                      </div>
+
+                      {!permissions.isReadOnly && permissions.canEditIngredients && (
+                        <div className="hidden md:flex items-center gap-1.5 shrink-0 ml-2">
+                          <button
+                            onClick={() => openIncreaseModal(ingredient)}
+                            className="p-2 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-500/20 transition"
+                            title="Add stock (new batch)"
+                          >
+                            <Plus size={16} />
+                          </button>
+                          <button
+                            onClick={() => openDecreaseModal(ingredient)}
+                            className="p-2 bg-red-500/10 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-500/20 transition"
+                            title="Use (FIFO)"
+                          >
+                            <Minus size={16} />
+                          </button>
+                          <button
+                            onClick={() => openEditModal(ingredient)}
+                            className="p-2 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 rounded-lg hover:bg-cyan-500/20 transition"
+                            title="Edit product"
+                          >
+                            <Edit2 size={16} />
+                          </button>
+                        </div>
+                      )}
                     </div>
 
+                    {/* Mobile actions */}
                     {!permissions.isReadOnly && permissions.canEditIngredients && (
-                      <div className="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-border">
+                      <div className="md:hidden grid grid-cols-3 gap-2 px-4 pb-3">
                         <button
                           onClick={() => openIncreaseModal(ingredient)}
-                          className="flex items-center justify-center gap-1 py-2.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-xl text-sm font-medium active:scale-95 transition-transform"
+                          className="flex items-center justify-center gap-1 py-2 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-xl text-xs font-medium"
                         >
-                          <Plus size={16} /> Add
+                          <Plus size={14} /> Add
                         </button>
                         <button
                           onClick={() => openDecreaseModal(ingredient)}
-                          className="flex items-center justify-center gap-1 py-2.5 bg-red-500/10 text-red-600 dark:text-red-400 rounded-xl text-sm font-medium active:scale-95 transition-transform"
+                          className="flex items-center justify-center gap-1 py-2 bg-red-500/10 text-red-600 dark:text-red-400 rounded-xl text-xs font-medium"
                         >
-                          <Minus size={16} /> Use
+                          <Minus size={14} /> Use
                         </button>
                         <button
                           onClick={() => openEditModal(ingredient)}
-                          className="flex items-center justify-center gap-1 py-2.5 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 rounded-xl text-sm font-medium active:scale-95 transition-transform"
+                          className="flex items-center justify-center gap-1 py-2 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 rounded-xl text-xs font-medium"
                         >
-                          <Edit2 size={16} /> Edit
+                          <Edit2 size={14} /> Edit
                         </button>
                       </div>
                     )}
                     {permissions.isReadOnly && (
-                      <div className="flex items-center gap-2 text-muted-foreground mt-3 pt-3 border-t border-border">
+                      <div className="flex items-center gap-2 text-muted-foreground px-4 pb-3 md:hidden">
                         <Eye size={14} />
                         <span className="text-xs font-medium">View Only</span>
+                      </div>
+                    )}
+
+                    {/* Expanded batches */}
+                    {isOpen && (
+                      <div className="border-t border-border bg-muted/30 px-4 py-3 space-y-2">
+                        {ingBatches.length === 0 ? (
+                          <div className="text-center text-xs text-muted-foreground py-4">
+                            No batches yet. Stock will appear here once invoices are confirmed or stock is added.
+                          </div>
+                        ) : (
+                          ingBatches.map((batch) => {
+                            const attrs = (batch.attributes || {}) as Record<string, any>;
+                            const attrEntries = Object.entries(attrs).filter(([, v]) => v !== null && v !== '' && v !== undefined);
+                            const purchased = Number(batch.quantity || 0);
+                            const remaining = Number(batch.remaining_quantity || 0);
+                            const pct = purchased > 0 ? Math.max(0, Math.min(100, (remaining / purchased) * 100)) : 0;
+                            const isDepleted = remaining <= 0;
+                            const isNext = batch.id === firstActiveBatchId;
+                            const date = new Date(batch.received_at).toLocaleDateString();
+
+                            return (
+                              <div
+                                key={batch.id}
+                                className={`bg-card border border-border rounded-xl p-3 ${isDepleted ? 'opacity-60' : ''}`}
+                              >
+                                <div className="flex items-start justify-between gap-3 flex-wrap">
+                                  <div className="min-w-0 flex-1">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                      {isNext && (
+                                        <span className="px-2 py-0.5 bg-amber-500/15 text-amber-700 dark:text-amber-400 text-[10px] font-semibold rounded-md uppercase tracking-wide">
+                                          Next to use
+                                        </span>
+                                      )}
+                                      {isDepleted && (
+                                        <span className="px-2 py-0.5 bg-muted text-muted-foreground text-[10px] font-semibold rounded-md uppercase tracking-wide">
+                                          Depleted
+                                        </span>
+                                      )}
+                                      {attrEntries.length > 0 ? (
+                                        attrEntries.map(([k, v]) => (
+                                          <span key={k} className="px-2 py-0.5 bg-blue-500/10 text-blue-700 dark:text-blue-300 text-[10px] font-medium rounded-md">
+                                            {k.replace(/_/g, ' ')}: {String(v)}
+                                          </span>
+                                        ))
+                                      ) : (
+                                        <span className="text-[10px] text-muted-foreground">No attributes</span>
+                                      )}
+                                    </div>
+                                    <div className="text-xs text-muted-foreground mt-1.5">
+                                      {batch.supplier ? `${batch.supplier} · ` : ''}{date}
+                                    </div>
+                                  </div>
+
+                                  <div className="text-right shrink-0">
+                                    <div className="text-sm font-semibold text-foreground tabular-nums">
+                                      {remaining} / {purchased} {batch.unit}
+                                    </div>
+                                    <div className="text-xs text-blue-600 dark:text-blue-400 font-medium tabular-nums">
+                                      {Number(batch.purchase_price).toFixed(2)} {batch.currency || 'RON'}/{batch.unit}
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="mt-2 h-1.5 bg-muted rounded-full overflow-hidden">
+                                  <div
+                                    className={`h-full transition-all ${isDepleted ? 'bg-muted-foreground/30' : 'bg-gradient-to-r from-blue-500 to-cyan-400'}`}
+                                    style={{ width: `${pct}%` }}
+                                  />
+                                </div>
+                              </div>
+                            );
+                          })
+                        )}
                       </div>
                     )}
                   </div>
                 );
               })}
-            </div>
-
-            {/* Desktop table */}
-            <div className="hidden md:block bg-muted/50 rounded-b-2xl overflow-hidden shadow-inner">
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[800px]">
-                <thead>
-                  <tr className="bg-muted border-b-2 border-border">
-                    <th className="text-left px-6 py-4 font-bold text-foreground">Item Name</th>
-                    <th className="text-left px-6 py-4 font-bold text-foreground">Quantity</th>
-                    <th className="text-left px-6 py-4 font-bold text-foreground">Unit</th>
-                    <th className="text-left px-6 py-4 font-bold text-foreground">Price</th>
-                    <th className="text-left px-6 py-4 font-bold text-foreground">Minimum Stock</th>
-                    <th className="text-left px-6 py-4 font-bold text-foreground">Status</th>
-                    <th className="text-left px-6 py-4 font-bold text-foreground">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredIngredients.map((ingredient) => {
-                    const status = getStatus(ingredient);
-                    return (
-                      <tr key={ingredient.id} className="group bg-card/50 backdrop-blur-sm border-b border-border hover:bg-card hover:shadow-md transition-all duration-300">
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold text-foreground">{ingredient.name}</span>
-                            {ingredient.is_shared ? (
-                              <span className="px-2 py-0.5 bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400 text-xs font-medium rounded-md whitespace-nowrap">
-                                Restaurant
-                              </span>
-                            ) : (
-                              <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-400 text-xs font-medium rounded-md whitespace-nowrap">
-                                Personal
-                              </span>
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 text-foreground font-medium">{ingredient.quantity}</td>
-                        <td className="px-6 py-4 text-muted-foreground">{ingredient.unit}</td>
-                        <td className="px-6 py-4">
-                          {ingredient.price_per_unit > 0 ? (
-                            <span className="text-blue-600 dark:text-blue-400 font-semibold">
-                              {formatPrice(ingredient.price_per_unit, ingredient.unit)}
-                            </span>
-                          ) : (
-                            <span className="text-orange-500 text-sm">⚠️ No price</span>
-                          )}
-                        </td>
-                        <td className="px-6 py-4 text-foreground font-medium">{ingredient.minimum_stock}</td>
-                        <td className="px-6 py-4">
-                          <span className={`inline-flex items-center gap-1.5 px-4 py-1.5 ${status.color} text-white rounded-full text-sm font-semibold whitespace-nowrap shadow-md`}>
-                            <span className="w-1.5 h-1.5 bg-card rounded-full animate-pulse"></span>
-                            {status.text}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-2">
-                            {permissions.isReadOnly ? (
-                              <div className="flex items-center gap-2 text-muted-foreground">
-                                <Eye size={16} />
-                                <span className="text-xs font-medium">View Only</span>
-                              </div>
-                            ) : (
-                              <>
-                                {permissions.canEditIngredients && (
-                                  <>
-                                    <button
-                                      onClick={() => openIncreaseModal(ingredient)}
-                                      className="group/btn p-2.5 bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110"
-                                      title="Increase quantity"
-                                    >
-                                      <Plus size={16} className="group-hover/btn:rotate-90 transition-transform" />
-                                    </button>
-                                    <button
-                                      onClick={() => openDecreaseModal(ingredient)}
-                                      className="group/btn p-2.5 bg-gradient-to-br from-red-500 to-red-600 text-white rounded-xl hover:from-red-600 hover:to-red-700 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110"
-                                      title="Use"
-                                    >
-                                      <Minus size={16} className="group-hover/btn:rotate-90 transition-transform" />
-                                    </button>
-                                    <button
-                                      onClick={() => openEditModal(ingredient)}
-                                      className="group/btn p-2.5 bg-gradient-to-br from-cyan-500 to-cyan-600 text-white rounded-xl hover:from-cyan-600 hover:to-cyan-700 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110"
-                                      title="Edit ingredient"
-                                    >
-                                      <Edit2 size={16} className="group-hover/btn:rotate-12 transition-transform" />
-                                    </button>
-                                  </>
-                                )}
-                              </>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-              </div>
             </div>
             </>
             )}
