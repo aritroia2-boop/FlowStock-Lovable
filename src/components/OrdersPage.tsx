@@ -120,7 +120,7 @@ export function OrdersPage() {
     }
   };
 
-  const handleProcessInvoice = async (order: Order) => {
+  const handleProcessInvoice = async (order: Order, isRetry = false) => {
     if (!currentUser) return;
 
     // Feature gate check
@@ -132,19 +132,29 @@ export function OrdersPage() {
 
     try {
       setProcessingId(order.id);
-      toast.info('Processing invoice... This may take a moment');
+      if (isRetry) {
+        // Reset row state so the UI reflects "processing" immediately
+        await ordersService.update(order.id, { status: 'pending', error_message: null as any });
+      }
+      toast.info(isRetry ? 'Retrying invoice...' : 'Processing invoice... This may take a moment');
 
-      const { error } = await supabase.functions.invoke('process-invoice', {
+      const { data, error } = await supabase.functions.invoke('process-invoice', {
         body: { fileUrl: order.file_url, orderId: order.id }
       });
 
       if (error) throw error;
+      if (data && data.success === false) {
+        throw new Error(data.error || 'Processing failed');
+      }
 
       toast.success('Invoice processed successfully');
       loadOrders();
     } catch (error) {
       console.error('Error processing invoice:', error);
-      toast.error('Failed to process invoice');
+      const msg = error instanceof Error ? error.message : 'Failed to process invoice';
+      // Trim very long provider error JSON for the toast
+      toast.error(msg.length > 200 ? msg.slice(0, 200) + '…' : msg);
+      loadOrders();
     } finally {
       setProcessingId(null);
     }
