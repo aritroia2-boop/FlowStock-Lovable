@@ -623,6 +623,46 @@ export function OrdersPage() {
                             </div>
                           </div>
 
+                          {/* Attribute chips */}
+                          {(item as any).attributes && Object.keys((item as any).attributes).length > 0 && (
+                            <div className="flex flex-wrap gap-1.5 mb-3">
+                              {Object.entries((item as any).attributes as Record<string, any>).map(([k, v]) => (
+                                <span key={k} className="px-2 py-0.5 text-[11px] font-mono rounded bg-primary/10 text-primary border border-primary/20">
+                                  {k}: {String(v)}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+
+                          {/* Invoice price vs standard price */}
+                          {(() => {
+                            const invoicePrice = (item as any).invoice_unit_price ?? item.price_per_unit ?? 0;
+                            const standardPrice = item.matchedIngredient?.standard_price ?? item.matchedIngredient?.price_per_unit ?? 0;
+                            const diffPct = standardPrice > 0
+                              ? Math.round(((invoicePrice - standardPrice) / standardPrice) * 100)
+                              : null;
+                            return (
+                              <div className="mb-3 p-2.5 bg-background/60 border border-border/40 rounded-lg text-xs space-y-1">
+                                <div className="flex justify-between">
+                                  <span className="text-muted-foreground">Invoice price</span>
+                                  <span className="font-bold text-foreground">{invoicePrice.toFixed(2)} {(item as any).currency || ''}/{item.unit}</span>
+                                </div>
+                                {item.matchedIngredient && (
+                                  <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Standard price</span>
+                                    <span className="font-medium text-foreground/70">{standardPrice.toFixed(2)}/{item.unit}</span>
+                                  </div>
+                                )}
+                                {diffPct !== null && diffPct !== 0 && (
+                                  <div className={`flex justify-between font-semibold ${diffPct < 0 ? 'text-green-500' : 'text-orange-500'}`}>
+                                    <span>Difference</span>
+                                    <span>{diffPct > 0 ? '+' : ''}{diffPct}%</span>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })()}
+
                           {/* Alternative Matches Warning */}
                           {hasMultipleMatches && (
                             <div className="mb-3 p-2 bg-yellow-500/10 border border-yellow-500/20 rounded text-xs text-yellow-400">
