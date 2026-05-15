@@ -7,17 +7,24 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const SYSTEM_PROMPT = `Extract Romanian invoice data.
-- Supplier: company name from header (e.g. "SC X SRL"), pick the topmost.
-- Items: only real product line items from the table. Skip transport, ambalaj, taxă, discount, livrare, TVA, total, subtotal.
-- Use exact names as written. Each item needs name, quantity, unit, unit_price.
-- Currency: ISO 4217 (lei/RON->RON, €->EUR, $->USD, £->GBP). Default RON if unclear.`;
+const SYSTEM_PROMPT = `You are an invoice extractor for a HoReCa restaurant inventory system.
+Extract ONLY real product line items. Output exactly what is needed for inventory matching.
+
+STRICT RULES:
+- KEEP attribute info inside the product name: fat % ("Lapte 4.5%"), protein %, brand, packaging size, type. NEVER strip these.
+- Also fill the structured "attributes" object: fat_pct (number), protein_pct (number), brand (string), packaging_size (string e.g. "1L", "500g"), type (string e.g. "UHT", "extra virgin").
+- Set "normalized_name" = clean product name without supplier slogans, marketing text, or stock-keeping codes, but WITH attributes preserved.
+- IGNORE / DO NOT EMIT as items: marketing words ("premium", "ofertă", "promoție", "promotion", "best quality", "nou", "calitate superioară"), brand slogans, headers, footers, transport, ambalaj, taxă, discount, livrare, shipping, TVA, total, subtotal, page numbers.
+- ALWAYS extract the actual invoice unit_price (even if discounted). Compute total_price_line = quantity * unit_price when missing.
+- Currency: ISO 4217 (lei/RON->RON, €->EUR, $->USD, £->GBP). Default RON.
+- invoice_date: YYYY-MM-DD if visible, else null.
+- Supplier: company name from the header (e.g. "SC X SRL"), the topmost one.`;
 
 const TOOL = {
   type: 'function',
   function: {
     name: 'extract_invoice_data',
-    description: 'Extract supplier and product line items from invoice',
+    description: 'Extract supplier, date, currency and product line items from an invoice',
     parameters: {
       type: 'object',
       properties: {
@@ -26,18 +33,31 @@ const TOOL = {
           properties: { name: { type: 'string' } },
           required: ['name'],
         },
+        invoice_date: { type: 'string', description: 'YYYY-MM-DD or empty' },
         currency: { type: 'string', description: 'ISO 4217 code, default RON' },
         items: {
           type: 'array',
           items: {
             type: 'object',
             properties: {
-              name: { type: 'string' },
+              product_name_raw: { type: 'string', description: 'Exact text as written on the invoice' },
+              normalized_name: { type: 'string', description: 'Cleaned name with attributes preserved' },
+              attributes: {
+                type: 'object',
+                properties: {
+                  fat_pct: { type: 'number' },
+                  protein_pct: { type: 'number' },
+                  brand: { type: 'string' },
+                  packaging_size: { type: 'string' },
+                  type: { type: 'string' },
+                },
+              },
               quantity: { type: 'number' },
               unit: { type: 'string' },
               unit_price: { type: 'number' },
+              total_price_line: { type: 'number' },
             },
-            required: ['name', 'quantity', 'unit', 'unit_price'],
+            required: ['product_name_raw', 'normalized_name', 'quantity', 'unit', 'unit_price'],
           },
         },
       },
@@ -46,12 +66,15 @@ const TOOL = {
   },
 };
 
-const IRRELEVANT = ['transport', 'ambalaj', 'taxa', 'taxă', 'discount', 'livrare', 'tva', 'total', 'subtotal', 'shipping'];
+const IRRELEVANT = [
+  'transport', 'ambalaj', 'taxa', 'taxă', 'discount', 'livrare', 'tva', 'total', 'subtotal', 'shipping',
+  'premium', 'ofertă', 'oferta', 'promoție', 'promotie', 'promotion', 'best quality', 'calitate superioară',
+];
 
 async function callAI(apiKey: string, model: string, fileUrl: string, catalogHint: string) {
   const userText = catalogHint
-    ? `Extract supplier and items. Existing catalog (reuse these names when they match): ${catalogHint}`
-    : 'Extract supplier and all product items from this invoice.';
+    ? `Extract supplier, invoice_date, currency and items. When a product matches one of these existing catalog entries, set normalized_name to match the catalog name exactly (preserve attributes). Existing catalog: ${catalogHint}`
+    : 'Extract supplier, invoice_date, currency and all product items from this invoice.';
 
   const res = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
     method: 'POST',
@@ -90,13 +113,28 @@ function cleanItems(items: any[]): any[] {
   const out: any[] = [];
   for (const item of items || []) {
     if (!item?.unit_price || !item?.quantity || item.quantity <= 0) continue;
-    const nameLower = String(item.name || '').toLowerCase();
-    if (!nameLower) continue;
-    if (IRRELEVANT.some((k) => nameLower.includes(k))) continue;
-    const key = `${nameLower.trim()}|${item.quantity}`;
+    const rawName = String(item.product_name_raw || item.name || '').trim();
+    const normalized = String(item.normalized_name || rawName).trim();
+    if (!normalized) continue;
+    const lower = normalized.toLowerCase();
+    if (IRRELEVANT.some((k) => lower.includes(k))) continue;
+    const key = `${lower}|${item.quantity}`;
     if (seen.has(key)) continue;
     seen.add(key);
-    out.push(item);
+
+    const total = item.total_price_line && item.total_price_line > 0
+      ? item.total_price_line
+      : Number((item.quantity * item.unit_price).toFixed(2));
+
+    out.push({
+      product_name_raw: rawName || normalized,
+      normalized_name: normalized,
+      attributes: item.attributes || {},
+      quantity: item.quantity,
+      unit: String(item.unit || 'buc').trim(),
+      unit_price: item.unit_price,
+      total_price_line: total,
+    });
   }
   return out;
 }
@@ -123,10 +161,8 @@ serve(async (req) => {
 
     supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Mark processing (don't await — fire and forget for speed)
     supabase.from('orders').update({ status: 'processing' }).eq('id', orderId).then(() => {});
 
-    // Get a signed URL instead of downloading + base64
     const storagePath = fileUrl.split('/order-invoices/')[1];
     if (!storagePath) throw new Error('Invalid fileUrl');
 
@@ -137,7 +173,7 @@ serve(async (req) => {
       throw new Error(`Failed to sign invoice URL: ${signErr?.message || 'unknown'}`);
     }
 
-    // Build catalog hint from order's user/restaurant ingredients
+    // Catalog hint: include attributes for better semantic matching
     const { data: orderRow } = await supabase
       .from('orders')
       .select('user_id, restaurant_id')
@@ -146,17 +182,23 @@ serve(async (req) => {
 
     let catalogHint = '';
     if (orderRow) {
-      const ingQuery = supabase.from('ingredients').select('name').limit(200);
+      const ingQuery = supabase.from('ingredients').select('name, attributes').limit(200);
       if (orderRow.restaurant_id) {
         ingQuery.eq('restaurant_id', orderRow.restaurant_id);
       } else if (orderRow.user_id) {
         ingQuery.eq('owner_id', orderRow.user_id);
       }
       const { data: ings } = await ingQuery;
-      if (ings?.length) catalogHint = ings.map((i: any) => i.name).join(', ');
+      if (ings?.length) {
+        catalogHint = ings.map((i: any) => {
+          const attr = i.attributes && Object.keys(i.attributes).length
+            ? ` [${Object.entries(i.attributes).map(([k, v]) => `${k}:${v}`).join(', ')}]`
+            : '';
+          return `${i.name}${attr}`;
+        }).join('; ');
+      }
     }
 
-    // Try fast model first, fall back to pro if it returns nothing usable
     console.log('Calling fast model...');
     let extracted: any;
     try {
@@ -176,31 +218,42 @@ serve(async (req) => {
     const currency = aliasMap[rawCur] || (KNOWN.has(rawCur) ? rawCur : 'RON');
 
     const supplierName = extracted.supplier?.name || 'Unknown Supplier';
+    const invoiceDate = (() => {
+      const d = String(extracted.invoice_date || '').trim();
+      return /^\d{4}-\d{2}-\d{2}$/.test(d) ? d : null;
+    })();
 
     const orderItems = cleaned.map((item: any) => ({
       order_id: orderId,
-      ingredient_name: item.name,
+      ingredient_name: item.normalized_name,
+      normalized_name: item.normalized_name,
+      attributes: item.attributes || {},
       quantity: item.quantity,
       unit: item.unit,
       price_per_unit: item.unit_price || 0,
+      invoice_unit_price: item.unit_price || 0,
+      total_price_line: item.total_price_line,
       currency,
       needs_confirmation: true,
       is_new_ingredient: false,
     }));
 
-    // Parallel writes
-    const [updateRes, insertRes] = await Promise.all([
-      supabase.from('orders').update({
-        status: 'processed',
-        supplier: supplierName,
+    const orderUpdate: any = {
+      status: 'processed',
+      supplier: supplierName,
+      currency,
+      extracted_data: {
+        supplier: extracted.supplier,
+        invoice_date: invoiceDate,
         currency,
-        extracted_data: {
-          supplier: extracted.supplier,
-          currency,
-          items: cleaned,
-          extracted_at: new Date().toISOString(),
-        },
-      }).eq('id', orderId),
+        items: cleaned,
+        extracted_at: new Date().toISOString(),
+      },
+    };
+    if (invoiceDate) orderUpdate.invoice_date = invoiceDate;
+
+    const [updateRes, insertRes] = await Promise.all([
+      supabase.from('orders').update(orderUpdate).eq('id', orderId),
       supabase.from('order_items').insert(orderItems),
     ]);
 
