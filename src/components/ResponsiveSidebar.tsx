@@ -65,19 +65,7 @@ export const ResponsiveSidebar = () => {
         <SidebarContent />
       </aside>
 
-      {/* Mobile Drawer */}
-      <Sheet open={open} onOpenChange={setOpen}>
-        <SheetTrigger asChild>
-          <Button variant="ghost" size="icon" className="md:hidden fixed top-4 left-4 z-50">
-            <Menu size={24} />
-          </Button>
-        </SheetTrigger>
-        <SheetContent side="left" className="w-64 p-0">
-          <div className="flex flex-col h-full">
-            <SidebarContent />
-          </div>
-        </SheetContent>
-      </Sheet>
+      {/* Mobile drawer is rendered by MobileTopBar */}
     </>
   );
 };
