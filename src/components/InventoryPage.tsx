@@ -159,6 +159,19 @@ export const InventoryPage = () => {
   const handleIncreaseQuantity = async () => {
     if (!selectedIngredient || quantityChange <= 0) return;
     try {
+      // Manual stock-in creates a batch using the ingredient's standard price
+      await inventoryBatchesService.create({
+        ingredient_id: selectedIngredient.id,
+        quantity: quantityChange,
+        remaining_quantity: quantityChange,
+        unit: selectedIngredient.unit,
+        purchase_price: (selectedIngredient as any).standard_price || selectedIngredient.price_per_unit || 0,
+        currency: 'RON',
+        owner_id: currentUser?.id,
+        restaurant_id: selectedIngredient.restaurant_id || undefined,
+        attributes: (selectedIngredient as any).attributes || {},
+        supplier: 'Manual',
+      } as any);
       await ingredientsService.adjustQuantity(selectedIngredient.id, quantityChange, 'Added', currentUser?.name || 'User');
       setShowIncreaseModal(false);
       setQuantityChange(0);
@@ -170,12 +183,13 @@ export const InventoryPage = () => {
 
   const handleDecreaseQuantity = async () => {
     if (!selectedIngredient || quantityChange <= 0) return;
-    if (quantityChange > selectedIngredient.quantity) {
-      alert('Cannot use more than current stock');
+    const available = totalRemaining(selectedIngredient.id);
+    if (quantityChange > available) {
+      alert(`Cannot use more than current stock (${available} ${selectedIngredient.unit})`);
       return;
     }
     try {
-      await ingredientsService.adjustQuantity(selectedIngredient.id, -quantityChange, 'Used', currentUser?.name || 'User');
+      await inventoryBatchesService.consume(selectedIngredient.id, quantityChange, 'Used');
       setShowDecreaseModal(false);
       setQuantityChange(0);
       loadIngredients();
