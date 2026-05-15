@@ -7,247 +7,177 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const SYSTEM_PROMPT = `Extract Romanian invoice data.
+- Supplier: company name from header (e.g. "SC X SRL"), pick the topmost.
+- Items: only real product line items from the table. Skip transport, ambalaj, taxă, discount, livrare, TVA, total, subtotal.
+- Use exact names as written. Each item needs name, quantity, unit, unit_price.
+- Currency: ISO 4217 (lei/RON->RON, €->EUR, $->USD, £->GBP). Default RON if unclear.`;
+
+const TOOL = {
+  type: 'function',
+  function: {
+    name: 'extract_invoice_data',
+    description: 'Extract supplier and product line items from invoice',
+    parameters: {
+      type: 'object',
+      properties: {
+        supplier: {
+          type: 'object',
+          properties: { name: { type: 'string' } },
+          required: ['name'],
+        },
+        currency: { type: 'string', description: 'ISO 4217 code, default RON' },
+        items: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              name: { type: 'string' },
+              quantity: { type: 'number' },
+              unit: { type: 'string' },
+              unit_price: { type: 'number' },
+            },
+            required: ['name', 'quantity', 'unit', 'unit_price'],
+          },
+        },
+      },
+      required: ['supplier', 'items', 'currency'],
+    },
+  },
+};
+
+const IRRELEVANT = ['transport', 'ambalaj', 'taxa', 'taxă', 'discount', 'livrare', 'tva', 'total', 'subtotal', 'shipping'];
+
+async function callAI(apiKey: string, model: string, fileUrl: string, catalogHint: string) {
+  const userText = catalogHint
+    ? `Extract supplier and items. Existing catalog (reuse these names when they match): ${catalogHint}`
+    : 'Extract supplier and all product items from this invoice.';
+
+  const res = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model,
+      messages: [
+        { role: 'system', content: SYSTEM_PROMPT },
+        {
+          role: 'user',
+          content: [
+            { type: 'text', text: userText },
+            { type: 'image_url', image_url: { url: fileUrl } },
+          ],
+        },
+      ],
+      tools: [TOOL],
+      tool_choice: { type: 'function', function: { name: 'extract_invoice_data' } },
+    }),
+  });
+
+  if (!res.ok) {
+    const t = await res.text();
+    throw new Error(`AI ${model} ${res.status}: ${t}`);
+  }
+  const data = await res.json();
+  const tc = data.choices?.[0]?.message?.tool_calls?.[0];
+  if (!tc || tc.function.name !== 'extract_invoice_data') {
+    throw new Error('No structured data returned');
+  }
+  return JSON.parse(tc.function.arguments);
+}
+
+function cleanItems(items: any[]): any[] {
+  const seen = new Set<string>();
+  const out: any[] = [];
+  for (const item of items || []) {
+    if (!item?.unit_price || !item?.quantity || item.quantity <= 0) continue;
+    const nameLower = String(item.name || '').toLowerCase();
+    if (!nameLower) continue;
+    if (IRRELEVANT.some((k) => nameLower.includes(k))) continue;
+    const key = `${nameLower.trim()}|${item.quantity}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(item);
+  }
+  return out;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
-  try {
-    const { fileUrl, orderId } = await req.json();
+  let orderId: string | undefined;
+  let supabase: ReturnType<typeof createClient> | undefined;
 
-    if (!fileUrl || !orderId) {
-      throw new Error('Missing fileUrl or orderId');
-    }
+  try {
+    const body = await req.json();
+    const fileUrl: string = body.fileUrl;
+    orderId = body.orderId;
+
+    if (!fileUrl || !orderId) throw new Error('Missing fileUrl or orderId');
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
+    if (!lovableApiKey) throw new Error('LOVABLE_API_KEY not configured');
 
-    if (!lovableApiKey) {
-      throw new Error('LOVABLE_API_KEY not configured');
-    }
+    supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    // Mark processing (don't await — fire and forget for speed)
+    supabase.from('orders').update({ status: 'processing' }).eq('id', orderId).then(() => {});
 
-    // Update order status to processing
-    await supabase
-      .from('orders')
-      .update({ status: 'processing' })
-      .eq('id', orderId);
+    // Get a signed URL instead of downloading + base64
+    const storagePath = fileUrl.split('/order-invoices/')[1];
+    if (!storagePath) throw new Error('Invalid fileUrl');
 
-    console.log('Downloading invoice from:', fileUrl);
-
-    // Download the PDF from storage
-    const { data: fileData, error: downloadError } = await supabase.storage
+    const { data: signed, error: signErr } = await supabase.storage
       .from('order-invoices')
-      .download(fileUrl.split('/order-invoices/')[1]);
-
-    if (downloadError) {
-      console.error('Error downloading file:', downloadError);
-      throw new Error(`Failed to download invoice: ${downloadError.message}`);
+      .createSignedUrl(storagePath, 600);
+    if (signErr || !signed?.signedUrl) {
+      throw new Error(`Failed to sign invoice URL: ${signErr?.message || 'unknown'}`);
     }
 
-    // Convert to base64
-    const bytes = await fileData.arrayBuffer();
-    const base64 = btoa(String.fromCharCode(...new Uint8Array(bytes)));
-
-    console.log('Sending to AI for extraction...');
-
-    // Call Lovable AI with structured extraction
-    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${lovableApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'google/gemini-2.5-pro',
-        messages: [
-          {
-            role: 'system',
-            content: `You are a Romanian invoice data extraction expert. Extract ONLY actual products from the invoice table.
-
-CRITICAL RULES:
-1. Extract supplier from header using patterns: "SC ___ SRL", "S.R.L.", "Furnizor:", "Emitent:", "Denumire firmă:"
-2. Extract ONLY line items from the product/item table section
-3. DO NOT generate, invent, or expand the product list
-4. Exclude: transport, ambalaj, taxă, discount, livrare, TVA, total
-5. Use exact item names as written on invoice
-6. Each item MUST have: name, quantity, unit, unit_price
-7. If multiple company names appear, choose the one at the top of the invoice
-8. Ignore addresses, CUI numbers, phone numbers in supplier detection
-9. Detect the invoice currency as an ISO 4217 code (RON, EUR, USD, GBP, MDL, etc.).
-   - "lei", "RON" -> RON
-   - "€", "EUR"   -> EUR
-   - "$", "USD"   -> USD
-   - "£", "GBP"   -> GBP
-   - Look near totals, unit prices, and the invoice header.
-   - If ambiguous, default to RON (Romanian invoices).`
-          },
-          {
-            role: 'user',
-            content: [
-              {
-                type: 'text',
-                text: 'Extract the supplier and all product items from this Romanian invoice. Return only real products from the table, with exact names and quantities.'
-              },
-              {
-                type: 'image_url',
-                image_url: {
-                  url: `data:application/pdf;base64,${base64}`
-                }
-              }
-            ]
-          }
-        ],
-        tools: [
-          {
-            type: 'function',
-            function: {
-              name: 'extract_invoice_data',
-              description: 'Extract structured invoice data including supplier and product items',
-              parameters: {
-                type: 'object',
-                properties: {
-                  supplier: {
-                    type: 'object',
-                    properties: {
-                      name: {
-                        type: 'string',
-                        description: 'Company name from invoice header (e.g., SC HERBALROM SRL)'
-                      }
-                    },
-                    required: ['name']
-                  },
-                  currency: {
-                    type: 'string',
-                    description: 'ISO 4217 currency code detected on the invoice (RON, EUR, USD, GBP, MDL, ...). Default RON.'
-                  },
-                  items: {
-                    type: 'array',
-                    description: 'ONLY products from the invoice table. Do NOT invent items.',
-                    items: {
-                      type: 'object',
-                      properties: {
-                        name: {
-                          type: 'string',
-                          description: 'Exact product name as written on invoice'
-                        },
-                        quantity: {
-                          type: 'number',
-                          description: 'Quantity ordered'
-                        },
-                        unit: {
-                          type: 'string',
-                          description: 'Unit of measurement (kg, g, ml, l, buc, etc.)'
-                        },
-                        unit_price: {
-                          type: 'number',
-                          description: 'Price per unit'
-                        },
-                        total_price: {
-                          type: 'number',
-                          description: 'Total price for this line item'
-                        }
-                      },
-                      required: ['name', 'quantity', 'unit', 'unit_price']
-                    }
-                  }
-                },
-                required: ['supplier', 'items', 'currency']
-              }
-            }
-          }
-        ],
-        tool_choice: { 
-          type: 'function', 
-          function: { name: 'extract_invoice_data' } 
-        }
-      }),
-    });
-
-    if (!aiResponse.ok) {
-      const errorText = await aiResponse.text();
-      console.error('AI API error:', aiResponse.status, errorText);
-      throw new Error(`AI extraction failed: ${errorText}`);
-    }
-
-    const aiData = await aiResponse.json();
-    console.log('AI response:', JSON.stringify(aiData, null, 2));
-
-    // Extract the tool call result
-    const toolCall = aiData.choices?.[0]?.message?.tool_calls?.[0];
-    if (!toolCall || toolCall.function.name !== 'extract_invoice_data') {
-      throw new Error('AI did not return structured data');
-    }
-
-    const extractedData = JSON.parse(toolCall.function.arguments);
-    console.log('Extracted data:', JSON.stringify(extractedData, null, 2));
-
-    // Post-processing: Remove irrelevant items and duplicates
-    const irrelevantKeywords = [
-      'transport', 'ambalaj', 'taxa', 'taxă', 'discount', 
-      'livrare', 'tva', 'total', 'subtotal', 'shipping'
-    ];
-
-    const cleanedItems = extractedData.items
-      .filter((item: any) => {
-        // Remove items without price or quantity
-        if (!item.unit_price || !item.quantity || item.quantity <= 0) {
-          console.log('Filtering out item without price/quantity:', item.name);
-          return false;
-        }
-
-        // Remove irrelevant items
-        const nameLower = item.name.toLowerCase();
-        if (irrelevantKeywords.some(keyword => nameLower.includes(keyword))) {
-          console.log('Filtering out irrelevant item:', item.name);
-          return false;
-        }
-
-        return true;
-      })
-      // Deduplicate by name + quantity
-      .filter((item: any, index: number, self: any[]) => {
-        return index === self.findIndex(t => 
-          t.name.toLowerCase().trim() === item.name.toLowerCase().trim() && 
-          t.quantity === item.quantity
-        );
-      });
-
-    console.log(`Cleaned items: ${cleanedItems.length} items (from ${extractedData.items.length} original)`);
-
-    if (cleanedItems.length === 0) {
-      throw new Error('No valid items found in invoice after filtering');
-    }
-
-    // Update order with extracted data
-    const supplierName = extractedData.supplier?.name || 'Unknown Supplier';
-
-    // Normalize currency: accept symbols/aliases, default to RON
-    const KNOWN = new Set(['RON', 'EUR', 'USD', 'GBP', 'MDL', 'CHF', 'PLN', 'HUF', 'BGN', 'CZK']);
-    const rawCur = (extractedData.currency || '').toString().trim().toUpperCase();
-    const aliasMap: Record<string, string> = { 'LEI': 'RON', '€': 'EUR', '$': 'USD', '£': 'GBP' };
-    const currency = aliasMap[rawCur] || (KNOWN.has(rawCur) ? rawCur : 'RON');
-    console.log('Detected invoice currency:', currency, '(raw:', rawCur, ')');
-
-    await supabase
+    // Build catalog hint from order's user/restaurant ingredients
+    const { data: orderRow } = await supabase
       .from('orders')
-      .update({
-        status: 'processed',
-        supplier: supplierName,
-        currency,
-        extracted_data: {
-          supplier: extractedData.supplier,
-          currency,
-          items: cleanedItems,
-          extracted_at: new Date().toISOString()
-        }
-      })
-      .eq('id', orderId);
+      .select('user_id, restaurant_id')
+      .eq('id', orderId)
+      .single();
 
-    // Insert order items
-    const orderItems = cleanedItems.map((item: any) => ({
+    let catalogHint = '';
+    if (orderRow) {
+      const ingQuery = supabase.from('ingredients').select('name').limit(200);
+      if (orderRow.restaurant_id) {
+        ingQuery.eq('restaurant_id', orderRow.restaurant_id);
+      } else if (orderRow.user_id) {
+        ingQuery.eq('owner_id', orderRow.user_id);
+      }
+      const { data: ings } = await ingQuery;
+      if (ings?.length) catalogHint = ings.map((i: any) => i.name).join(', ');
+    }
+
+    // Try fast model first, fall back to pro if it returns nothing usable
+    console.log('Calling fast model...');
+    let extracted: any;
+    try {
+      extracted = await callAI(lovableApiKey, 'google/gemini-3-flash-preview', signed.signedUrl, catalogHint);
+      if (!extracted?.items?.length) throw new Error('flash returned 0 items');
+    } catch (flashErr) {
+      console.warn('Flash failed, falling back to pro:', flashErr);
+      extracted = await callAI(lovableApiKey, 'google/gemini-2.5-pro', signed.signedUrl, catalogHint);
+    }
+
+    const cleaned = cleanItems(extracted.items || []);
+    if (cleaned.length === 0) throw new Error('No valid items after filtering');
+
+    const KNOWN = new Set(['RON', 'EUR', 'USD', 'GBP', 'MDL', 'CHF', 'PLN', 'HUF', 'BGN', 'CZK']);
+    const aliasMap: Record<string, string> = { LEI: 'RON', '€': 'EUR', $: 'USD', '£': 'GBP' };
+    const rawCur = String(extracted.currency || '').trim().toUpperCase();
+    const currency = aliasMap[rawCur] || (KNOWN.has(rawCur) ? rawCur : 'RON');
+
+    const supplierName = extracted.supplier?.name || 'Unknown Supplier';
+
+    const orderItems = cleaned.map((item: any) => ({
       order_id: orderId,
       ingredient_name: item.name,
       quantity: item.quantity,
@@ -255,57 +185,50 @@ CRITICAL RULES:
       price_per_unit: item.unit_price || 0,
       currency,
       needs_confirmation: true,
-      is_new_ingredient: false
+      is_new_ingredient: false,
     }));
 
-    const { error: itemsError } = await supabase
-      .from('order_items')
-      .insert(orderItems);
+    // Parallel writes
+    const [updateRes, insertRes] = await Promise.all([
+      supabase.from('orders').update({
+        status: 'processed',
+        supplier: supplierName,
+        currency,
+        extracted_data: {
+          supplier: extracted.supplier,
+          currency,
+          items: cleaned,
+          extracted_at: new Date().toISOString(),
+        },
+      }).eq('id', orderId),
+      supabase.from('order_items').insert(orderItems),
+    ]);
 
-    if (itemsError) {
-      console.error('Error inserting order items:', itemsError);
-      throw itemsError;
-    }
+    if (insertRes.error) throw insertRes.error;
+    if (updateRes.error) throw updateRes.error;
 
-    console.log(`Successfully extracted ${cleanedItems.length} items from invoice`);
+    console.log(`Extracted ${cleaned.length} items from invoice`);
 
     return new Response(
-      JSON.stringify({
-        success: true,
-        supplier: supplierName,
-        itemsExtracted: cleanedItems.length
-      }),
+      JSON.stringify({ success: true, supplier: supplierName, itemsExtracted: cleaned.length }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
-
   } catch (error) {
     console.error('Error processing invoice:', error);
 
-    // Update order status to error
-    if (req.json && (await req.json()).orderId) {
-      const { orderId } = await req.json();
-      const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-      const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-      const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
+    if (orderId && supabase) {
       await supabase
         .from('orders')
         .update({
           status: 'error',
-          error_message: error instanceof Error ? error.message : 'Unknown error'
+          error_message: error instanceof Error ? error.message : 'Unknown error',
         })
         .eq('id', orderId);
     }
 
     return new Response(
-      JSON.stringify({
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
+      JSON.stringify({ success: false, error: error instanceof Error ? error.message : 'Unknown error' }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });
