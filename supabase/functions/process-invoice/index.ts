@@ -109,6 +109,19 @@ async function callAI(apiKey: string, model: string, fileUrl: string, catalogHin
   return JSON.parse(tc.function.arguments);
 }
 
+async function callAIWithRetry(apiKey: string, model: string, fileUrl: string, catalogHint: string) {
+  try {
+    return await callAI(apiKey, model, fileUrl, catalogHint);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    const transient = /no pages|INTERNAL|UNAVAILABLE|\b5\d\d\b/i.test(msg);
+    if (!transient) throw err;
+    console.warn(`Transient AI error on ${model}, retrying once: ${msg.slice(0, 200)}`);
+    await new Promise((r) => setTimeout(r, 1000));
+    return await callAI(apiKey, model, fileUrl, catalogHint);
+  }
+}
+
 function cleanItems(items: any[]): any[] {
   const seen = new Set<string>();
   const out: any[] = [];
