@@ -2,8 +2,9 @@ import { useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 
 /**
- * Hook to protect restaurant features from non-subscribed, non-admin users
- * Redirects to pricing page if user doesn't have access
+ * Hook to protect pages from users with no access at all.
+ * Allows: admins, self-subscribed users, AND employees inheriting access from their restaurant.
+ * Personal-only feature gating happens inside each page (see PersonalPaywall).
  */
 export const useSubscriptionGuard = () => {
   const { currentUser, setCurrentPage } = useAppContext();
@@ -11,11 +12,14 @@ export const useSubscriptionGuard = () => {
   useEffect(() => {
     if (!currentUser) return;
 
-    // Allow access if subscribed OR admin
-    const hasAccess = currentUser.is_subscribed || currentUser.is_admin;
-    
+    const subscriptionSource = currentUser.subscription_source || 'none';
+    const hasAccess =
+      currentUser.is_subscribed ||
+      currentUser.is_admin ||
+      subscriptionSource !== 'none';
+
     if (!hasAccess) {
-      console.log('[SUBSCRIPTION GUARD] Access denied, redirecting to pricing');
+      console.log('[SUBSCRIPTION GUARD] No access, redirecting to pricing');
       setCurrentPage('pricing');
     }
   }, [currentUser, setCurrentPage]);
