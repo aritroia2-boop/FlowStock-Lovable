@@ -621,6 +621,13 @@ export type Database = {
         Args: { p_restaurant_id: string }
         Returns: undefined
       }
+      get_effective_subscription: {
+        Args: never
+        Returns: {
+          is_subscribed: boolean
+          source: string
+        }[]
+      }
       get_my_restaurant_id: { Args: never; Returns: string }
       get_unread_notification_count: { Args: never; Returns: number }
       i_own_restaurant: { Args: { p_restaurant_id: string }; Returns: boolean }
