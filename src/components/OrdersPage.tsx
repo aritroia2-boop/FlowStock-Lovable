@@ -251,7 +251,9 @@ export function OrdersPage() {
             currency: orderCurrency,
             owner_id: currentUser.id,
             restaurant_id: restaurantId || undefined,
-          });
+            attributes: (item as any).attributes || {},
+            supplier: (selectedOrder as any).supplier || null,
+          } as any);
         } else if (item.matchedIngredient) {
           // Add stock to existing ingredient (do NOT overwrite standard_price)
           await ingredientsService.adjustQuantity(
