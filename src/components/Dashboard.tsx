@@ -339,7 +339,7 @@ export function Dashboard() {
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Active Users</p>
                     <p className="text-3xl font-bold text-foreground mt-1">{stats.activeUsers}</p>
-                    <p className="text-sm text-blue-600 mt-1">Team members</p>
+                    <p className="text-sm text-blue-600 mt-1">Members in your restaurant</p>
                   </div>
                   <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:animate-icon-pulse transition-transform duration-300">
                     <Users size={24} className="text-white" />
@@ -358,7 +358,7 @@ export function Dashboard() {
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Inventory Value</p>
                     <p className="text-3xl font-bold text-foreground mt-1">
-                      ${stats.inventoryValue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                      {formatMoney(stats.inventoryValue, 'RON', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                     </p>
                     <p className="text-sm text-green-600 mt-1 flex items-center gap-1">
                       <TrendingUp size={14} />
@@ -366,7 +366,7 @@ export function Dashboard() {
                     </p>
                   </div>
                   <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:animate-icon-pulse transition-transform duration-300">
-                    <DollarSign size={24} className="text-white" />
+                    <Banknote size={24} className="text-white" />
                   </div>
                 </div>
               </div>
@@ -383,7 +383,7 @@ export function Dashboard() {
             {/* Right Column: Recent Activity + My Teams */}
             <div className="space-y-4">
               {/* Recent Activity */}
-              <div className="bg-white/80 backdrop-blur-xl rounded-xl shadow-lg overflow-hidden border border-border">
+              <div className="bg-card/80 backdrop-blur-xl rounded-xl shadow-lg overflow-hidden border border-border">
                 <div className="bg-gradient-to-r from-blue-500 to-cyan-500 h-1"></div>
                 <div className="p-4 sm:p-6">
                   <h2 className="text-base sm:text-lg font-bold text-foreground mb-4 flex items-center gap-2">
@@ -452,35 +452,6 @@ export function Dashboard() {
                 </div>
               )}
 
-              {/* Quick Actions (if no teams) */}
-              {myTeams.length === 0 && (
-                <div className="bg-card rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm border border-border">
-                  <h2 className="text-base sm:text-lg font-bold text-foreground mb-4">Quick Actions</h2>
-                  <div className="space-y-3">
-                    <button 
-                      onClick={() => setCurrentPage('inventory')}
-                      className="w-full text-left p-3 sm:p-4 rounded-xl bg-gradient-to-r from-blue-50 to-cyan-50 hover:from-blue-100 hover:to-cyan-100 dark:from-blue-950/50 dark:to-cyan-950/50 dark:hover:from-blue-900/50 dark:hover:to-cyan-900/50 transition-all border border-blue-200 dark:border-blue-800 min-h-[56px]"
-                    >
-                      <p className="font-semibold text-sm sm:text-base text-foreground">View Inventory</p>
-                      <p className="text-xs sm:text-sm text-muted-foreground">Check stock levels</p>
-                    </button>
-                    <button 
-                      onClick={() => setCurrentPage('recipes')}
-                      className="w-full text-left p-3 sm:p-4 rounded-xl bg-gradient-to-r from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 dark:from-purple-950/50 dark:to-pink-950/50 dark:hover:from-purple-900/50 dark:hover:to-pink-900/50 transition-all border border-purple-200 dark:border-purple-800 min-h-[56px]"
-                    >
-                      <p className="font-semibold text-sm sm:text-base text-foreground">Manage Recipes</p>
-                      <p className="text-xs sm:text-sm text-muted-foreground">Update your recipes</p>
-                    </button>
-                    <button 
-                      onClick={() => setCurrentPage('audit-logs')}
-                      className="w-full text-left p-3 sm:p-4 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 hover:from-green-100 hover:to-emerald-100 dark:from-green-950/50 dark:to-emerald-950/50 dark:hover:from-green-900/50 dark:hover:to-emerald-900/50 transition-all border border-green-200 dark:border-green-800 min-h-[56px]"
-                    >
-                      <p className="font-semibold text-sm sm:text-base text-foreground">View Audit Logs</p>
-                      <p className="text-xs sm:text-sm text-muted-foreground">Track all changes</p>
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </div>
