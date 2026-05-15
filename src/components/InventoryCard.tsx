@@ -1,6 +1,7 @@
 import { Minus, Plus, Trash2, Edit } from 'lucide-react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
+import { formatUnitPrice } from '../lib/currency';
 
 interface IngredientCardProps {
   ingredient: {
@@ -48,7 +49,7 @@ export const InventoryCard = ({ ingredient, onQuantityChange, onEdit, onDelete }
           </div>
           {ingredient.price_per_unit && (
             <div className="text-xs text-muted-foreground">
-              ${ingredient.price_per_unit.toFixed(2)}/{ingredient.unit}
+              {formatUnitPrice(ingredient.price_per_unit, ingredient.unit)}
             </div>
           )}
         </div>
