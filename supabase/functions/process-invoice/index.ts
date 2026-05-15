@@ -75,7 +75,14 @@ CRITICAL RULES:
 5. Use exact item names as written on invoice
 6. Each item MUST have: name, quantity, unit, unit_price
 7. If multiple company names appear, choose the one at the top of the invoice
-8. Ignore addresses, CUI numbers, phone numbers in supplier detection`
+8. Ignore addresses, CUI numbers, phone numbers in supplier detection
+9. Detect the invoice currency as an ISO 4217 code (RON, EUR, USD, GBP, MDL, etc.).
+   - "lei", "RON" -> RON
+   - "€", "EUR"   -> EUR
+   - "$", "USD"   -> USD
+   - "£", "GBP"   -> GBP
+   - Look near totals, unit prices, and the invoice header.
+   - If ambiguous, default to RON (Romanian invoices).`
           },
           {
             role: 'user',
@@ -105,12 +112,16 @@ CRITICAL RULES:
                   supplier: {
                     type: 'object',
                     properties: {
-                      name: { 
+                      name: {
                         type: 'string',
                         description: 'Company name from invoice header (e.g., SC HERBALROM SRL)'
                       }
                     },
                     required: ['name']
+                  },
+                  currency: {
+                    type: 'string',
+                    description: 'ISO 4217 currency code detected on the invoice (RON, EUR, USD, GBP, MDL, ...). Default RON.'
                   },
                   items: {
                     type: 'array',
@@ -118,19 +129,19 @@ CRITICAL RULES:
                     items: {
                       type: 'object',
                       properties: {
-                        name: { 
+                        name: {
                           type: 'string',
                           description: 'Exact product name as written on invoice'
                         },
-                        quantity: { 
+                        quantity: {
                           type: 'number',
                           description: 'Quantity ordered'
                         },
-                        unit: { 
+                        unit: {
                           type: 'string',
                           description: 'Unit of measurement (kg, g, ml, l, buc, etc.)'
                         },
-                        unit_price: { 
+                        unit_price: {
                           type: 'number',
                           description: 'Price per unit'
                         },
@@ -143,7 +154,7 @@ CRITICAL RULES:
                     }
                   }
                 },
-                required: ['supplier', 'items']
+                required: ['supplier', 'items', 'currency']
               }
             }
           }
@@ -213,13 +224,22 @@ CRITICAL RULES:
     // Update order with extracted data
     const supplierName = extractedData.supplier?.name || 'Unknown Supplier';
 
+    // Normalize currency: accept symbols/aliases, default to RON
+    const KNOWN = new Set(['RON', 'EUR', 'USD', 'GBP', 'MDL', 'CHF', 'PLN', 'HUF', 'BGN', 'CZK']);
+    const rawCur = (extractedData.currency || '').toString().trim().toUpperCase();
+    const aliasMap: Record<string, string> = { 'LEI': 'RON', '€': 'EUR', '$': 'USD', '£': 'GBP' };
+    const currency = aliasMap[rawCur] || (KNOWN.has(rawCur) ? rawCur : 'RON');
+    console.log('Detected invoice currency:', currency, '(raw:', rawCur, ')');
+
     await supabase
       .from('orders')
       .update({
         status: 'processed',
         supplier: supplierName,
+        currency,
         extracted_data: {
           supplier: extractedData.supplier,
+          currency,
           items: cleanedItems,
           extracted_at: new Date().toISOString()
         }
@@ -233,6 +253,7 @@ CRITICAL RULES:
       quantity: item.quantity,
       unit: item.unit,
       price_per_unit: item.unit_price || 0,
+      currency,
       needs_confirmation: true,
       is_new_ingredient: false
     }));
