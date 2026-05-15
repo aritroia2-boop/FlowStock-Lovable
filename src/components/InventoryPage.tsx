@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Search, Plus, Minus, Edit2, User, Building2, Eye, Lock } from 'lucide-react';
-import { ingredientsService, auditLogsService, Ingredient, recipeCostService } from '../lib/database';
+import { Search, Plus, Minus, Edit2, User, Building2, Eye, Lock, ChevronDown, ChevronRight, Package } from 'lucide-react';
+import { ingredientsService, auditLogsService, Ingredient, recipeCostService, inventoryBatchesService, InventoryBatch } from '../lib/database';
 import { useApp } from '../context/AppContext';
 import { usePermissions } from '../hooks/usePermissions';
 import { RoleBadge } from './RoleBadge';
