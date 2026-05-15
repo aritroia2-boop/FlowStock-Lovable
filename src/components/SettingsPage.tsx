@@ -678,7 +678,7 @@ export const SettingsPage = () => {
           <div className="bg-card/90 backdrop-blur-xl rounded-2xl shadow-xl border border-border overflow-hidden">
             <div className="bg-gradient-to-r from-green-500 to-emerald-400 px-6 py-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-white/20 backdrop-blur-sm rounded-lg">
+                <div className="p-2 bg-card/20 backdrop-blur-sm rounded-lg">
                   <User size={24} className="text-white" />
                 </div>
                 <div>
@@ -693,23 +693,23 @@ export const SettingsPage = () => {
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="flex items-center gap-2 text-sm font-semibold text-slate-600 uppercase tracking-wide">
+                      <label className="flex items-center gap-2 text-sm font-semibold text-muted-foreground uppercase tracking-wide">
                         <User size={16} />
                         Full Name
                       </label>
-                      <p className="text-xl font-bold text-slate-900">{currentUser?.name}</p>
+                      <p className="text-xl font-bold text-foreground">{currentUser?.name}</p>
                     </div>
 
                     <div className="space-y-2">
-                      <label className="flex items-center gap-2 text-sm font-semibold text-slate-600 uppercase tracking-wide">
+                      <label className="flex items-center gap-2 text-sm font-semibold text-muted-foreground uppercase tracking-wide">
                         <Mail size={16} />
                         Email Address
                       </label>
-                      <p className="text-xl font-bold text-slate-900">{currentUser?.email}</p>
+                      <p className="text-xl font-bold text-foreground">{currentUser?.email}</p>
                     </div>
 
                     <div className="space-y-2">
-                      <label className="flex items-center gap-2 text-sm font-semibold text-slate-600 uppercase tracking-wide">
+                      <label className="flex items-center gap-2 text-sm font-semibold text-muted-foreground uppercase tracking-wide">
                         <Shield size={16} />
                         Account Role
                       </label>
@@ -724,7 +724,7 @@ export const SettingsPage = () => {
                     </div>
                   </div>
 
-                  <div className="pt-4 border-t border-slate-200">
+                  <div className="pt-4 border-t border-border">
                     <button
                       onClick={() => setIsEditingProfile(true)}
                       className="px-6 py-3 bg-gradient-to-r from-slate-700 to-slate-600 hover:from-slate-800 hover:to-slate-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
@@ -736,30 +736,30 @@ export const SettingsPage = () => {
               ) : (
                 <form onSubmit={handleUpdateProfile} className="space-y-6">
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2 uppercase tracking-wide">
+                    <label className="block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide">
                       Full Name *
                     </label>
                     <input
                       type="text"
                       value={profileFormData.name}
                       onChange={(e) => setProfileFormData({ ...profileFormData, name: e.target.value })}
-                      className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                      className="w-full px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
                       placeholder="Enter your full name"
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2 uppercase tracking-wide">
+                    <label className="block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide">
                       Email Address
                     </label>
                     <input
                       type="email"
                       value={profileFormData.email}
                       disabled
-                      className="w-full px-4 py-3 bg-slate-100 border-2 border-slate-200 rounded-xl text-slate-500 cursor-not-allowed"
+                      className="w-full px-4 py-3 bg-muted border-2 border-border rounded-xl text-muted-foreground cursor-not-allowed"
                     />
-                    <p className="mt-2 text-xs text-slate-500">Email cannot be changed</p>
+                    <p className="mt-2 text-xs text-muted-foreground">Email cannot be changed</p>
                   </div>
 
                   <div className="flex items-center gap-3 pt-4">
@@ -772,7 +772,7 @@ export const SettingsPage = () => {
                           email: currentUser?.email || ''
                         });
                       }}
-                      className="flex-1 px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl font-semibold transition-all"
+                      className="flex-1 px-6 py-3 bg-muted hover:bg-slate-300 text-foreground rounded-xl font-semibold transition-all"
                     >
                       Cancel
                     </button>
@@ -789,10 +789,10 @@ export const SettingsPage = () => {
           </div>
 
           {/* Subscription Section */}
-          <div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+          <div className="bg-card/90 backdrop-blur-xl rounded-2xl shadow-xl border border-border overflow-hidden">
             <div className="bg-gradient-to-r from-purple-500 to-pink-400 px-6 py-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-white/20 backdrop-blur-sm rounded-lg">
+                <div className="p-2 bg-card/20 backdrop-blur-sm rounded-lg">
                   <CreditCard size={24} className="text-white" />
                 </div>
                 <div>
@@ -808,23 +808,23 @@ export const SettingsPage = () => {
                   <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-100">
                     <div className="flex items-center gap-2 mb-2">
                       <Shield className="w-5 h-5 text-purple-600" />
-                      <p className="text-sm text-slate-600 font-medium uppercase tracking-wide">Admin Access</p>
+                      <p className="text-sm text-muted-foreground font-medium uppercase tracking-wide">Admin Access</p>
                     </div>
-                    <p className="text-xl font-bold text-slate-900">
+                    <p className="text-xl font-bold text-foreground">
                       Full Access Granted
                     </p>
                   </div>
                 ) : isSubscribed ? (
                   <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-100">
-                    <p className="text-sm text-slate-600 font-medium uppercase tracking-wide mb-1">Current Plan</p>
-                    <p className="text-3xl font-bold text-slate-900">
+                    <p className="text-sm text-muted-foreground font-medium uppercase tracking-wide mb-1">Current Plan</p>
+                    <p className="text-3xl font-bold text-foreground">
                       FlowStock Pro
                     </p>
                   </div>
                 ) : (
-                  <div className="p-4 bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl border border-slate-200">
-                    <p className="text-sm text-slate-600 font-medium uppercase tracking-wide mb-1">Current Plan</p>
-                    <p className="text-3xl font-bold text-slate-900">
+                  <div className="p-4 bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl border border-border">
+                    <p className="text-sm text-muted-foreground font-medium uppercase tracking-wide mb-1">Current Plan</p>
+                    <p className="text-3xl font-bold text-foreground">
                       Free
                     </p>
                   </div>
@@ -853,10 +853,10 @@ export const SettingsPage = () => {
 
           {(currentUser?.role === 'owner' || currentUser?.role === 'none') && (
             <>
-              <div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+              <div className="bg-card/90 backdrop-blur-xl rounded-2xl shadow-xl border border-border overflow-hidden">
                 <div className="bg-gradient-to-r from-blue-500 to-cyan-400 px-6 py-4">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-white/20 backdrop-blur-sm rounded-lg">
+                    <div className="p-2 bg-card/20 backdrop-blur-sm rounded-lg">
                       <Building2 size={24} className="text-white" />
                     </div>
                     <div>
@@ -875,56 +875,56 @@ export const SettingsPage = () => {
 
                       <form onSubmit={handleCreateRestaurant} className="space-y-4">
                         <div>
-                          <label className="block text-sm font-semibold text-slate-700 mb-2 uppercase tracking-wide">
+                          <label className="block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide">
                             Restaurant Name *
                           </label>
                           <input
                             type="text"
                             value={restaurantFormData.name}
                             onChange={(e) => setRestaurantFormData({ ...restaurantFormData, name: e.target.value })}
-                            className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                            className="w-full px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                             placeholder="e.g., The Golden Fork"
                             required
                           />
                         </div>
 
                         <div>
-                          <label className="block text-sm font-semibold text-slate-700 mb-2 uppercase tracking-wide">
+                          <label className="block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide">
                             Address *
                           </label>
                           <input
                             type="text"
                             value={restaurantFormData.address}
                             onChange={(e) => setRestaurantFormData({ ...restaurantFormData, address: e.target.value })}
-                            className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                            className="w-full px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                             placeholder="123 Main Street, City"
                             required
                           />
                         </div>
 
                         <div>
-                          <label className="block text-sm font-semibold text-slate-700 mb-2 uppercase tracking-wide">
+                          <label className="block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide">
                             Phone Number *
                           </label>
                           <input
                             type="tel"
                             value={restaurantFormData.phone}
                             onChange={(e) => setRestaurantFormData({ ...restaurantFormData, phone: e.target.value })}
-                            className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                            className="w-full px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                             placeholder="+1 (555) 123-4567"
                             required
                           />
                         </div>
 
                         <div>
-                          <label className="block text-sm font-semibold text-slate-700 mb-2 uppercase tracking-wide">
+                          <label className="block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide">
                             Logo (Optional)
                           </label>
                           <div className="flex items-center gap-4">
                             {restaurantFormData.logo_url && (
-                              <img src={restaurantFormData.logo_url} alt="Logo" className="w-20 h-20 rounded-xl object-cover border-2 border-slate-200" />
+                              <img src={restaurantFormData.logo_url} alt="Logo" className="w-20 h-20 rounded-xl object-cover border-2 border-border" />
                             )}
-                            <label className="flex items-center gap-2 px-4 py-3 bg-slate-100 hover:bg-slate-200 rounded-xl cursor-pointer transition-all font-medium text-slate-700">
+                            <label className="flex items-center gap-2 px-4 py-3 bg-muted hover:bg-muted rounded-xl cursor-pointer transition-all font-medium text-foreground">
                               <Upload size={20} />
                               <span>Choose File</span>
                               <input
@@ -960,13 +960,13 @@ export const SettingsPage = () => {
                               </div>
                             )}
                             <div className="flex-1 space-y-3">
-                              <h3 className="text-2xl font-bold text-slate-900">{restaurant.name}</h3>
+                              <h3 className="text-2xl font-bold text-foreground">{restaurant.name}</h3>
                               <div className="space-y-2">
-                                <p className="flex items-center gap-2 text-slate-700">
+                                <p className="flex items-center gap-2 text-foreground">
                                   <MapPin size={18} className="text-blue-500" />
                                   {restaurant.address}
                                 </p>
-                                <p className="flex items-center gap-2 text-slate-700">
+                                <p className="flex items-center gap-2 text-foreground">
                                   <Phone size={18} className="text-blue-500" />
                                   {restaurant.phone}
                                 </p>
@@ -974,7 +974,7 @@ export const SettingsPage = () => {
                             </div>
                           </div>
 
-                          <div className="pt-4 border-t border-slate-200 flex items-center justify-between">
+                          <div className="pt-4 border-t border-border flex items-center justify-between">
                             <div>
                               {permissions.canEditRestaurant ? (
                                 <button
@@ -984,7 +984,7 @@ export const SettingsPage = () => {
                                   Edit Restaurant
                                 </button>
                               ) : (
-                                <div className="flex items-center gap-2 text-slate-500">
+                                <div className="flex items-center gap-2 text-muted-foreground">
                                   <Lock size={18} />
                                   <span className="text-sm font-medium">Only managers can edit restaurant information</span>
                                 </div>
@@ -1014,53 +1014,53 @@ export const SettingsPage = () => {
                       ) : (
                         <form onSubmit={handleUpdateRestaurant} className="space-y-4">
                           <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2 uppercase tracking-wide">
+                            <label className="block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide">
                               Restaurant Name *
                             </label>
                             <input
                               type="text"
                               value={restaurantFormData.name}
                               onChange={(e) => setRestaurantFormData({ ...restaurantFormData, name: e.target.value })}
-                              className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                              className="w-full px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                               required
                             />
                           </div>
 
                           <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2 uppercase tracking-wide">
+                            <label className="block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide">
                               Address *
                             </label>
                             <input
                               type="text"
                               value={restaurantFormData.address}
                               onChange={(e) => setRestaurantFormData({ ...restaurantFormData, address: e.target.value })}
-                              className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                              className="w-full px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                               required
                             />
                           </div>
 
                           <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2 uppercase tracking-wide">
+                            <label className="block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide">
                               Phone Number *
                             </label>
                             <input
                               type="tel"
                               value={restaurantFormData.phone}
                               onChange={(e) => setRestaurantFormData({ ...restaurantFormData, phone: e.target.value })}
-                              className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                              className="w-full px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                               required
                             />
                           </div>
 
                           <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2 uppercase tracking-wide">
+                            <label className="block text-sm font-semibold text-foreground mb-2 uppercase tracking-wide">
                               Logo (Optional)
                             </label>
                             <div className="flex items-center gap-4">
                               {restaurantFormData.logo_url && (
-                                <img src={restaurantFormData.logo_url} alt="Logo" className="w-20 h-20 rounded-xl object-cover border-2 border-slate-200" />
+                                <img src={restaurantFormData.logo_url} alt="Logo" className="w-20 h-20 rounded-xl object-cover border-2 border-border" />
                               )}
-                              <label className="flex items-center gap-2 px-4 py-3 bg-slate-100 hover:bg-slate-200 rounded-xl cursor-pointer transition-all font-medium text-slate-700">
+                              <label className="flex items-center gap-2 px-4 py-3 bg-muted hover:bg-muted rounded-xl cursor-pointer transition-all font-medium text-foreground">
                                 <Upload size={20} />
                                 <span>Change Logo</span>
                                 <input
@@ -1085,7 +1085,7 @@ export const SettingsPage = () => {
                                   logo_url: restaurant.logo_url || ''
                                 });
                               }}
-                              className="flex-1 px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl font-semibold transition-all"
+                              className="flex-1 px-6 py-3 bg-muted hover:bg-slate-300 text-foreground rounded-xl font-semibold transition-all"
                             >
                               Cancel
                             </button>
@@ -1104,10 +1104,10 @@ export const SettingsPage = () => {
               </div>
 
               {restaurant && permissions.canManageTeam && (
-                <div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+                <div className="bg-card/90 backdrop-blur-xl rounded-2xl shadow-xl border border-border overflow-hidden">
                   <div className="bg-gradient-to-r from-purple-500 to-pink-400 px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-white/20 backdrop-blur-sm rounded-lg">
+                      <div className="p-2 bg-card/20 backdrop-blur-sm rounded-lg">
                         <Users size={24} className="text-white" />
                       </div>
                       <div>
@@ -1119,7 +1119,7 @@ export const SettingsPage = () => {
 
                   <div className="p-6 space-y-6">
                     <div className="p-5 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border-2 border-purple-100">
-                      <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2 text-lg">
+                      <h3 className="font-bold text-foreground mb-4 flex items-center gap-2 text-lg">
                         <UserPlus size={20} className="text-purple-600" />
                         Invite New Employee
                       </h3>
@@ -1139,15 +1139,15 @@ export const SettingsPage = () => {
                           {isAddingEmployee ? 'Adding...' : 'Send Invite'}
                         </button>
                       </div>
-                      <p className="mt-3 text-xs text-slate-600">The user must have an account before you can add them</p>
+                      <p className="mt-3 text-xs text-muted-foreground">The user must have an account before you can add them</p>
                     </div>
 
                     <div>
-                      <h3 className="font-bold text-slate-900 mb-4 text-lg">Current Team Members</h3>
+                      <h3 className="font-bold text-foreground mb-4 text-lg">Current Team Members</h3>
                       {employees.length === 0 ? (
-                        <div className="text-center py-12 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
+                        <div className="text-center py-12 bg-muted rounded-xl border-2 border-dashed border-border">
                           <Users size={48} className="text-slate-300 mx-auto mb-3" />
-                          <p className="text-slate-500 font-medium">No employees added yet</p>
+                          <p className="text-muted-foreground font-medium">No employees added yet</p>
                           <p className="text-slate-400 text-sm mt-1">Invite your first team member above</p>
                         </div>
                       ) : (
@@ -1155,15 +1155,15 @@ export const SettingsPage = () => {
                           {employees.map((employee) => (
                             <div
                               key={employee.id}
-                              className="flex items-center justify-between p-4 bg-gradient-to-r from-slate-50 to-slate-100 hover:from-slate-100 hover:to-slate-200 rounded-xl border border-slate-200 transition-all"
+                              className="flex items-center justify-between p-4 bg-gradient-to-r from-slate-50 to-slate-100 hover:from-slate-100 hover:to-slate-200 rounded-xl border border-border transition-all"
                             >
                               <div className="flex items-center gap-4">
                                 <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-400 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg">
                                   {employee.name.charAt(0).toUpperCase()}
                                 </div>
                                 <div>
-                                  <p className="font-bold text-slate-900 text-lg">{employee.name}</p>
-                                  <p className="text-slate-600 text-sm">{employee.email}</p>
+                                  <p className="font-bold text-foreground text-lg">{employee.name}</p>
+                                  <p className="text-muted-foreground text-sm">{employee.email}</p>
                                   <span className="inline-block mt-1 px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full uppercase tracking-wide">
                                     {employee.role}
                                   </span>
@@ -1186,11 +1186,11 @@ export const SettingsPage = () => {
               )}
 
               {restaurant && teams.length >= 0 && permissions.canManageTeam && (
-                <div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+                <div className="bg-card/90 backdrop-blur-xl rounded-2xl shadow-xl border border-border overflow-hidden">
                   <div className="bg-gradient-to-r from-orange-500 to-amber-400 px-6 py-4">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-white/20 backdrop-blur-sm rounded-lg">
+                        <div className="p-2 bg-card/20 backdrop-blur-sm rounded-lg">
                           <Folder size={24} className="text-white" />
                         </div>
                         <div>
@@ -1200,7 +1200,7 @@ export const SettingsPage = () => {
                       </div>
                       <button
                         onClick={() => setShowCreateTeam(!showCreateTeam)}
-                        className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white rounded-xl font-semibold transition-all"
+                        className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-card/20 hover:bg-card/30 backdrop-blur-sm text-white rounded-xl font-semibold transition-all"
                       >
                         <Plus size={18} />
                         Create Team
@@ -1211,7 +1211,7 @@ export const SettingsPage = () => {
                   <div className="p-6 space-y-6">
                     {showCreateTeam && (
                       <div className="p-5 bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl border-2 border-orange-100">
-                        <h3 className="font-bold text-slate-900 mb-4 text-lg">Create New Team</h3>
+                        <h3 className="font-bold text-foreground mb-4 text-lg">Create New Team</h3>
                         <div className="space-y-3">
                           <input
                             type="text"
@@ -1234,7 +1234,7 @@ export const SettingsPage = () => {
                                 setNewTeamName('');
                                 setNewTeamDescription('');
                               }}
-                              className="flex-1 px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl font-semibold transition-all"
+                              className="flex-1 px-4 py-2 bg-muted hover:bg-slate-300 text-foreground rounded-xl font-semibold transition-all"
                             >
                               Cancel
                             </button>
@@ -1251,16 +1251,16 @@ export const SettingsPage = () => {
                     )}
 
                     {teams.length === 0 ? (
-                      <div className="text-center py-12 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
+                      <div className="text-center py-12 bg-muted rounded-xl border-2 border-dashed border-border">
                         <Folder size={48} className="text-slate-300 mx-auto mb-3" />
-                        <p className="text-slate-500 font-medium">No teams created yet</p>
+                        <p className="text-muted-foreground font-medium">No teams created yet</p>
                         <p className="text-slate-400 text-sm mt-1">Create your first team to organize employees</p>
                       </div>
                     ) : (
                       <div className="space-y-4">
                         {teams.map((team) => (
-                          <div key={team.id} className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl border border-slate-200 overflow-hidden">
-                            <div className="p-4 bg-white/50 border-b border-slate-200">
+                          <div key={team.id} className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl border border-border overflow-hidden">
+                            <div className="p-4 bg-card/50 border-b border-border">
                               {editingTeamId === team.id ? (
                                 <div className="flex items-center gap-3">
                                   <input
@@ -1282,7 +1282,7 @@ export const SettingsPage = () => {
                                       setEditingTeamId(null);
                                       setEditTeamName('');
                                     }}
-                                    className="p-2 bg-slate-300 hover:bg-slate-400 text-slate-700 rounded-lg transition-all"
+                                    className="p-2 bg-slate-300 hover:bg-slate-400 text-foreground rounded-lg transition-all"
                                     title="Cancel"
                                   >
                                     <X size={18} />
@@ -1291,12 +1291,12 @@ export const SettingsPage = () => {
                               ) : (
                                 <div className="flex items-center justify-between">
                                   <div>
-                                    <h4 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                                    <h4 className="text-lg font-bold text-foreground flex items-center gap-2">
                                       <Folder size={20} className="text-orange-500" />
                                       {team.name}
                                     </h4>
                                     {team.description && (
-                                      <p className="text-sm text-slate-600 mt-1">{team.description}</p>
+                                      <p className="text-sm text-muted-foreground mt-1">{team.description}</p>
                                     )}
                                   </div>
                                   <div className="flex items-center gap-2">
@@ -1324,28 +1324,28 @@ export const SettingsPage = () => {
 
                             <div className="p-4">
                               <div className="mb-3">
-                                <h5 className="font-semibold text-slate-700">Team Members ({teamMembers[team.id]?.length || 0})</h5>
+                                <h5 className="font-semibold text-foreground">Team Members ({teamMembers[team.id]?.length || 0})</h5>
                               </div>
 
                               {!teamMembers[team.id] || teamMembers[team.id].length === 0 ? (
-                                <div className="text-center py-6 bg-white rounded-lg border border-dashed border-slate-200">
+                                <div className="text-center py-6 bg-card rounded-lg border border-dashed border-border">
                                   <Users size={32} className="text-slate-300 mx-auto mb-2" />
-                                  <p className="text-slate-500 text-sm">No members in this team</p>
+                                  <p className="text-muted-foreground text-sm">No members in this team</p>
                                 </div>
                               ) : (
                                 <div className="space-y-2">
                                   {teamMembers[team.id].map((member) => (
                                     <div
                                       key={member.id}
-                                      className="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-200 hover:border-orange-300 transition-all"
+                                      className="flex items-center justify-between p-3 bg-card rounded-lg border border-border hover:border-orange-300 transition-all"
                                     >
                                       <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-amber-400 rounded-lg flex items-center justify-center text-white font-bold shadow-lg">
                                           {member.profiles.name.charAt(0).toUpperCase()}
                                         </div>
                                         <div>
-                                          <p className="font-semibold text-slate-900">{member.profiles.name}</p>
-                                          <p className="text-xs text-slate-600">{member.profiles.email}</p>
+                                          <p className="font-semibold text-foreground">{member.profiles.name}</p>
+                                          <p className="text-xs text-muted-foreground">{member.profiles.email}</p>
                                         </div>
                                       </div>
                                       <div className="flex items-center gap-2">
@@ -1373,12 +1373,12 @@ export const SettingsPage = () => {
                               )}
 
                               {employees.length > 0 && (
-                                <div className="mt-4 pt-4 border-t border-slate-200">
-                                  <p className="text-sm font-medium text-slate-700 mb-2">Add Employee to Team:</p>
+                                <div className="mt-4 pt-4 border-t border-border">
+                                  <p className="text-sm font-medium text-foreground mb-2">Add Employee to Team:</p>
                                   <div className="flex gap-2">
                                     <select
                                       id={`select-employee-${team.id}`}
-                                      className="flex-1 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 text-sm"
+                                      className="flex-1 px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-orange-500 text-sm"
                                     >
                                       <option value="">Select employee...</option>
                                       {employees
@@ -1389,7 +1389,7 @@ export const SettingsPage = () => {
                                     </select>
                                     <select
                                       id={`select-role-${team.id}`}
-                                      className="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 text-sm"
+                                      className="px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-orange-500 text-sm"
                                       defaultValue="member"
                                     >
                                       <option value="supervisor">Supervisor</option>

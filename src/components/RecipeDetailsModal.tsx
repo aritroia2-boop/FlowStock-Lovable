@@ -333,14 +333,14 @@ export const RecipeDetailsModal = ({ recipe, onClose, onUpdate, permissions }: R
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-6 overflow-y-auto">
-      <div className="bg-white rounded-3xl max-w-5xl w-full shadow-2xl my-8">
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-3xl font-bold text-gray-900">Recipe Details</h2>
+      <div className="bg-card rounded-3xl max-w-5xl w-full shadow-2xl my-8">
+        <div className="flex items-center justify-between p-6 border-b border-border">
+          <h2 className="text-3xl font-bold text-foreground">Recipe Details</h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
+            className="p-2 hover:bg-muted rounded-xl transition-colors"
           >
-            <X size={24} className="text-gray-600" />
+            <X size={24} className="text-muted-foreground" />
           </button>
         </div>
 
@@ -396,7 +396,7 @@ export const RecipeDetailsModal = ({ recipe, onClose, onUpdate, permissions }: R
 
           <div className="bg-gradient-to-br from-slate-600 to-slate-800 rounded-3xl p-8 mb-6 relative overflow-hidden">
             <div className="absolute top-4 left-6 flex items-center gap-2 text-white">
-              <div className="bg-white/20 p-2 rounded-lg backdrop-blur-sm">
+              <div className="bg-card/20 p-2 rounded-lg backdrop-blur-sm">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-white">
                   <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -438,7 +438,7 @@ export const RecipeDetailsModal = ({ recipe, onClose, onUpdate, permissions }: R
           {isEditMode ? (
             <div className="mb-6 space-y-4">
               <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-6">
-                <label className="block text-lg font-semibold text-gray-900 mb-3">Recipe Image</label>
+                <label className="block text-lg font-semibold text-foreground mb-3">Recipe Image</label>
                 <div className="flex items-center gap-6">
                   <label className="flex items-center gap-3 px-6 py-4 bg-gradient-to-r from-blue-500 to-cyan-400 hover:from-blue-600 hover:to-cyan-500 text-white rounded-xl cursor-pointer shadow-lg hover:shadow-xl transition-all font-medium">
                     <Upload size={22} />
@@ -457,29 +457,29 @@ export const RecipeDetailsModal = ({ recipe, onClose, onUpdate, permissions }: R
                         alt="Preview"
                         className="h-40 w-full max-w-md object-cover rounded-xl border-2 border-blue-300 shadow-md"
                       />
-                      <p className="text-sm text-gray-600 mt-2">Preview of selected image</p>
+                      <p className="text-sm text-muted-foreground mt-2">Preview of selected image</p>
                     </div>
                   )}
                   {!imagePreview && (
-                    <p className="text-gray-600">No image selected</p>
+                    <p className="text-muted-foreground">No image selected</p>
                   )}
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Recipe Name</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Recipe Name</label>
                 <input
                   type="text"
                   value={editFormData.name}
                   onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-400"
+                  className="w-full px-4 py-3 border-2 border-border rounded-xl focus:outline-none focus:border-primary"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Category</label>
                 <select
                   value={editFormData.category}
                   onChange={(e) => setEditFormData({ ...editFormData, category: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-400"
+                  className="w-full px-4 py-3 border-2 border-border rounded-xl focus:outline-none focus:border-primary"
                 >
                   <option>Appetizers</option>
                   <option>Main Courses</option>
@@ -488,29 +488,29 @@ export const RecipeDetailsModal = ({ recipe, onClose, onUpdate, permissions }: R
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Description</label>
                 <textarea
                   value={editFormData.description}
                   onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
                   rows={4}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-400"
+                  className="w-full px-4 py-3 border-2 border-border rounded-xl focus:outline-none focus:border-primary"
                   placeholder="Enter recipe description..."
                 />
               </div>
             </div>
           ) : (
             <div className="mb-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-2">{recipe.name}</h3>
-              <p className="text-gray-600 mb-2">{recipe.category}</p>
+              <h3 className="text-xl font-bold text-foreground mb-2">{recipe.name}</h3>
+              <p className="text-muted-foreground mb-2">{recipe.category}</p>
               {recipe.description && (
-                <p className="text-gray-700">{recipe.description}</p>
+                <p className="text-foreground">{recipe.description}</p>
               )}
             </div>
           )}
 
           <div className="grid grid-cols-2 gap-6 mb-6">
-            <div className="bg-gray-50 rounded-2xl p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Ingredients</h3>
+            <div className="bg-muted rounded-2xl p-6">
+              <h3 className="text-xl font-bold text-foreground mb-4">Ingredients</h3>
               <div className="space-y-3">
                 {recipeIngredients.map((ri) => {
                   const inventoryItem = allIngredients.find(inv => inv.id === ri.ingredient_id);
@@ -546,7 +546,7 @@ export const RecipeDetailsModal = ({ recipe, onClose, onUpdate, permissions }: R
                           <AlertCircle size={20} className="text-red-500 flex-shrink-0" />
                         )}
                         <div className="flex-1">
-                          <span className="text-gray-700">
+                          <span className="text-foreground">
                             {ri.ingredient?.name || 'Unknown'} ({ri.quantity} {ri.unit})
                           </span>
                           {inventoryItem && inventoryItem.price_per_unit > 0 && (
@@ -580,13 +580,13 @@ export const RecipeDetailsModal = ({ recipe, onClose, onUpdate, permissions }: R
               </div>
 
               {isEditMode && (
-                <div className="mt-4 pt-4 border-t border-gray-200">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-3">Add Ingredient</h4>
+                <div className="mt-4 pt-4 border-t border-border">
+                  <h4 className="text-sm font-semibold text-foreground mb-3">Add Ingredient</h4>
                   <div className="space-y-2">
                     <select
                       value={newIngredient.ingredient_id}
                       onChange={(e) => setNewIngredient({ ...newIngredient, ingredient_id: e.target.value })}
-                      className="w-full px-3 py-2 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-400"
+                      className="w-full px-3 py-2 border-2 border-border rounded-xl text-sm focus:outline-none focus:border-primary"
                     >
                       <option value="">
                         {recipe.restaurant_id 
@@ -604,12 +604,12 @@ export const RecipeDetailsModal = ({ recipe, onClose, onUpdate, permissions }: R
                         placeholder="Quantity"
                         value={newIngredient.quantity || ''}
                         onChange={(e) => setNewIngredient({ ...newIngredient, quantity: Number(e.target.value) })}
-                        className="flex-1 px-3 py-2 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-400"
+                        className="flex-1 px-3 py-2 border-2 border-border rounded-xl text-sm focus:outline-none focus:border-primary"
                       />
                       <select
                         value={newIngredient.unit}
                         onChange={(e) => setNewIngredient({ ...newIngredient, unit: e.target.value })}
-                        className="w-24 px-3 py-2 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-400"
+                        className="w-24 px-3 py-2 border-2 border-border rounded-xl text-sm focus:outline-none focus:border-primary"
                       >
                         <option>kg</option>
                         <option>g</option>
@@ -629,8 +629,8 @@ export const RecipeDetailsModal = ({ recipe, onClose, onUpdate, permissions }: R
               )}
             </div>
 
-            <div className="bg-gray-50 rounded-2xl p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Cost Analysis</h3>
+            <div className="bg-muted rounded-2xl p-6">
+              <h3 className="text-xl font-bold text-foreground mb-4">Cost Analysis</h3>
               <div className="space-y-3">
                 {/* Individual ingredient costs */}
                 {recipeIngredients
@@ -642,7 +642,7 @@ export const RecipeDetailsModal = ({ recipe, onClose, onUpdate, permissions }: R
                     const inv = allIngredients.find(i => i.id === ri.ingredient_id);
                     return (
                       <div key={ri.id} className="flex justify-between text-sm">
-                        <span className="text-gray-600">{inv?.name}</span>
+                        <span className="text-muted-foreground">{inv?.name}</span>
                         <span className="font-medium">{ri.cost?.toFixed(2) || '0.00'} lei</span>
                       </div>
                     );
@@ -652,7 +652,7 @@ export const RecipeDetailsModal = ({ recipe, onClose, onUpdate, permissions }: R
                 <div className="pt-3 mt-3 border-t-2 border-blue-300">
                   <div className="bg-gradient-to-r from-blue-100 to-cyan-100 rounded-xl p-4">
                     <div className="flex justify-between items-center">
-                      <span className="text-lg font-bold text-gray-900">Total Recipe Cost</span>
+                      <span className="text-lg font-bold text-foreground">Total Recipe Cost</span>
                       <span className="text-2xl font-bold text-blue-600">
                         {recipeIngredients
                           .reduce((sum: number, ri: any) => sum + (ri.cost || 0), 0)
@@ -694,7 +694,7 @@ export const RecipeDetailsModal = ({ recipe, onClose, onUpdate, permissions }: R
                     setImagePreview(recipe.image_url || '');
                     setImageFile(null);
                   }}
-                  className="px-8 py-4 border-2 border-gray-300 text-gray-700 rounded-2xl font-semibold hover:bg-gray-50 transition-colors"
+                  className="px-8 py-4 border-2 border-border text-foreground rounded-2xl font-semibold hover:bg-muted transition-colors"
                   disabled={isUploading}
                 >
                   Cancel
@@ -719,7 +719,7 @@ export const RecipeDetailsModal = ({ recipe, onClose, onUpdate, permissions }: R
                     Edit Recipe
                   </button>
                 ) : (
-                  <div className="flex items-center gap-2 px-8 py-4 bg-slate-100 text-slate-400 rounded-2xl font-semibold">
+                  <div className="flex items-center gap-2 px-8 py-4 bg-muted text-slate-400 rounded-2xl font-semibold">
                     <Lock size={20} />
                     <span>View Only</span>
                   </div>
@@ -734,7 +734,7 @@ export const RecipeDetailsModal = ({ recipe, onClose, onUpdate, permissions }: R
                 </button>
                 <button
                   onClick={onClose}
-                  className="px-8 py-4 border-2 border-gray-300 text-gray-700 rounded-2xl font-semibold hover:bg-gray-50 transition-colors"
+                  className="px-8 py-4 border-2 border-border text-foreground rounded-2xl font-semibold hover:bg-muted transition-colors"
                 >
                   Close
                 </button>

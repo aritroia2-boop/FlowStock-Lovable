@@ -216,7 +216,7 @@ export const RecipesPage = () => {
                     )}
                     <div className="absolute inset-0 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full blur-2xl opacity-40 group-hover:opacity-60 transition-opacity duration-300"></div>
                     <div className="relative bg-gradient-to-br from-cyan-200 via-blue-300 to-cyan-200 p-8 rounded-full shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
-                      <Utensils size={48} className="text-slate-700" />
+                      <Utensils size={48} className="text-foreground" />
                     </div>
                   </div>
                 )}
@@ -260,29 +260,29 @@ export const RecipesPage = () => {
 
       {showAddModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-6">
-          <div className="relative bg-white/95 backdrop-blur-xl rounded-3xl p-8 max-w-md w-full shadow-2xl border border-white/20 overflow-hidden">
+          <div className="relative bg-card/95 backdrop-blur-xl rounded-3xl p-8 max-w-md w-full shadow-2xl border border-border overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500"></div>
             <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-transparent to-cyan-50/30 pointer-events-none"></div>
             <div className="relative z-10">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Add New Recipe</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-6">Add New Recipe</h2>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Recipe Name</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Recipe Name</label>
                 <input
                   type="text"
                   value={newRecipe.name}
                   onChange={(e) => setNewRecipe({ ...newRecipe, name: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-400"
+                  className="w-full px-4 py-3 border-2 border-border rounded-xl focus:outline-none focus:border-primary"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Category</label>
                 <select
                   value={newRecipe.category}
                   onChange={(e) => setNewRecipe({ ...newRecipe, category: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-400"
+                  className="w-full px-4 py-3 border-2 border-border rounded-xl focus:outline-none focus:border-primary"
                 >
                   <option>Appetizers</option>
                   <option>Main Courses</option>
@@ -292,13 +292,13 @@ export const RecipesPage = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Cost</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Cost</label>
                 <input
                   type="number"
                   step="0.01"
                   value={newRecipe.cost}
                   onChange={(e) => setNewRecipe({ ...newRecipe, cost: Number(e.target.value) })}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-400"
+                  className="w-full px-4 py-3 border-2 border-border rounded-xl focus:outline-none focus:border-primary"
                 />
               </div>
             </div>
@@ -306,7 +306,7 @@ export const RecipesPage = () => {
               <div className="flex gap-4 mt-6">
                 <button
                   onClick={() => setShowAddModal(false)}
-                  className="flex-1 px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium shadow-sm hover:shadow-md transition-all duration-300"
+                  className="flex-1 px-6 py-3 bg-muted hover:bg-muted text-foreground rounded-xl font-medium shadow-sm hover:shadow-md transition-all duration-300"
                 >
                   Cancel
                 </button>

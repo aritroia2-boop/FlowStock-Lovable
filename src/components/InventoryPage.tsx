@@ -393,7 +393,7 @@ export const InventoryPage = () => {
                         <td className="px-6 py-4 text-foreground font-medium">{ingredient.minimum_stock}</td>
                         <td className="px-6 py-4">
                           <span className={`inline-flex items-center gap-1.5 px-4 py-1.5 ${status.color} text-white rounded-full text-sm font-semibold whitespace-nowrap shadow-md`}>
-                            <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
+                            <span className="w-1.5 h-1.5 bg-card rounded-full animate-pulse"></span>
                             {status.text}
                           </span>
                         </td>
@@ -541,77 +541,77 @@ export const InventoryPage = () => {
 
       {showEditModal && selectedIngredient && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-6">
-          <div className="relative bg-white/95 backdrop-blur-xl rounded-3xl p-8 max-w-md w-full shadow-2xl border border-white/20 overflow-hidden">
+          <div className="relative bg-card/95 backdrop-blur-xl rounded-3xl p-8 max-w-md w-full shadow-2xl border border-border overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 via-blue-400 to-cyan-500"></div>
             <div className="absolute inset-0 bg-gradient-to-br from-cyan-50/30 via-transparent to-blue-50/30 pointer-events-none"></div>
             <div className="relative z-10">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Edit Ingredient</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-6">Edit Ingredient</h2>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Name</label>
                 <input
                   type="text"
                   value={editFormData.name}
                   onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-400"
+                  className="w-full px-4 py-3 border-2 border-border rounded-xl focus:outline-none focus:border-primary"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Quantity</label>
+                  <label className="block text-sm font-medium text-foreground mb-2">Quantity</label>
                   <input
                     type="number"
                     value={editFormData.quantity}
                     onChange={(e) => setEditFormData({ ...editFormData, quantity: Number(e.target.value) })}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-400"
+                    className="w-full px-4 py-3 border-2 border-border rounded-xl focus:outline-none focus:border-primary"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Unit</label>
+                  <label className="block text-sm font-medium text-foreground mb-2">Unit</label>
                   <input
                     type="text"
                     value={editFormData.unit}
                     onChange={(e) => setEditFormData({ ...editFormData, unit: e.target.value })}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-400"
+                    className="w-full px-4 py-3 border-2 border-border rounded-xl focus:outline-none focus:border-primary"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Minimum Stock</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Minimum Stock</label>
                 <input
                   type="number"
                   value={editFormData.minimum_stock}
                   onChange={(e) => setEditFormData({ ...editFormData, minimum_stock: Number(e.target.value) })}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-400"
+                  className="w-full px-4 py-3 border-2 border-border rounded-xl focus:outline-none focus:border-primary"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Category (Optional)</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Category (Optional)</label>
                 <input
                   type="text"
                   value={editFormData.category}
                   onChange={(e) => setEditFormData({ ...editFormData, category: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-400"
+                  className="w-full px-4 py-3 border-2 border-border rounded-xl focus:outline-none focus:border-primary"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Supplier (Optional)</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Supplier (Optional)</label>
                 <input
                   type="text"
                   value={editFormData.supplier}
                   onChange={(e) => setEditFormData({ ...editFormData, supplier: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-400"
+                  className="w-full px-4 py-3 border-2 border-border rounded-xl focus:outline-none focus:border-primary"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-foreground mb-2">
                   Price Per Unit (lei/{editFormData.unit})
                 </label>
                 <input
@@ -623,10 +623,10 @@ export const InventoryPage = () => {
                     ...editFormData, 
                     price_per_unit: parseFloat(e.target.value) || 0 
                   })}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-400"
+                  className="w-full px-4 py-3 border-2 border-border rounded-xl focus:outline-none focus:border-primary"
                   placeholder="Enter price (e.g., 4.50)"
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Price in lei per {editFormData.unit}
                 </p>
               </div>
@@ -635,7 +635,7 @@ export const InventoryPage = () => {
               <div className="flex gap-4 mt-6">
                 <button
                   onClick={() => setShowEditModal(false)}
-                  className="flex-1 px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium shadow-sm hover:shadow-md transition-all duration-300"
+                  className="flex-1 px-6 py-3 bg-muted hover:bg-muted text-foreground rounded-xl font-medium shadow-sm hover:shadow-md transition-all duration-300"
                 >
                   Cancel
                 </button>
@@ -653,67 +653,67 @@ export const InventoryPage = () => {
 
       {showAddModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-6">
-          <div className="relative bg-white/95 backdrop-blur-xl rounded-3xl p-8 max-w-md w-full shadow-2xl border border-white/20 overflow-hidden">
+          <div className="relative bg-card/95 backdrop-blur-xl rounded-3xl p-8 max-w-md w-full shadow-2xl border border-border overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500"></div>
             <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-transparent to-cyan-50/30 pointer-events-none"></div>
             <div className="relative z-10">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Add New Ingredient</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-6">Add New Ingredient</h2>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Name</label>
                 <input
                   type="text"
                   value={newIngredient.name}
                   onChange={(e) => setNewIngredient({ ...newIngredient, name: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-400"
+                  className="w-full px-4 py-3 border-2 border-border rounded-xl focus:outline-none focus:border-primary"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Quantity</label>
+                  <label className="block text-sm font-medium text-foreground mb-2">Quantity</label>
                   <input
                     type="number"
                     value={newIngredient.quantity}
                     onChange={(e) => setNewIngredient({ ...newIngredient, quantity: Number(e.target.value) })}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-400"
+                    className="w-full px-4 py-3 border-2 border-border rounded-xl focus:outline-none focus:border-primary"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Unit</label>
+                  <label className="block text-sm font-medium text-foreground mb-2">Unit</label>
                   <input
                     type="text"
                     value={newIngredient.unit}
                     onChange={(e) => setNewIngredient({ ...newIngredient, unit: e.target.value })}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-400"
+                    className="w-full px-4 py-3 border-2 border-border rounded-xl focus:outline-none focus:border-primary"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Minimum Stock</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Minimum Stock</label>
                 <input
                   type="number"
                   value={newIngredient.minimum_stock}
                   onChange={(e) => setNewIngredient({ ...newIngredient, minimum_stock: Number(e.target.value) })}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-400"
+                  className="w-full px-4 py-3 border-2 border-border rounded-xl focus:outline-none focus:border-primary"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Supplier (Optional)</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Supplier (Optional)</label>
                 <input
                   type="text"
                   value={newIngredient.supplier}
                   onChange={(e) => setNewIngredient({ ...newIngredient, supplier: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-400"
+                  className="w-full px-4 py-3 border-2 border-border rounded-xl focus:outline-none focus:border-primary"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-foreground mb-2">
                   Price Per Unit (lei/{newIngredient.unit})
                 </label>
                 <input
@@ -725,10 +725,10 @@ export const InventoryPage = () => {
                     ...newIngredient, 
                     price_per_unit: parseFloat(e.target.value) || 0 
                   })}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-400"
+                  className="w-full px-4 py-3 border-2 border-border rounded-xl focus:outline-none focus:border-primary"
                   placeholder="Enter price (e.g., 4.50)"
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Price in lei per {newIngredient.unit}
                 </p>
               </div>
@@ -737,7 +737,7 @@ export const InventoryPage = () => {
               <div className="flex gap-4 mt-6">
                 <button
                   onClick={() => setShowAddModal(false)}
-                  className="flex-1 px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium shadow-sm hover:shadow-md transition-all duration-300"
+                  className="flex-1 px-6 py-3 bg-muted hover:bg-muted text-foreground rounded-xl font-medium shadow-sm hover:shadow-md transition-all duration-300"
                 >
                   Cancel
                 </button>
