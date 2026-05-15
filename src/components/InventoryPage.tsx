@@ -515,6 +515,8 @@ export const InventoryPage = () => {
               </table>
               </div>
             </div>
+            </>
+            )}
           </div>
         </div>
       </div>
