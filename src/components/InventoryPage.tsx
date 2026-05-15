@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Search, Plus, Minus, Edit2, Home, Settings, User, Building2, Eye, Lock } from 'lucide-react';
+import { Search, Plus, Minus, Edit2, User, Building2, Eye, Lock } from 'lucide-react';
 import { ingredientsService, auditLogsService, Ingredient, recipeCostService } from '../lib/database';
 import { useApp } from '../context/AppContext';
 import { usePermissions } from '../hooks/usePermissions';
 import { RoleBadge } from './RoleBadge';
 import { formatPrice } from '../lib/unitConverter';
+import { AppLayout } from './AppLayout';
 
 import { useSubscriptionGuard } from '../hooks/useSubscriptionGuard';
 
