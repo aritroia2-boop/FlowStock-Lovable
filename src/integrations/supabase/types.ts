@@ -52,10 +52,12 @@ export type Database = {
       }
       ingredients: {
         Row: {
+          attributes: Json | null
           category: string | null
           created_at: string | null
           id: string
           is_shared: boolean | null
+          last_purchase_price: number | null
           low_stock_threshold: number
           minimum_stock: number
           name: string
@@ -63,15 +65,18 @@ export type Database = {
           price_per_unit: number | null
           quantity: number
           restaurant_id: string | null
+          standard_price: number | null
           supplier: string | null
           unit: string
           updated_at: string | null
         }
         Insert: {
+          attributes?: Json | null
           category?: string | null
           created_at?: string | null
           id?: string
           is_shared?: boolean | null
+          last_purchase_price?: number | null
           low_stock_threshold?: number
           minimum_stock?: number
           name: string
@@ -79,15 +84,18 @@ export type Database = {
           price_per_unit?: number | null
           quantity?: number
           restaurant_id?: string | null
+          standard_price?: number | null
           supplier?: string | null
           unit: string
           updated_at?: string | null
         }
         Update: {
+          attributes?: Json | null
           category?: string | null
           created_at?: string | null
           id?: string
           is_shared?: boolean | null
+          last_purchase_price?: number | null
           low_stock_threshold?: number
           minimum_stock?: number
           name?: string
@@ -95,6 +103,7 @@ export type Database = {
           price_per_unit?: number | null
           quantity?: number
           restaurant_id?: string | null
+          standard_price?: number | null
           supplier?: string | null
           unit?: string
           updated_at?: string | null
@@ -115,6 +124,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      inventory_batches: {
+        Row: {
+          created_at: string
+          currency: string | null
+          id: string
+          ingredient_id: string
+          order_id: string | null
+          owner_id: string | null
+          purchase_price: number
+          quantity: number
+          received_at: string
+          remaining_quantity: number
+          restaurant_id: string | null
+          unit: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string | null
+          id?: string
+          ingredient_id: string
+          order_id?: string | null
+          owner_id?: string | null
+          purchase_price?: number
+          quantity: number
+          received_at?: string
+          remaining_quantity: number
+          restaurant_id?: string | null
+          unit: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string | null
+          id?: string
+          ingredient_id?: string
+          order_id?: string | null
+          owner_id?: string | null
+          purchase_price?: number
+          quantity?: number
+          received_at?: string
+          remaining_quantity?: number
+          restaurant_id?: string | null
+          unit?: string
+        }
+        Relationships: []
       }
       notifications: {
         Row: {
@@ -185,42 +239,57 @@ export type Database = {
       }
       order_items: {
         Row: {
+          attributes: Json | null
+          confidence_score: number | null
           created_at: string | null
           currency: string | null
           id: string
           ingredient_name: string
+          invoice_unit_price: number | null
           is_new_ingredient: boolean | null
           matched_ingredient_id: string | null
           needs_confirmation: boolean | null
+          normalized_name: string | null
           order_id: string
           price_per_unit: number | null
           quantity: number
+          total_price_line: number | null
           unit: string
         }
         Insert: {
+          attributes?: Json | null
+          confidence_score?: number | null
           created_at?: string | null
           currency?: string | null
           id?: string
           ingredient_name: string
+          invoice_unit_price?: number | null
           is_new_ingredient?: boolean | null
           matched_ingredient_id?: string | null
           needs_confirmation?: boolean | null
+          normalized_name?: string | null
           order_id: string
           price_per_unit?: number | null
           quantity: number
+          total_price_line?: number | null
           unit: string
         }
         Update: {
+          attributes?: Json | null
+          confidence_score?: number | null
           created_at?: string | null
           currency?: string | null
           id?: string
           ingredient_name?: string
+          invoice_unit_price?: number | null
           is_new_ingredient?: boolean | null
           matched_ingredient_id?: string | null
           needs_confirmation?: boolean | null
+          normalized_name?: string | null
           order_id?: string
           price_per_unit?: number | null
           quantity?: number
+          total_price_line?: number | null
           unit?: string
         }
         Relationships: [
@@ -249,6 +318,7 @@ export type Database = {
           file_name: string
           file_url: string
           id: string
+          invoice_date: string | null
           restaurant_id: string | null
           status: string
           supplier: string | null
@@ -263,6 +333,7 @@ export type Database = {
           file_name: string
           file_url: string
           id?: string
+          invoice_date?: string | null
           restaurant_id?: string | null
           status?: string
           supplier?: string | null
@@ -277,6 +348,7 @@ export type Database = {
           file_name?: string
           file_url?: string
           id?: string
+          invoice_date?: string | null
           restaurant_id?: string | null
           status?: string
           supplier?: string | null
