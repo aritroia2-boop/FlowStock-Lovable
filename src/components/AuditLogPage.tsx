@@ -84,10 +84,33 @@ export const AuditLogPage = () => {
               className="px-6 py-3 border-2 border-border bg-background text-foreground placeholder:text-muted-foreground rounded-2xl focus:outline-none focus:border-primary transition-colors"
             />
 
-            <div className="flex items-center gap-3 px-6 py-3 border-2 border-primary/50 bg-primary/10 rounded-2xl">
-              <Calendar size={20} className="text-muted-foreground" />
-              <span className="text-foreground font-medium">Timestamp</span>
-              <Calendar size={20} className="text-muted-foreground" />
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+              <div className="flex flex-col">
+                <label className="text-xs font-medium text-muted-foreground mb-1 ml-1">From</label>
+                <input
+                  type="date"
+                  value={filterDateFrom}
+                  onChange={(e) => setFilterDateFrom(e.target.value)}
+                  className="px-4 py-3 border-2 border-border bg-background text-foreground rounded-2xl focus:outline-none focus:border-primary transition-colors"
+                />
+              </div>
+              <div className="flex flex-col">
+                <label className="text-xs font-medium text-muted-foreground mb-1 ml-1">To</label>
+                <input
+                  type="date"
+                  value={filterDateTo}
+                  onChange={(e) => setFilterDateTo(e.target.value)}
+                  className="px-4 py-3 border-2 border-border bg-background text-foreground rounded-2xl focus:outline-none focus:border-primary transition-colors"
+                />
+              </div>
+              {(filterDateFrom || filterDateTo) && (
+                <button
+                  onClick={() => { setFilterDateFrom(''); setFilterDateTo(''); }}
+                  className="self-end px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground rounded-2xl hover:bg-muted transition-colors"
+                >
+                  Clear dates
+                </button>
+              )}
             </div>
           </div>
 
