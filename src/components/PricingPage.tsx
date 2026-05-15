@@ -200,20 +200,27 @@ export const PricingPage = () => {
                 </li>
               </ul>
 
-              <button
-                onClick={handleSubscribe}
-                disabled={loading}
-                className="w-full py-3 rounded-lg font-medium transition-all bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Processing...
-                  </>
-                ) : (
-                  'Subscribe Now'
-                )}
-              </button>
+              {isEmployee ? (
+                <div className="w-full py-3 px-4 rounded-lg bg-muted/50 border border-border text-center">
+                  <p className="text-sm text-foreground font-medium mb-1">Billing is handled by your restaurant owner</p>
+                  <p className="text-xs text-muted-foreground">Ask the owner to subscribe so your team can use FlowStock Pro features.</p>
+                </div>
+              ) : (
+                <button
+                  onClick={handleSubscribe}
+                  disabled={loading}
+                  className="w-full py-3 rounded-lg font-medium transition-all bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    'Subscribe Now'
+                  )}
+                </button>
+              )}
             </div>
           </div>
         </div>
