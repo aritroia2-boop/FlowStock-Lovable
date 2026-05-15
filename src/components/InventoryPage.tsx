@@ -740,5 +740,6 @@ export const InventoryPage = () => {
         </div>
       )}
     </div>
+    </AppLayout>
   );
 };
