@@ -66,18 +66,39 @@ export const InventoryPage = () => {
   const loadIngredients = async () => {
     try {
       let data: Ingredient[];
+      let batchData: InventoryBatch[];
       if (viewContext === 'personal') {
         data = await ingredientsService.getPersonal();
+        batchData = await inventoryBatchesService.getPersonal();
       } else if (viewContext === 'restaurant' && currentUser?.restaurant_id) {
         data = await ingredientsService.getRestaurant(currentUser.restaurant_id);
+        batchData = await inventoryBatchesService.getRestaurant(currentUser.restaurant_id);
       } else {
         data = [];
+        batchData = [];
       }
       setIngredients(data);
+      setBatches(batchData);
     } catch (error) {
       console.error('Error loading ingredients:', error);
     }
   };
+
+  const toggleExpanded = (id: string) => {
+    setExpanded(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const batchesFor = (ingredientId: string) =>
+    batches.filter(b => b.ingredient_id === ingredientId)
+      .sort((a, b) => new Date(a.received_at).getTime() - new Date(b.received_at).getTime());
+
+  const totalRemaining = (ingredientId: string) =>
+    batchesFor(ingredientId).reduce((sum, b) => sum + Number(b.remaining_quantity || 0), 0);
 
   const handleAddIngredient = async () => {
     if (newIngredient.price_per_unit < 0) {
