@@ -215,46 +215,32 @@ export const InventoryPage = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-slate-900 dark:to-slate-800 p-4 md:p-8 relative overflow-hidden">
+    <AppLayout>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-slate-900 dark:to-slate-800 p-3 sm:p-4 md:p-8 relative overflow-hidden">
       <div className="absolute top-0 right-0 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl"></div>
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-cyan-400/10 rounded-full blur-3xl"></div>
 
       <div className="max-w-7xl mx-auto relative z-10">
-        <div className="relative bg-card/70 backdrop-blur-xl rounded-3xl shadow-2xl border border-border overflow-hidden">
+        <div className="relative bg-card/70 backdrop-blur-xl rounded-2xl md:rounded-3xl shadow-2xl border border-border overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-cyan-50/50 dark:from-blue-900/10 dark:to-cyan-900/10"></div>
           <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500 animate-pulse"></div>
 
           <div className="relative z-10 p-4 md:p-6 lg:p-8">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6 md:mb-8">
-              <div className="flex items-center gap-4">
-                <div className="bg-gradient-to-br from-blue-500 to-cyan-400 p-3 rounded-2xl shadow-lg">
-                  <Search size={28} className="text-white" />
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-5 md:mb-8">
+              <div className="flex items-center gap-3 md:gap-4">
+                <div className="bg-gradient-to-br from-blue-500 to-cyan-400 p-2.5 md:p-3 rounded-2xl shadow-lg">
+                  <Search size={22} className="text-white md:hidden" />
+                  <Search size={28} className="text-white hidden md:block" />
                 </div>
-                <div>
-                  <div className="flex items-center gap-3">
-                    <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">Inventory Overview</h1>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 md:gap-3 flex-wrap">
+                    <h1 className="text-xl sm:text-2xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">Inventory</h1>
                     {currentUser?.restaurant_id && <RoleBadge role={restaurantRole} size="sm" />}
                   </div>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 md:mt-1">
                     {permissions.isReadOnly ? 'View ingredients' : 'Manage and track your ingredients'}
                   </p>
                 </div>
-              </div>
-              <div className="flex items-center gap-3 w-full md:w-auto">
-                <button
-                  onClick={() => setCurrentPage('settings')}
-                  className="group p-3 bg-muted hover:bg-muted/80 rounded-2xl transition-all duration-300"
-                  title="Settings"
-                >
-                  <Settings size={20} className="text-muted-foreground group-hover:text-primary group-hover:rotate-90 transition-all duration-300" />
-                </button>
-                <button
-                  onClick={() => setCurrentPage('dashboard')}
-                  className="group flex items-center gap-2 px-6 py-3 bg-muted hover:bg-muted/80 border border-border text-foreground rounded-2xl font-medium shadow-sm hover:shadow-md transition-all duration-300"
-                >
-                  <Home size={20} className="group-hover:-translate-x-0.5 transition-transform" />
-                  Home
-                </button>
               </div>
             </div>
 
