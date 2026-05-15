@@ -325,5 +325,6 @@ export const RecipesPage = () => {
         />
       )}
     </div>
+    </AppLayout>
   );
 };
