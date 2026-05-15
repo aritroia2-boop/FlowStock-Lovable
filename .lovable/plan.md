@@ -1,43 +1,44 @@
-## 1. Employees: free restaurant access, paid personal features
 
-**Current behavior:** `useSubscriptionGuard` redirects any user without `is_subscribed || is_admin` straight to the pricing page. That blocks employees from everything, even though they should have restaurant access via inheritance from the owner.
+# Make Invoice AI Faster & More Efficient
 
-**New behavior:**
-- Employees with `subscriptionSource === 'restaurant'` (their owner pays) get full access to **restaurant** features on Inventory, Recipes, Orders, Audit Logs, Dashboard, Settings.
-- Personal features (the "Personal" tab on Inventory / Recipes / Orders) require **their own** Pro subscription (`subscriptionSource === 'self'` or `is_admin`).
-- Owners and admins keep current behavior unchanged.
+Goal: cut invoice processing time and cost without losing accuracy. Today every invoice goes to `google/gemini-2.5-pro` with the full PDF as base64, which is the slowest and most expensive path.
 
-**Changes:**
-- `src/hooks/useSubscriptionGuard.ts` — allow access when user is admin OR subscribed OR has any inherited subscription (`subscriptionSource !== 'none'`). Only redirect users with no access at all.
-- `src/components/InventoryPage.tsx`, `src/components/RecipesPage.tsx`, `src/components/OrdersPage.tsx`:
-  - Add a `canUsePersonal = isAdmin || subscriptionSource === 'self'` flag.
-  - Default `viewContext` to `'restaurant'` for employees who can't use personal.
-  - When the user clicks the "Personal" tab without access, show a paywall card in the content area (lock icon + "Personal features require a Pro plan" + "Upgrade to Pro" button → `setCurrentPage('pricing')`) instead of the data list. The tab itself stays clickable so they discover the upsell.
-- `src/components/PricingPage.tsx` — for employees inheriting restaurant access (`subscriptionSource === 'restaurant'`), keep the "Access Provided by Your Restaurant" panel but add a secondary section: "Want to use Personal inventory, recipes and orders? Upgrade to Pro for personal features." with a working Subscribe button (it already exists for owners; we extend it to employees too — Stripe checkout already works per-user).
+## Changes to `supabase/functions/process-invoice/index.ts`
 
-## 2. Audit Logs: working date filter + better label
+### 1. Switch default model to a fast one
+- Use `google/gemini-3-flash-preview` as the primary model (5–10x faster, much cheaper, strong at structured extraction with tool calling).
+- Keep `google/gemini-2.5-pro` only as a **fallback** when flash returns 0 valid items or fails the schema. This gives us speed by default and accuracy when needed.
 
-**Current:** `AuditLogPage` shows a static "Timestamp" pill with two calendar icons that does nothing.
+### 2. Send the PDF as a URL, not base64
+- Today: download PDF from storage → base64 encode → send inline. Doubles payload size and adds a full download step on the edge function.
+- New: create a short-lived **signed URL** for the file in `order-invoices` and send it as `image_url.url` directly. Removes the download + base64 step entirely.
 
-**Changes in `src/components/AuditLogPage.tsx`:**
-- Replace the pill with two `<input type="date">` controls labeled **"From"** and **"To"** (rename "Timestamp" → "Date range").
-- Add `filterDateFrom` and `filterDateTo` state.
-- Extend `filteredLogs` to also match `created_at` between the selected dates (inclusive, end-of-day for "To").
-- Style the inputs to match the other filter pills (same border, padding, rounded, dark-mode aware via semantic tokens).
+### 3. Trim the prompt + schema
+- The current system prompt is long and repeats rules. Tighten it to ~10 lines focused on: extract supplier, extract line items, exclude transport/TVA/total, detect currency.
+- Remove `total_price` from the tool schema (we never use it; we recompute from qty × unit_price). Smaller schema = faster tool-call generation.
 
-## 3. Settings dark mode fix (team members + teams sections)
+### 4. Parallelize DB writes
+- Today: `update orders` → await → `insert order_items` → await. Run both in `Promise.all` since they don't depend on each other (order id is already known).
 
-The screenshot shows hard white cards in dark mode. The culprit is hard-coded Tailwind colors like `bg-gradient-to-r from-slate-50 to-slate-100`, `bg-gradient-to-br from-orange-50 to-amber-50`, and the gray team header bar.
+### 5. Early status update + no double `req.json()`
+- The current `catch` block calls `req.json()` again, which throws because the body was already consumed. Parse once at the top, store `orderId`, reuse in the catch. This avoids a hidden second failure that masks the real error and slows the error path.
 
-**Changes in `src/components/SettingsPage.tsx`:**
-- Team member row (~line 1158): replace `from-slate-50 to-slate-100 hover:from-slate-100 hover:to-slate-200` with `bg-muted hover:bg-muted/70` (semantic tokens, dark-mode aware).
-- "Create New Team" panel (~line 1213): `from-orange-50 to-amber-50 border-orange-100` → `bg-orange-500/10 border-orange-500/30`.
-- Team card header (the gray "Staff" bar in the screenshot) and any other `bg-slate-*`, `bg-orange-50`, `bg-white`, `border-orange-100/200` in this section: swap to `bg-card`, `bg-muted`, `border-border`, or `bg-orange-500/10` so they render correctly in both themes.
-- Inputs inside team panels: use `bg-background text-foreground border-border` instead of hard-coded white.
+### 6. Cache supplier-name → matched ingredients hint (optional, small win)
+- Pass the list of existing ingredient names for the user/restaurant into the prompt (just names, comma-separated, capped at ~200). The model returns names that already match our catalog, which makes the client-side `matchIngredients` step nearly instant and reduces "needs confirmation" rows.
 
-Audit each block from line ~1140 to the end of the Teams section (~line 1380) and convert remaining hard-coded light colors to semantic tokens.
+### 7. Reduce post-processing work
+- Move the irrelevant-keyword filter and dedupe into a single pass instead of two `.filter()` chains. Negligible CPU but cleaner.
+
+## Expected impact
+
+- ~3–6x faster end-to-end (flash vs pro, no base64 round-trip, parallel writes).
+- Lower AI cost per invoice.
+- Fewer "needs confirmation" items thanks to catalog hint.
+- Same or better accuracy because pro is still used as a fallback.
 
 ## Out of scope
+- No UI changes to `OrdersPage`.
 - No DB schema changes.
-- No changes to per-role permissions or RLS.
-- No change to who can subscribe — both owners and employees can buy their own Pro for personal features.
+- No change to how invoices are uploaded or to the order-items confirmation flow.
+
+Approve and I'll implement.
