@@ -23,6 +23,7 @@ import { PersonalPaywall } from './PersonalPaywall';
 export function OrdersPage() {
   useSubscriptionGuard();
   const { currentUser, setCurrentPage, canAccessRestaurantFeatures, isAdmin, subscriptionSource } = useApp();
+  const isMobile = useIsMobile();
   const canUsePersonal = isAdmin || subscriptionSource === 'self';
   const [context, setContext] = useState<'personal' | 'restaurant'>(
     canUsePersonal ? 'personal' : 'restaurant'
