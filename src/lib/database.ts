@@ -17,9 +17,40 @@ export const inventoryBatchesService = {
       .from('inventory_batches')
       .select('*')
       .eq('ingredient_id', ingredientId)
-      .order('received_at', { ascending: false });
+      .order('received_at', { ascending: true });
     if (error) throw error;
     return data as InventoryBatch[];
+  },
+  async getPersonal() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('Not authenticated');
+    const { data, error } = await supabase
+      .from('inventory_batches')
+      .select('*')
+      .eq('owner_id', user.id)
+      .is('restaurant_id', null)
+      .order('received_at', { ascending: true });
+    if (error) throw error;
+    return data as InventoryBatch[];
+  },
+  async getRestaurant(restaurantId: string) {
+    const { data, error } = await supabase
+      .from('inventory_batches')
+      .select('*')
+      .eq('restaurant_id', restaurantId)
+      .order('received_at', { ascending: true });
+    if (error) throw error;
+    return data as InventoryBatch[];
+  },
+  async consume(ingredientId: string, quantity: number, reason = 'Used', recipeId?: string) {
+    const { data, error } = await supabase.rpc('consume_ingredient' as any, {
+      p_ingredient_id: ingredientId,
+      p_quantity: quantity,
+      p_reason: reason,
+      p_recipe_id: recipeId ?? null,
+    });
+    if (error) throw error;
+    return data as { requested: number; fulfilled: number; shortfall: number; batches: any[] };
   },
 };
 

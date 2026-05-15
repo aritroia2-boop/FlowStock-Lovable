@@ -127,6 +127,7 @@ export type Database = {
       }
       inventory_batches: {
         Row: {
+          attributes: Json
           created_at: string
           currency: string | null
           id: string
@@ -138,9 +139,11 @@ export type Database = {
           received_at: string
           remaining_quantity: number
           restaurant_id: string | null
+          supplier: string | null
           unit: string
         }
         Insert: {
+          attributes?: Json
           created_at?: string
           currency?: string | null
           id?: string
@@ -152,9 +155,11 @@ export type Database = {
           received_at?: string
           remaining_quantity: number
           restaurant_id?: string | null
+          supplier?: string | null
           unit: string
         }
         Update: {
+          attributes?: Json
           created_at?: string
           currency?: string | null
           id?: string
@@ -166,6 +171,7 @@ export type Database = {
           received_at?: string
           remaining_quantity?: number
           restaurant_id?: string | null
+          supplier?: string | null
           unit?: string
         }
         Relationships: []
@@ -685,6 +691,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      consume_ingredient: {
+        Args: {
+          p_ingredient_id: string
+          p_quantity: number
+          p_reason?: string
+          p_recipe_id?: string
+        }
+        Returns: Json
+      }
       create_team_invite_notification: {
         Args: { p_recipient_id: string; p_role: string; p_team_id: string }
         Returns: string

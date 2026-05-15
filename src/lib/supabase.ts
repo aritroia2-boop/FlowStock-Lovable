@@ -135,6 +135,8 @@ export interface InventoryBatch {
   owner_id?: string;
   restaurant_id?: string;
   created_at: string;
+  attributes?: Record<string, any>;
+  supplier?: string | null;
 }
 
 export interface Recipe {
