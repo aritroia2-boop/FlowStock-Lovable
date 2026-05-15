@@ -328,7 +328,7 @@ export function Dashboard() {
           </div>
 
           {/* Stats Grid - Second Row */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 mb-6">
+          <div className="grid grid-cols-2 gap-2.5 sm:gap-4 md:gap-6 mb-4 sm:mb-6">
             {/* Active Users Card */}
             <button 
               onClick={() => setCurrentPage('settings')}
