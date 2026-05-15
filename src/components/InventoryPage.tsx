@@ -143,16 +143,16 @@ export const InventoryPage = () => {
   const handleDecreaseQuantity = async () => {
     if (!selectedIngredient || quantityChange <= 0) return;
     if (quantityChange > selectedIngredient.quantity) {
-      alert('Cannot decrease by more than current quantity');
+      alert('Cannot use more than current stock');
       return;
     }
     try {
-      await ingredientsService.adjustQuantity(selectedIngredient.id, -quantityChange, 'Removed', currentUser?.name || 'User');
+      await ingredientsService.adjustQuantity(selectedIngredient.id, -quantityChange, 'Used', currentUser?.name || 'User');
       setShowDecreaseModal(false);
       setQuantityChange(0);
       loadIngredients();
     } catch (error) {
-      console.error('Error decreasing quantity:', error);
+      console.error('Error using ingredient:', error);
     }
   };
 
@@ -418,7 +418,7 @@ export const InventoryPage = () => {
                                     <button
                                       onClick={() => openDecreaseModal(ingredient)}
                                       className="group/btn p-2.5 bg-gradient-to-br from-red-500 to-red-600 text-white rounded-xl hover:from-red-600 hover:to-red-700 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110"
-                                      title="Decrease quantity"
+                                      title="Use"
                                     >
                                       <Minus size={16} className="group-hover/btn:rotate-90 transition-transform" />
                                     </button>
@@ -494,27 +494,27 @@ export const InventoryPage = () => {
 
       {showDecreaseModal && selectedIngredient && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-6">
-          <div className="relative bg-white/95 backdrop-blur-xl rounded-3xl p-8 max-w-md w-full shadow-2xl border border-white/20 overflow-hidden">
+          <div className="relative bg-card/95 backdrop-blur-xl rounded-3xl p-8 max-w-md w-full shadow-2xl border border-border overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 via-orange-400 to-red-500"></div>
-            <div className="absolute inset-0 bg-gradient-to-br from-red-50/30 via-transparent to-orange-50/30 pointer-events-none"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-red-50/30 via-transparent to-orange-50/30 dark:from-red-900/10 dark:to-orange-900/10 pointer-events-none"></div>
             <div className="relative z-10">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Decrease Quantity</h2>
-            <p className="text-gray-600 mb-6">{selectedIngredient.name}</p>
+            <h2 className="text-2xl font-bold text-foreground mb-2">Use Ingredient</h2>
+            <p className="text-muted-foreground mb-6">{selectedIngredient.name}</p>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Amount to Remove</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Amount to Use</label>
                 <input
                   type="number"
                   min="0"
                   max={selectedIngredient.quantity}
                   value={quantityChange}
                   onChange={(e) => setQuantityChange(Number(e.target.value))}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-400"
+                  className="w-full px-4 py-3 border-2 border-border bg-background text-foreground rounded-xl focus:outline-none focus:border-primary"
                   placeholder="Enter quantity"
                 />
               </div>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-muted-foreground">
                 Current: {selectedIngredient.quantity} {selectedIngredient.unit}
               </p>
             </div>
@@ -522,7 +522,7 @@ export const InventoryPage = () => {
               <div className="flex gap-4 mt-6">
                 <button
                   onClick={() => setShowDecreaseModal(false)}
-                  className="flex-1 px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium shadow-sm hover:shadow-md transition-all duration-300"
+                  className="flex-1 px-6 py-3 bg-muted hover:bg-muted/80 text-foreground rounded-xl font-medium shadow-sm hover:shadow-md transition-all duration-300"
                 >
                   Cancel
                 </button>
@@ -531,7 +531,7 @@ export const InventoryPage = () => {
                   disabled={quantityChange <= 0 || quantityChange > selectedIngredient.quantity}
                   className="flex-1 px-6 py-3 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-xl font-medium shadow-lg shadow-red-500/30 hover:shadow-xl hover:shadow-red-500/40 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
                 >
-                  Confirm
+                  Use
                 </button>
               </div>
             </div>
