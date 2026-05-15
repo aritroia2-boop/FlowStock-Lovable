@@ -403,25 +403,45 @@ export function OrdersPage() {
               <div>
                 <h2 className="text-lg font-semibold text-foreground">Upload Invoice</h2>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Upload PDF invoices from suppliers to extract ingredients
+                  Upload a PDF or photo of a supplier invoice to extract ingredients
                 </p>
               </div>
             </div>
 
-            <label className="relative flex flex-col items-center justify-center border-2 border-dashed border-border/40 rounded-lg p-8 cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-all group">
-              <Upload size={32} className="text-muted-foreground group-hover:text-primary transition-colors mb-2" />
-              <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
-                {uploading ? 'Uploading...' : 'Click to upload or drag and drop'}
-              </span>
-              <span className="text-xs text-muted-foreground mt-1">PDF files up to 10MB</span>
-              <input
-                type="file"
-                accept=".pdf"
-                onChange={handleFileUpload}
-                disabled={uploading}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              />
-            </label>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="relative flex flex-col items-center justify-center border-2 border-dashed border-border/40 rounded-lg p-8 cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-all group">
+                <Upload size={32} className="text-muted-foreground group-hover:text-primary transition-colors mb-2" />
+                <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
+                  {uploading ? 'Uploading...' : 'Upload file'}
+                </span>
+                <span className="text-xs text-muted-foreground mt-1 text-center">PDF, JPG, PNG, WebP, HEIC — up to 15MB</span>
+                <input
+                  type="file"
+                  accept="application/pdf,image/jpeg,image/png,image/webp,image/heic,image/heif"
+                  onChange={handleFileUpload}
+                  disabled={uploading}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+              </label>
+
+              {isMobile && (
+                <label className="relative flex flex-col items-center justify-center border-2 border-dashed border-primary/40 rounded-lg p-8 cursor-pointer hover:border-primary hover:bg-primary/5 transition-all group">
+                  <Camera size={32} className="text-primary mb-2" />
+                  <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
+                    {uploading ? 'Uploading...' : 'Take photo'}
+                  </span>
+                  <span className="text-xs text-muted-foreground mt-1 text-center">Snap the invoice with your camera</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    onChange={handleFileUpload}
+                    disabled={uploading}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                </label>
+              )}
+            </div>
           </div>
         </div>
 
