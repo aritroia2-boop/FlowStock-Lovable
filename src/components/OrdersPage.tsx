@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { ArrowLeft, Upload, FileText, Loader2, Check, X, AlertCircle, Trash2, Eye, ChevronDown } from 'lucide-react';
-import { ordersService, orderItemsService, ingredientsService } from '../lib/database';
+import { ordersService, orderItemsService, ingredientsService, inventoryBatchesService } from '../lib/database';
 import { uploadOrderInvoice, deleteOrderInvoice } from '../lib/supabase';
 import type { Order, OrderItem, Ingredient } from '../lib/supabase';
 import { matchIngredients } from '../lib/ingredientMatcher';
@@ -154,20 +154,23 @@ export function OrdersPage() {
       
       const items = await orderItemsService.getByOrderId(order.id);
       
-      // Match ingredients with inventory
+      // Match ingredients with inventory using attribute-aware matcher
       const matched = matchIngredients(
         items.map(item => ({
-          name: item.ingredient_name,
+          name: (item as any).normalized_name || item.ingredient_name,
           quantity: item.quantity,
           unit: item.unit,
-          price_per_unit: item.price_per_unit
+          price_per_unit: (item as any).invoice_unit_price ?? item.price_per_unit,
+          attributes: (item as any).attributes || {},
         })),
         allIngredients
       );
 
       const matchedItems: MatchedItem[] = items.map((item, index) => ({
         ...item,
-        ...matched[index]
+        ...matched[index],
+        // ensure invoice price is what we use
+        price_per_unit: (item as any).invoice_unit_price ?? item.price_per_unit,
       }));
 
       setOrderItems(matchedItems);
@@ -215,22 +218,42 @@ export function OrdersPage() {
     try {
       setConfirming(true);
       const ingredientsWithPriceUpdates: string[] = [];
+      const restaurantId = context === 'restaurant' ? currentUser.restaurant_id : null;
+      const orderCurrency = (selectedOrder as any).currency || 'RON';
 
       for (const item of orderItems) {
+        const invoicePrice = (item as any).invoice_unit_price ?? item.price_per_unit ?? 0;
+
         if (item.is_new_ingredient) {
-          // Create new ingredient
-          await ingredientsService.create({
+          // Create new ingredient — seed standard_price = invoice price (first reference)
+          const created = await ingredientsService.create({
             name: item.ingredient_name,
             quantity: item.quantity,
             unit: item.unit,
-            price_per_unit: item.price_per_unit,
+            price_per_unit: invoicePrice,
+            standard_price: invoicePrice,
+            last_purchase_price: invoicePrice,
+            attributes: (item as any).attributes || {},
             minimum_stock: 0,
             owner_id: currentUser.id,
-            restaurant_id: context === 'restaurant' ? currentUser.restaurant_id : null,
-            is_shared: context === 'restaurant'
+            restaurant_id: restaurantId || undefined,
+            is_shared: context === 'restaurant',
+          } as any);
+
+          // Record the batch with the real invoice price
+          await inventoryBatchesService.create({
+            ingredient_id: created.id,
+            order_id: selectedOrder.id,
+            quantity: item.quantity,
+            remaining_quantity: item.quantity,
+            unit: item.unit,
+            purchase_price: invoicePrice,
+            currency: orderCurrency,
+            owner_id: currentUser.id,
+            restaurant_id: restaurantId || undefined,
           });
         } else if (item.matchedIngredient) {
-          // Update existing ingredient quantity
+          // Add stock to existing ingredient (do NOT overwrite standard_price)
           await ingredientsService.adjustQuantity(
             item.matchedIngredient.id,
             item.quantity,
@@ -238,17 +261,30 @@ export function OrdersPage() {
             currentUser.name
           );
 
-          // Update price if provided and track for recipe recalculation
-          if (item.price_per_unit > 0) {
+          // Update last_purchase_price only — standard_price stays as the baseline reference
+          if (invoicePrice > 0) {
             await ingredientsService.update(item.matchedIngredient.id, {
-              price_per_unit: item.price_per_unit
-            });
+              last_purchase_price: invoicePrice,
+            } as any);
             ingredientsWithPriceUpdates.push(item.matchedIngredient.id);
           }
+
+          // Record the per-delivery batch at the actual invoice price
+          await inventoryBatchesService.create({
+            ingredient_id: item.matchedIngredient.id,
+            order_id: selectedOrder.id,
+            quantity: item.quantity,
+            remaining_quantity: item.quantity,
+            unit: item.unit,
+            purchase_price: invoicePrice,
+            currency: orderCurrency,
+            owner_id: currentUser.id,
+            restaurant_id: restaurantId || undefined,
+          });
         }
       }
 
-      // Recalculate recipe costs for ingredients with price updates
+      // Recalculate recipe costs only when actual purchase price changed
       if (ingredientsWithPriceUpdates.length > 0) {
         const { recipeCostService } = await import('../lib/database');
         const result = await recipeCostService.updateRecipesForMultipleIngredients(
