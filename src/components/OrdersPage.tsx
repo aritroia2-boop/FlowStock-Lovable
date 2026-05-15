@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
-import { ArrowLeft, Upload, FileText, Loader2, Check, X, AlertCircle, Trash2, Eye, ChevronDown } from 'lucide-react';
+import { ArrowLeft, Upload, FileText, Image as ImageIcon, Camera, Loader2, Check, X, AlertCircle, Trash2, Eye, ChevronDown, RefreshCw } from 'lucide-react';
 import { ordersService, orderItemsService, ingredientsService, inventoryBatchesService } from '../lib/database';
 import { uploadOrderInvoice, deleteOrderInvoice } from '../lib/supabase';
 import type { Order, OrderItem, Ingredient } from '../lib/supabase';
