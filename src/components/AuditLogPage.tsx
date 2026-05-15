@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Calendar, ChevronLeft, ChevronRight, Home, Settings } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { auditLogsService, AuditLog } from '../lib/database';
 import { useApp } from '../context/AppContext';
 import { AppLayout } from './AppLayout';
@@ -13,6 +13,8 @@ export const AuditLogPage = () => {
   const [filterIngredient, setFilterIngredient] = useState('');
   const [filterOperation, setFilterOperation] = useState('Operation');
   const [filterUser, setFilterUser] = useState('');
+  const [filterDateFrom, setFilterDateFrom] = useState('');
+  const [filterDateTo, setFilterDateTo] = useState('');
   const [currentLogPage] = useState(2);
 
   useEffect(() => {
