@@ -108,7 +108,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       connectionError,
       isSubscribed,
       isAdmin,
-      canAccessRestaurantFeatures
+      canAccessRestaurantFeatures,
+      subscriptionSource
     }}>
       {children}
     </AppContext.Provider>
