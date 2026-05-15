@@ -186,6 +186,7 @@ export type Database = {
       order_items: {
         Row: {
           created_at: string | null
+          currency: string | null
           id: string
           ingredient_name: string
           is_new_ingredient: boolean | null
@@ -198,6 +199,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          currency?: string | null
           id?: string
           ingredient_name: string
           is_new_ingredient?: boolean | null
@@ -210,6 +212,7 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          currency?: string | null
           id?: string
           ingredient_name?: string
           is_new_ingredient?: boolean | null
@@ -240,6 +243,7 @@ export type Database = {
       orders: {
         Row: {
           created_at: string | null
+          currency: string
           error_message: string | null
           extracted_data: Json | null
           file_name: string
@@ -253,6 +257,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          currency?: string
           error_message?: string | null
           extracted_data?: Json | null
           file_name: string
@@ -266,6 +271,7 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          currency?: string
           error_message?: string | null
           extracted_data?: Json | null
           file_name?: string
