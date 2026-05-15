@@ -8,15 +8,19 @@ import { formatPrice } from '../lib/unitConverter';
 import { AppLayout } from './AppLayout';
 
 import { useSubscriptionGuard } from '../hooks/useSubscriptionGuard';
+import { PersonalPaywall } from './PersonalPaywall';
 
 export const InventoryPage = () => {
   useSubscriptionGuard();
-  const { currentUser, setCurrentPage, inventoryFilter, setInventoryFilter } = useApp();
+  const { currentUser, setCurrentPage, inventoryFilter, setInventoryFilter, isAdmin, subscriptionSource } = useApp();
   const { restaurantRole, getPermissionsForContext } = usePermissions();
+  const canUsePersonal = isAdmin || subscriptionSource === 'self';
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('All');
-  const [viewContext, setViewContext] = useState<'personal' | 'restaurant'>('personal');
+  const [viewContext, setViewContext] = useState<'personal' | 'restaurant'>(
+    canUsePersonal ? 'personal' : 'restaurant'
+  );
   const [showAddModal, setShowAddModal] = useState(false);
   const [showIncreaseModal, setShowIncreaseModal] = useState(false);
   const [showDecreaseModal, setShowDecreaseModal] = useState(false);
