@@ -18,6 +18,7 @@ interface AppContextType {
   isSubscribed: boolean;
   isAdmin: boolean;
   canAccessRestaurantFeatures: boolean;
+  subscriptionSource: 'self' | 'restaurant' | 'none';
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
