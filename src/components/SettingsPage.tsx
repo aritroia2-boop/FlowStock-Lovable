@@ -655,7 +655,7 @@ export const SettingsPage = () => {
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-xl flex items-start gap-3 shadow-sm">
+          <div className="mb-6 p-4 bg-red-50 dark:bg-red-950/30 border-l-4 border-red-500 rounded-r-xl flex items-start gap-3 shadow-sm">
             <AlertCircle size={24} className="text-red-500 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
               <p className="font-semibold text-red-900">Error</p>
@@ -665,7 +665,7 @@ export const SettingsPage = () => {
         )}
 
         {success && (
-          <div className="mb-6 p-4 bg-green-50 border-l-4 border-green-500 rounded-r-xl flex items-start gap-3 shadow-sm">
+          <div className="mb-6 p-4 bg-green-50 dark:bg-green-950/30 border-l-4 border-green-500 rounded-r-xl flex items-start gap-3 shadow-sm">
             <CheckCircle size={24} className="text-green-500 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
               <p className="font-semibold text-green-900">Success</p>
@@ -772,7 +772,7 @@ export const SettingsPage = () => {
                           email: currentUser?.email || ''
                         });
                       }}
-                      className="flex-1 px-6 py-3 bg-muted hover:bg-slate-300 text-foreground rounded-xl font-semibold transition-all"
+                      className="flex-1 px-6 py-3 bg-muted hover:bg-muted/80 text-foreground rounded-xl font-semibold transition-all"
                     >
                       Cancel
                     </button>
@@ -805,7 +805,7 @@ export const SettingsPage = () => {
             <div className="p-6">
               <div className="space-y-4">
                 {isAdmin ? (
-                  <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-100">
+                  <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/30 dark:to-pink-950/30 rounded-xl border border-purple-200 dark:border-purple-900/50">
                     <div className="flex items-center gap-2 mb-2">
                       <Shield className="w-5 h-5 text-purple-600" />
                       <p className="text-sm text-muted-foreground font-medium uppercase tracking-wide">Admin Access</p>
@@ -815,7 +815,7 @@ export const SettingsPage = () => {
                     </p>
                   </div>
                 ) : isSubscribed ? (
-                  <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-100">
+                  <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/30 dark:to-pink-950/30 rounded-xl border border-purple-200 dark:border-purple-900/50">
                     <p className="text-sm text-muted-foreground font-medium uppercase tracking-wide mb-1">Current Plan</p>
                     <p className="text-3xl font-bold text-foreground">
                       FlowStock Pro
@@ -869,7 +869,7 @@ export const SettingsPage = () => {
                 <div className="p-6">
                   {!restaurant ? (
                     <div>
-                      <div className="mb-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded-r-xl">
+                      <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-950/30 border-l-4 border-blue-500 rounded-r-xl">
                         <p className="text-blue-900 font-medium">Set up your restaurant to unlock all features</p>
                       </div>
 
@@ -951,7 +951,7 @@ export const SettingsPage = () => {
                     <div>
                       {!isEditingRestaurant ? (
                         <div className="space-y-6">
-                          <div className="flex items-start gap-6 p-6 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl border border-blue-100">
+                          <div className="flex items-start gap-6 p-6 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/30 dark:to-cyan-950/30 rounded-xl border border-blue-200 dark:border-blue-900/50">
                             {restaurant.logo_url ? (
                               <img src={restaurant.logo_url} alt={restaurant.name} className="w-24 h-24 rounded-xl object-cover border-2 border-white shadow-lg" />
                             ) : (
@@ -1085,7 +1085,7 @@ export const SettingsPage = () => {
                                   logo_url: restaurant.logo_url || ''
                                 });
                               }}
-                              className="flex-1 px-6 py-3 bg-muted hover:bg-slate-300 text-foreground rounded-xl font-semibold transition-all"
+                              className="flex-1 px-6 py-3 bg-muted hover:bg-muted/80 text-foreground rounded-xl font-semibold transition-all"
                             >
                               Cancel
                             </button>
@@ -1118,7 +1118,7 @@ export const SettingsPage = () => {
                   </div>
 
                   <div className="p-6 space-y-6">
-                    <div className="p-5 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border-2 border-purple-100">
+                    <div className="p-5 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/30 dark:to-pink-950/30 rounded-xl border-2 border-purple-200 dark:border-purple-900/50">
                       <h3 className="font-bold text-foreground mb-4 flex items-center gap-2 text-lg">
                         <UserPlus size={20} className="text-purple-600" />
                         Invite New Employee
@@ -1146,9 +1146,9 @@ export const SettingsPage = () => {
                       <h3 className="font-bold text-foreground mb-4 text-lg">Current Team Members</h3>
                       {employees.length === 0 ? (
                         <div className="text-center py-12 bg-muted rounded-xl border-2 border-dashed border-border">
-                          <Users size={48} className="text-slate-300 mx-auto mb-3" />
+                          <Users size={48} className="text-muted-foreground mx-auto mb-3" />
                           <p className="text-muted-foreground font-medium">No employees added yet</p>
-                          <p className="text-slate-400 text-sm mt-1">Invite your first team member above</p>
+                          <p className="text-muted-foreground text-sm mt-1">Invite your first team member above</p>
                         </div>
                       ) : (
                         <div className="space-y-3">
@@ -1171,7 +1171,7 @@ export const SettingsPage = () => {
                               </div>
                               <button
                                 onClick={() => handleRemoveEmployee(employee.id)}
-                                className="p-3 text-red-600 hover:bg-red-50 rounded-xl transition-all"
+                                className="p-3 text-red-600 hover:bg-red-500/10 rounded-xl transition-all"
                                 title="Remove employee"
                               >
                                 <Trash2 size={20} />
@@ -1234,7 +1234,7 @@ export const SettingsPage = () => {
                                 setNewTeamName('');
                                 setNewTeamDescription('');
                               }}
-                              className="flex-1 px-4 py-2 bg-muted hover:bg-slate-300 text-foreground rounded-xl font-semibold transition-all"
+                              className="flex-1 px-4 py-2 bg-muted hover:bg-muted/80 text-foreground rounded-xl font-semibold transition-all"
                             >
                               Cancel
                             </button>
@@ -1252,9 +1252,9 @@ export const SettingsPage = () => {
 
                     {teams.length === 0 ? (
                       <div className="text-center py-12 bg-muted rounded-xl border-2 border-dashed border-border">
-                        <Folder size={48} className="text-slate-300 mx-auto mb-3" />
+                        <Folder size={48} className="text-muted-foreground mx-auto mb-3" />
                         <p className="text-muted-foreground font-medium">No teams created yet</p>
-                        <p className="text-slate-400 text-sm mt-1">Create your first team to organize employees</p>
+                        <p className="text-muted-foreground text-sm mt-1">Create your first team to organize employees</p>
                       </div>
                     ) : (
                       <div className="space-y-4">
@@ -1282,7 +1282,7 @@ export const SettingsPage = () => {
                                       setEditingTeamId(null);
                                       setEditTeamName('');
                                     }}
-                                    className="p-2 bg-slate-300 hover:bg-slate-400 text-foreground rounded-lg transition-all"
+                                    className="p-2 bg-muted hover:bg-muted/80 text-foreground rounded-lg transition-all"
                                     title="Cancel"
                                   >
                                     <X size={18} />
@@ -1305,14 +1305,14 @@ export const SettingsPage = () => {
                                         setEditingTeamId(team.id);
                                         setEditTeamName(team.name);
                                       }}
-                                      className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                                      className="p-2 text-blue-600 hover:bg-blue-500/10 rounded-lg transition-all"
                                       title="Edit team"
                                     >
                                       <Edit size={18} />
                                     </button>
                                     <button
                                       onClick={() => handleDeleteTeam(team.id)}
-                                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                                      className="p-2 text-red-600 hover:bg-red-500/10 rounded-lg transition-all"
                                       title="Delete team"
                                     >
                                       <Trash2 size={18} />
@@ -1329,7 +1329,7 @@ export const SettingsPage = () => {
 
                               {!teamMembers[team.id] || teamMembers[team.id].length === 0 ? (
                                 <div className="text-center py-6 bg-card rounded-lg border border-dashed border-border">
-                                  <Users size={32} className="text-slate-300 mx-auto mb-2" />
+                                  <Users size={32} className="text-muted-foreground mx-auto mb-2" />
                                   <p className="text-muted-foreground text-sm">No members in this team</p>
                                 </div>
                               ) : (
@@ -1361,7 +1361,7 @@ export const SettingsPage = () => {
                                         </select>
                                         <button
                                           onClick={() => handleRemoveMemberFromTeam(team.id, member.profile_id)}
-                                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                                          className="p-2 text-red-600 hover:bg-red-500/10 rounded-lg transition-all"
                                           title="Remove from team"
                                         >
                                           <X size={16} />
@@ -1441,7 +1441,7 @@ export const SettingsPage = () => {
           )}
 
           {currentUser?.role === 'employee' && (
-            <div className="bg-blue-50 border-l-4 border-blue-500 rounded-r-xl p-6">
+            <div className="bg-blue-50 dark:bg-blue-950/30 border-l-4 border-blue-500 rounded-r-xl p-6">
               <div className="flex items-start gap-4">
                 <div className="p-3 bg-blue-500 rounded-xl">
                   <Building2 size={24} className="text-white" />
