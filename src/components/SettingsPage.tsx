@@ -1155,7 +1155,7 @@ export const SettingsPage = () => {
                           {employees.map((employee) => (
                             <div
                               key={employee.id}
-                              className="flex items-center justify-between p-4 bg-gradient-to-r from-slate-50 to-slate-100 hover:from-slate-100 hover:to-slate-200 rounded-xl border border-border transition-all"
+                              className="flex items-center justify-between p-4 bg-muted/60 hover:bg-muted rounded-xl border border-border transition-all"
                             >
                               <div className="flex items-center gap-4">
                                 <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-400 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg">
