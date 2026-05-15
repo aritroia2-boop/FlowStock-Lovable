@@ -658,8 +658,8 @@ export const SettingsPage = () => {
           <div className="mb-6 p-4 bg-red-50 dark:bg-red-950/30 border-l-4 border-red-500 rounded-r-xl flex items-start gap-3 shadow-sm">
             <AlertCircle size={24} className="text-red-500 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
-              <p className="font-semibold text-red-900">Error</p>
-              <p className="text-red-700 text-sm">{error}</p>
+              <p className="font-semibold text-red-900 dark:text-red-200">Error</p>
+              <p className="text-red-700 dark:text-red-300 text-sm">{error}</p>
             </div>
           </div>
         )}
@@ -668,8 +668,8 @@ export const SettingsPage = () => {
           <div className="mb-6 p-4 bg-green-50 dark:bg-green-950/30 border-l-4 border-green-500 rounded-r-xl flex items-start gap-3 shadow-sm">
             <CheckCircle size={24} className="text-green-500 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
-              <p className="font-semibold text-green-900">Success</p>
-              <p className="text-green-700 text-sm">{success}</p>
+              <p className="font-semibold text-green-900 dark:text-green-200">Success</p>
+              <p className="text-green-700 dark:text-green-300 text-sm">{success}</p>
             </div>
           </div>
         )}
@@ -870,7 +870,7 @@ export const SettingsPage = () => {
                   {!restaurant ? (
                     <div>
                       <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-950/30 border-l-4 border-blue-500 rounded-r-xl">
-                        <p className="text-blue-900 font-medium">Set up your restaurant to unlock all features</p>
+                        <p className="text-blue-900 dark:text-blue-200 font-medium">Set up your restaurant to unlock all features</p>
                       </div>
 
                       <form onSubmit={handleCreateRestaurant} className="space-y-4">
@@ -1164,7 +1164,7 @@ export const SettingsPage = () => {
                                 <div>
                                   <p className="font-bold text-foreground text-lg">{employee.name}</p>
                                   <p className="text-muted-foreground text-sm">{employee.email}</p>
-                                  <span className="inline-block mt-1 px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full uppercase tracking-wide">
+                                  <span className="inline-block mt-1 px-3 py-1 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 text-xs font-bold rounded-full uppercase tracking-wide">
                                     {employee.role}
                                   </span>
                                 </div>
@@ -1352,7 +1352,7 @@ export const SettingsPage = () => {
                                         <select
                                           value={member.role}
                                           onChange={(e) => handleUpdateMemberRole(member.id, e.target.value)}
-                                          className="text-sm px-3 py-1 bg-orange-100 text-orange-700 border border-orange-200 rounded-lg font-medium focus:ring-2 focus:ring-orange-500"
+                                          className="text-sm px-3 py-1 bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300 border border-orange-200 dark:border-orange-800 rounded-lg font-medium focus:ring-2 focus:ring-orange-500"
                                         >
                                           <option value="manager">Manager</option>
                                           <option value="supervisor">Supervisor</option>
