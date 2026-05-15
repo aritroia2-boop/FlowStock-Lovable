@@ -21,6 +21,7 @@ export interface User {
   is_admin?: boolean;
   subscription_status?: string;
   stripe_customer_id?: string;
+  subscription_source?: 'self' | 'restaurant' | 'none';
 }
 
 export const authService = {
@@ -82,16 +83,32 @@ export const authService = {
         };
       }
 
+      // Inherit subscription access from restaurant owner if applicable
+      let effectiveIsSubscribed = profile?.is_subscribed || false;
+      let subscriptionSource: 'self' | 'restaurant' | 'none' =
+        effectiveIsSubscribed ? 'self' : 'none';
+      try {
+        const { data: eff } = await supabase.rpc('get_effective_subscription');
+        const row = Array.isArray(eff) ? eff[0] : eff;
+        if (row) {
+          effectiveIsSubscribed = !!row.is_subscribed;
+          subscriptionSource = (row.source as 'self' | 'restaurant' | 'none') || 'none';
+        }
+      } catch (e) {
+        console.warn('get_effective_subscription failed, falling back to profile flag', e);
+      }
+
       return {
         id: user.id,
         email: user.email || '',
         name: profile?.name || 'User',
         role: profile?.role || 'none',
         restaurant_id: profile?.restaurant_id || undefined,
-        is_subscribed: profile?.is_subscribed || false,
+        is_subscribed: effectiveIsSubscribed,
         is_admin: profile?.is_admin || false,
         subscription_status: profile?.subscription_status || 'none',
         stripe_customer_id: profile?.stripe_customer_id || undefined,
+        subscription_source: subscriptionSource,
       };
     } catch (error) {
       console.error('Unexpected error in getCurrentUser:', error);

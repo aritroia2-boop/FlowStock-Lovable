@@ -5,7 +5,9 @@ import { subscriptionService, SUBSCRIPTION_PRICE_ID, SUBSCRIPTION_PRICE } from '
 import { toast } from 'sonner';
 
 export const PricingPage = () => {
-  const { setCurrentPage, currentUser, isSubscribed, isAdmin, canAccessRestaurantFeatures } = useAppContext();
+  const { setCurrentPage, currentUser, isSubscribed, isAdmin, canAccessRestaurantFeatures, subscriptionSource } = useAppContext();
+  const isOwner = (currentUser?.role || 'owner') === 'owner';
+  const isEmployee = !isOwner;
   const [loading, setLoading] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
 
@@ -68,15 +70,21 @@ export const PricingPage = () => {
               <Check className="w-8 h-8 text-green-500" />
             </div>
             <h2 className="text-2xl font-bold text-foreground mb-2">
-              {isAdmin ? 'Admin Access Active' : 'Subscription Active'}
+              {isAdmin
+                ? 'Admin Access Active'
+                : subscriptionSource === 'restaurant'
+                  ? 'Access Provided by Your Restaurant'
+                  : 'Subscription Active'}
             </h2>
             <p className="text-muted-foreground mb-6">
-              {isAdmin 
-                ? 'You have admin access to all restaurant features.' 
-                : 'You have full access to all restaurant features.'}
+              {isAdmin
+                ? 'You have admin access to all restaurant features.'
+                : subscriptionSource === 'restaurant'
+                  ? 'Your restaurant owner is subscribed to FlowStock Pro, so you have full access to all features. Billing is managed by the owner.'
+                  : 'You have full access to all restaurant features.'}
             </p>
-            
-            {isSubscribed && !isAdmin && (
+
+            {isSubscribed && !isAdmin && subscriptionSource === 'self' && (
               <div className="space-y-4">
                 <div className="bg-muted/50 rounded-xl p-4 text-left">
                   <div className="flex items-center justify-between mb-2">
@@ -88,7 +96,7 @@ export const PricingPage = () => {
                     <span className="font-medium text-foreground">{SUBSCRIPTION_PRICE}/month</span>
                   </div>
                 </div>
-                
+
                 <button
                   onClick={handleManageBilling}
                   disabled={portalLoading}
@@ -192,20 +200,27 @@ export const PricingPage = () => {
                 </li>
               </ul>
 
-              <button
-                onClick={handleSubscribe}
-                disabled={loading}
-                className="w-full py-3 rounded-lg font-medium transition-all bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Processing...
-                  </>
-                ) : (
-                  'Subscribe Now'
-                )}
-              </button>
+              {isEmployee ? (
+                <div className="w-full py-3 px-4 rounded-lg bg-muted/50 border border-border text-center">
+                  <p className="text-sm text-foreground font-medium mb-1">Billing is handled by your restaurant owner</p>
+                  <p className="text-xs text-muted-foreground">Ask the owner to subscribe so your team can use FlowStock Pro features.</p>
+                </div>
+              ) : (
+                <button
+                  onClick={handleSubscribe}
+                  disabled={loading}
+                  className="w-full py-3 rounded-lg font-medium transition-all bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    'Subscribe Now'
+                  )}
+                </button>
+              )}
             </div>
           </div>
         </div>
