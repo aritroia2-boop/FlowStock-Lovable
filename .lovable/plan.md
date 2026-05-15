@@ -1,91 +1,62 @@
-## Goals
-1. Force the entire app into permanent dark mode and remove the toggle.
-2. Make every page (not just dashboard) actually look correct in dark mode.
-3. Remove the Quick Actions panel from the Dashboard.
-4. Replace the `$` currency symbol with `RON` (lei) everywhere in the UI.
-5. Make invoice processing detect and store the currency from each invoice (RON / EUR / USD), and display amounts in that currency on the Orders page.
-6. Rename the inventory "Decrease" action to "Use" (button title, modal title, related labels).
-7. Fix Dashboard "Active Users" so it counts only users belonging to the current user's restaurant (and shows 0/1 correctly when alone).
 
-## 1. Permanent dark mode
-- In `src/App.tsx`, replace the `ThemeProvider` config with `attribute="class" defaultTheme="dark" forcedTheme="dark" enableSystem={false}`. This locks the `dark` class on `<html>` regardless of OS / stored preference.
-- In `src/index.css`, also add `dark` class to `:root` defaults (or set `:root` variables to the dark palette) as a safety net so the app is dark even before React mounts. Update the loading screen gradient in `App.tsx` to use `bg-background` instead of light blue.
-- Remove every theme toggle UI:
-  - Search and remove toggle buttons / `useTheme()` `setTheme` calls in `ResponsiveSidebar.tsx`, `MobileNav.tsx`, `SettingsPage.tsx`, and any header dropdowns.
-- Keep `next-themes` installed (still used to apply the class).
+# Mobile & Tablet Redesign
 
-## 2. Make dark mode look good across the whole app
-Continue the semantic-token migration started earlier. Audit and convert hardcoded light classes (`bg-white`, `bg-gray-*`, `text-gray-*`, `border-gray-*`, light gradients without `dark:` variants) to tokens (`bg-card`, `bg-muted`, `text-foreground`, `text-muted-foreground`, `border-border`) plus `dark:` gradient variants in:
-- `InventoryPage.tsx` (remaining modals: Add, Increase, Use, Edit; table rows; status pills backgrounds)
-- `RecipesPage.tsx` (recipe cards, cost badge, modals)
-- `RecipeDetailsModal.tsx` (full pass)
-- `OrdersPage.tsx` (status cards, upload area, extraction review panel)
-- `SettingsPage.tsx` (remaining sections: restaurant, team management, employees, danger zone)
-- `AuditLogPage.tsx` (filters, table)
-- `InventoryCard.tsx`, `WeeklyAnalytics.tsx` (chart text/legend colors)
-- `LoginPage.tsx` (already partially done — finish background + sign-up modal)
-- `SuccessPage.tsx`, `CancelPage.tsx`, `PricingPage.tsx`, `SubscribeBanner.tsx` (verify)
-Goal: every page reads cleanly on the dark background, with proper contrast for text, inputs, borders, hovers, and modals.
+Right now the app is designed desktop-first. On phones the dashboard cards feel huge, the sidebar drawer trigger overlaps the page title, the bottom nav crowds content, modals and tables overflow horizontally, and the inventory/orders pages don't reflow. Goal: make every page feel like it was built for the phone first, while keeping the desktop look intact.
 
-## 3. Remove Quick Actions from Dashboard
-In `src/components/Dashboard.tsx`, delete the `{myTeams.length === 0 && (... Quick Actions ...)}` block entirely. The Recent Activity card stays. If the user has no teams, that column simply ends after Recent Activity.
+## What will change
 
-## 4. Currency: replace `$` with `RON`
-- Create a small helper `src/lib/currency.ts` exporting `formatMoney(amount, currency = 'RON')` that returns e.g. `"1,250.00 RON"` (or `"1.250,00 RON"` — Romanian formatting via `Intl.NumberFormat('ro-RO', { style: 'currency', currency })`).
-- Update everywhere `$` is hardcoded in front of a number:
-  - `Dashboard.tsx` — Inventory Value card.
-  - `RecipesPage.tsx` line 243 — recipe cost.
-  - `InventoryCard.tsx` line 51 — price per unit.
-  - `WeeklyAnalytics.tsx` — any `$` in tooltips/labels (and switch the `DollarSign` lucide icon to a neutral icon like `Banknote` or keep icon but it's just decorative).
-  - `RecipeDetailsModal.tsx`, `OrdersPage.tsx`, `SettingsPage.tsx` — any cost/price displays.
-  - `unitConverter.ts` `formatPrice` already uses `lei` — keep but standardize wording to `RON/<unit>` for consistency.
-- Default display currency = `RON`. For order/invoice items, display in the currency stored on that order (see step 5).
+### 1. Global shell (AppLayout, top bar, sidebar, bottom nav)
+- Add a real **mobile top bar** (sticky): hamburger on the left, page title in the center, notifications bell on the right. This removes the floating menu button overlapping the dashboard heading.
+- Bottom nav: thinner (h-14), bigger tap targets, active item gets a pill background, safe-area padding for iPhone home bar, hide labels on very small screens, condense to 5 most-used items.
+- Sidebar drawer: full-height, slide-in, swipe-to-close, larger row spacing.
+- Add proper `pb-[env(safe-area-inset-bottom)]` and `pt-[env(safe-area-inset-top)]`.
 
-## 5. Detect invoice currency
-Database:
-- Add a `currency text not null default 'RON'` column to `orders`.
-- Add a `currency text` column to `order_items` (nullable, falls back to the parent order's currency).
+### 2. Dashboard
+- Stat cards: on mobile, switch from 4 huge cards to a **2-column compact grid** with smaller padding, smaller numbers, icon top-right, no hover-scale (causes layout shift on touch).
+- Drop the second row's redundant gradients on mobile (flatter look).
+- Recent Activity becomes a stacked list with truncation; Weekly Analytics chart gets horizontal scroll on phones.
+- Header text scales down (text-xl on mobile, text-3xl on desktop).
 
-Edge function `supabase/functions/process-invoice/index.ts`:
-- Extend the AI extraction prompt + JSON schema to also return a top-level `currency` field (ISO 4217: `RON`, `EUR`, `USD`, etc.). Detection rules: look for `RON`, `LEI`, `lei`, `€`, `EUR`, `$`, `USD`, `MDL`, `GBP`, `£` near totals or in the header, defaulting to `RON` if ambiguous (Romanian invoices).
-- When the function inserts the order/items, persist the detected `currency` on the `orders` row (and optionally per item).
+### 3. Inventory page
+- Replace the table view with **ingredient cards** on mobile (name, qty + unit, status pill, quick actions: Use / Add / Edit as icon buttons).
+- Search + filter chips become a sticky horizontal scroll bar under the header.
+- Add (+) becomes a **floating action button** on phones (bottom-right, above bottom nav).
+- Modals become bottom sheets (using existing Drawer component) on mobile.
 
-Frontend (`OrdersPage.tsx` + anywhere that renders invoice amounts):
-- Read `order.currency` and pass it to `formatMoney(amount, order.currency)` so each invoice shows its own currency. Inventory/recipes still default to `RON`.
+### 4. Orders page
+- Order list: each order = a card with thumbnail of invoice, status badge, currency badge, total. Tap to open details.
+- Upload area: full-width dashed drop zone with big "Take photo / Upload" buttons (camera input on phone).
+- Confirm modal → bottom sheet on mobile.
 
-## 6. Rename inventory "Decrease" → "Use"
-In `InventoryPage.tsx`:
-- Rename state and handlers for clarity: `showDecreaseModal` → `showUseModal`, `openDecreaseModal` → `openUseModal`, `handleDecreaseQuantity` → `handleUseQuantity` (internal only).
-- Button `title="Decrease quantity"` → `title="Use"`; if there is visible label text, set it to `Use`.
-- Modal heading `Decrease Quantity` → `Use Ingredient`; submit button label → `Use`; validation message `Cannot decrease by more than current quantity` → `Cannot use more than current stock`.
-- Audit log operation strings stay the same data-wise but, where shown to the user as "decrease/decreased", relabel to "used".
+### 5. Recipes page
+- Grid: 1 column on phone, 2 on tablet, 3+ on desktop.
+- Recipe card image aspect locked 16:9, ingredient availability pill, tap opens detail sheet.
+- Recipe details modal becomes a full-screen sheet on mobile.
 
-## 7. Dashboard "Active Users" accuracy
-Current code in `Dashboard.tsx > loadStats`:
-```
-supabase.from('team_members').select('*', { count:'exact', head:true }).eq('status','active')
-```
-This counts active `team_members` across ALL restaurants visible to the user, and a single user can produce multiple rows (one per team they belong to).
+### 6. Settings, Audit Logs, Pricing, Login, Success/Cancel
+- Convert hardcoded `max-w` containers to fluid `w-full max-w-*` with `px-4` on mobile.
+- Settings sections become collapsible accordions on mobile.
+- Audit logs: card list on mobile instead of table.
+- Login: single column, larger inputs (h-12), bigger buttons, logo above form.
+- Pricing: stack plan cards vertically on mobile, "Most popular" stays highlighted.
 
-Fix:
-- Compute distinct active members of the current user's restaurant only:
-  - First get `currentUser.restaurant_id` (already loaded as `restaurantInfo`/profile).
-  - If the user has a `restaurant_id`, query `profiles` filtered by `restaurant_id = <my restaurant>` and count rows. This represents everyone (owner + employees) in the restaurant.
-  - If the user has no restaurant, show `1` (just you).
-- Update the card subtitle to "Members in your restaurant" so it's clear what is being counted.
+### 7. Forms, modals, inputs
+- All inputs `h-11`/`h-12` on mobile so iOS doesn't zoom (`text-base`/16px font).
+- Convert dialogs that hit viewport edge to **Drawer (vaul)** on `sm:` breakpoint and below.
+- Sticky modal headers + footers so action buttons stay reachable.
 
-(Note: Supabase auth doesn't expose a real "currently online" presence without Realtime presence channels. Counting restaurant members matches the user's expectation — they were the only person in their restaurant and want to see `1`.)
+### 8. Typography & spacing tokens
+- Standardize: `text-2xl md:text-3xl lg:text-4xl` for page titles, `p-4 md:p-6 lg:p-8` for page padding, `gap-3 md:gap-6` for grids.
+- Add a `useIsMobile` hook usage where layout actually branches (already exists at `src/hooks/use-mobile.tsx`).
+
+## Technical notes
+
+- New component: `src/components/MobileTopBar.tsx` rendered by `AppLayout` only on `md:hidden`.
+- Touch FAB: small reusable `FloatingActionButton` component.
+- Reuse existing `Drawer` (vaul) for bottom sheets; wrap pattern as `ResponsiveDialog` so each page calls one component and gets Dialog on desktop / Drawer on mobile.
+- No backend/data changes. No route changes.
+- Keep all dark-mode semantic tokens; this is layout/spacing only.
 
 ## Out of scope
-- No new Stripe / subscription changes.
-- No light-mode theme switcher (explicitly removed).
-- No realtime presence tracking for "online now" — using restaurant member count.
-
-## Order of execution
-1. DB migration: add `currency` columns to `orders` and `order_items`.
-2. Force dark mode + remove toggle (App.tsx, ThemeProvider usage, sidebars).
-3. Token sweep across remaining pages/modals.
-4. Dashboard: remove Quick Actions, fix Active Users count.
-5. Add `formatMoney` helper, replace `$` everywhere with RON.
-6. Update `process-invoice` edge function to extract currency; render order amounts with their own currency.
-7. Inventory: rename Decrease → Use across UI.
+- No new features, no schema changes, no copy rewrites beyond layout-driven truncation.
+- Desktop layout stays visually the same.

@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Search, Plus, Minus, Edit2, Home, Settings, User, Building2, Eye, Lock } from 'lucide-react';
+import { Search, Plus, Minus, Edit2, User, Building2, Eye, Lock } from 'lucide-react';
 import { ingredientsService, auditLogsService, Ingredient, recipeCostService } from '../lib/database';
 import { useApp } from '../context/AppContext';
 import { usePermissions } from '../hooks/usePermissions';
 import { RoleBadge } from './RoleBadge';
 import { formatPrice } from '../lib/unitConverter';
+import { AppLayout } from './AppLayout';
 
 import { useSubscriptionGuard } from '../hooks/useSubscriptionGuard';
 
@@ -214,46 +215,32 @@ export const InventoryPage = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-slate-900 dark:to-slate-800 p-4 md:p-8 relative overflow-hidden">
+    <AppLayout>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-slate-900 dark:to-slate-800 p-3 sm:p-4 md:p-8 relative overflow-hidden">
       <div className="absolute top-0 right-0 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl"></div>
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-cyan-400/10 rounded-full blur-3xl"></div>
 
       <div className="max-w-7xl mx-auto relative z-10">
-        <div className="relative bg-card/70 backdrop-blur-xl rounded-3xl shadow-2xl border border-border overflow-hidden">
+        <div className="relative bg-card/70 backdrop-blur-xl rounded-2xl md:rounded-3xl shadow-2xl border border-border overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-cyan-50/50 dark:from-blue-900/10 dark:to-cyan-900/10"></div>
           <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500 animate-pulse"></div>
 
           <div className="relative z-10 p-4 md:p-6 lg:p-8">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6 md:mb-8">
-              <div className="flex items-center gap-4">
-                <div className="bg-gradient-to-br from-blue-500 to-cyan-400 p-3 rounded-2xl shadow-lg">
-                  <Search size={28} className="text-white" />
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-5 md:mb-8">
+              <div className="flex items-center gap-3 md:gap-4">
+                <div className="bg-gradient-to-br from-blue-500 to-cyan-400 p-2.5 md:p-3 rounded-2xl shadow-lg">
+                  <Search size={22} className="text-white md:hidden" />
+                  <Search size={28} className="text-white hidden md:block" />
                 </div>
-                <div>
-                  <div className="flex items-center gap-3">
-                    <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">Inventory Overview</h1>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 md:gap-3 flex-wrap">
+                    <h1 className="text-xl sm:text-2xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">Inventory</h1>
                     {currentUser?.restaurant_id && <RoleBadge role={restaurantRole} size="sm" />}
                   </div>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 md:mt-1">
                     {permissions.isReadOnly ? 'View ingredients' : 'Manage and track your ingredients'}
                   </p>
                 </div>
-              </div>
-              <div className="flex items-center gap-3 w-full md:w-auto">
-                <button
-                  onClick={() => setCurrentPage('settings')}
-                  className="group p-3 bg-muted hover:bg-muted/80 rounded-2xl transition-all duration-300"
-                  title="Settings"
-                >
-                  <Settings size={20} className="text-muted-foreground group-hover:text-primary group-hover:rotate-90 transition-all duration-300" />
-                </button>
-                <button
-                  onClick={() => setCurrentPage('dashboard')}
-                  className="group flex items-center gap-2 px-6 py-3 bg-muted hover:bg-muted/80 border border-border text-foreground rounded-2xl font-medium shadow-sm hover:shadow-md transition-all duration-300"
-                >
-                  <Home size={20} className="group-hover:-translate-x-0.5 transition-transform" />
-                  Home
-                </button>
               </div>
             </div>
 
@@ -346,7 +333,85 @@ export const InventoryPage = () => {
               </div>
             </div>
 
-            <div className="bg-muted/50 rounded-b-2xl overflow-hidden shadow-inner">
+            {/* Mobile card list */}
+            <div className="md:hidden space-y-3 mt-2">
+              {filteredIngredients.length === 0 && (
+                <div className="text-center text-sm text-muted-foreground py-10">
+                  No ingredients found.
+                </div>
+              )}
+              {filteredIngredients.map((ingredient) => {
+                const status = getStatus(ingredient);
+                return (
+                  <div key={ingredient.id} className="bg-card/80 backdrop-blur-sm border border-border rounded-2xl p-4 shadow-sm">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h3 className="font-semibold text-foreground truncate">{ingredient.name}</h3>
+                          {ingredient.is_shared ? (
+                            <span className="px-2 py-0.5 bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400 text-[10px] font-medium rounded-md">
+                              Restaurant
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-400 text-[10px] font-medium rounded-md">
+                              Personal
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-baseline gap-1 mt-1">
+                          <span className="text-2xl font-bold text-foreground">{ingredient.quantity}</span>
+                          <span className="text-sm text-muted-foreground">{ingredient.unit}</span>
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          Min: {ingredient.minimum_stock} {ingredient.unit}
+                          {ingredient.price_per_unit > 0 && (
+                            <span className="ml-2 text-blue-600 dark:text-blue-400 font-medium">
+                              {formatPrice(ingredient.price_per_unit, ingredient.unit)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <span className={`shrink-0 inline-flex items-center gap-1 px-2.5 py-1 ${status.color} text-white rounded-full text-[10px] font-semibold shadow`}>
+                        <span className="w-1 h-1 bg-white rounded-full animate-pulse"></span>
+                        {status.text}
+                      </span>
+                    </div>
+
+                    {!permissions.isReadOnly && permissions.canEditIngredients && (
+                      <div className="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-border">
+                        <button
+                          onClick={() => openIncreaseModal(ingredient)}
+                          className="flex items-center justify-center gap-1 py-2.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-xl text-sm font-medium active:scale-95 transition-transform"
+                        >
+                          <Plus size={16} /> Add
+                        </button>
+                        <button
+                          onClick={() => openDecreaseModal(ingredient)}
+                          className="flex items-center justify-center gap-1 py-2.5 bg-red-500/10 text-red-600 dark:text-red-400 rounded-xl text-sm font-medium active:scale-95 transition-transform"
+                        >
+                          <Minus size={16} /> Use
+                        </button>
+                        <button
+                          onClick={() => openEditModal(ingredient)}
+                          className="flex items-center justify-center gap-1 py-2.5 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 rounded-xl text-sm font-medium active:scale-95 transition-transform"
+                        >
+                          <Edit2 size={16} /> Edit
+                        </button>
+                      </div>
+                    )}
+                    {permissions.isReadOnly && (
+                      <div className="flex items-center gap-2 text-muted-foreground mt-3 pt-3 border-t border-border">
+                        <Eye size={14} />
+                        <span className="text-xs font-medium">View Only</span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Desktop table */}
+            <div className="hidden md:block bg-muted/50 rounded-b-2xl overflow-hidden shadow-inner">
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[800px]">
                 <thead>
@@ -753,5 +818,6 @@ export const InventoryPage = () => {
         </div>
       )}
     </div>
+    </AppLayout>
   );
 };

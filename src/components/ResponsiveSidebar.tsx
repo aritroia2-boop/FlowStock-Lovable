@@ -1,13 +1,10 @@
-import { LayoutDashboard, Package, ChefHat, ShoppingCart, FileText, Settings, LogOut, Menu } from 'lucide-react';
+import { LayoutDashboard, Package, ChefHat, ShoppingCart, FileText, Settings, LogOut } from 'lucide-react';
 import { NavLink } from './NavLink';
 import { useApp } from '@/context/AppContext';
 import { Button } from './ui/button';
-import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
-import { useState } from 'react';
 
 export const ResponsiveSidebar = () => {
   const { logout, currentUser } = useApp();
-  const [open, setOpen] = useState(false);
 
   const navItems = [
     { page: 'dashboard' as const, icon: LayoutDashboard, label: 'Dashboard' },
@@ -34,7 +31,6 @@ export const ResponsiveSidebar = () => {
             to={page}
             className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors text-muted-foreground hover:text-foreground hover:bg-accent"
             activeClassName="bg-primary text-primary-foreground font-medium"
-            onClick={() => setOpen(false)}
           >
             <Icon size={20} />
             <span>{label}</span>
@@ -46,7 +42,6 @@ export const ResponsiveSidebar = () => {
         <Button
           onClick={() => {
             logout();
-            setOpen(false);
           }}
           variant="outline"
           className="w-full justify-start gap-3"
@@ -65,19 +60,7 @@ export const ResponsiveSidebar = () => {
         <SidebarContent />
       </aside>
 
-      {/* Mobile Drawer */}
-      <Sheet open={open} onOpenChange={setOpen}>
-        <SheetTrigger asChild>
-          <Button variant="ghost" size="icon" className="md:hidden fixed top-4 left-4 z-50">
-            <Menu size={24} />
-          </Button>
-        </SheetTrigger>
-        <SheetContent side="left" className="w-64 p-0">
-          <div className="flex flex-col h-full">
-            <SidebarContent />
-          </div>
-        </SheetContent>
-      </Sheet>
+      {/* Mobile drawer is rendered by MobileTopBar */}
     </>
   );
 };

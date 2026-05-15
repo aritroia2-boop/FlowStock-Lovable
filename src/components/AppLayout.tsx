@@ -2,6 +2,7 @@ import { ReactNode } from 'react';
 import { useSwipeable } from 'react-swipeable';
 import { ResponsiveSidebar } from './ResponsiveSidebar';
 import { MobileNav } from './MobileNav';
+import { MobileTopBar } from './MobileTopBar';
 import { useApp } from '../context/AppContext';
 
 interface AppLayoutProps {
@@ -48,13 +49,16 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
   return (
     <div className="min-h-screen bg-background flex">
       <ResponsiveSidebar />
-      
-      <main 
-        {...swipeHandlers}
-        className="flex-1 w-full md:w-auto pb-20 md:pb-0 touch-pan-y"
-      >
-        {children}
-      </main>
+
+      <div className="flex-1 w-full md:w-auto flex flex-col min-w-0">
+        <MobileTopBar />
+        <main
+          {...swipeHandlers}
+          className="flex-1 pb-24 md:pb-0 touch-pan-y"
+        >
+          {children}
+        </main>
+      </div>
 
       <MobileNav />
     </div>
