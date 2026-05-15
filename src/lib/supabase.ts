@@ -110,6 +110,9 @@ export interface Ingredient {
   unit: string;
   minimum_stock: number;
   price_per_unit: number;
+  standard_price?: number;
+  last_purchase_price?: number;
+  attributes?: Record<string, any>;
   category?: string;
   supplier?: string;
   owner_id?: string;
@@ -117,6 +120,21 @@ export interface Ingredient {
   is_shared?: boolean;
   created_at: string;
   updated_at: string;
+}
+
+export interface InventoryBatch {
+  id: string;
+  ingredient_id: string;
+  order_id?: string;
+  quantity: number;
+  remaining_quantity: number;
+  unit: string;
+  purchase_price: number;
+  currency: string;
+  received_at: string;
+  owner_id?: string;
+  restaurant_id?: string;
+  created_at: string;
 }
 
 export interface Recipe {
@@ -160,12 +178,18 @@ export interface OrderItem {
   id: string;
   order_id: string;
   ingredient_name: string;
+  normalized_name?: string;
+  attributes?: Record<string, any>;
   quantity: number;
   unit: string;
   price_per_unit: number;
+  invoice_unit_price?: number;
+  total_price_line?: number;
+  confidence_score?: number;
   matched_ingredient_id?: string;
   needs_confirmation: boolean;
   is_new_ingredient: boolean;
+  currency?: string;
   created_at: string;
 }
 

@@ -1,6 +1,27 @@
-import { supabase, Ingredient, Recipe, RecipeIngredient, AuditLog, Team, TeamMember, Profile, Notification, Order, OrderItem } from './supabase';
+import { supabase, Ingredient, Recipe, RecipeIngredient, AuditLog, Team, TeamMember, Profile, Notification, Order, OrderItem, InventoryBatch } from './supabase';
 
-export type { Ingredient, Recipe, RecipeIngredient, AuditLog, Team, TeamMember, Profile, Notification, Order, OrderItem };
+export type { Ingredient, Recipe, RecipeIngredient, AuditLog, Team, TeamMember, Profile, Notification, Order, OrderItem, InventoryBatch };
+
+export const inventoryBatchesService = {
+  async create(batch: Omit<InventoryBatch, 'id' | 'created_at' | 'received_at'> & { received_at?: string }) {
+    const { data, error } = await supabase
+      .from('inventory_batches')
+      .insert([{ ...batch, received_at: batch.received_at || new Date().toISOString() }])
+      .select()
+      .single();
+    if (error) throw error;
+    return data as InventoryBatch;
+  },
+  async getByIngredient(ingredientId: string) {
+    const { data, error } = await supabase
+      .from('inventory_batches')
+      .select('*')
+      .eq('ingredient_id', ingredientId)
+      .order('received_at', { ascending: false });
+    if (error) throw error;
+    return data as InventoryBatch[];
+  },
+};
 
 export const restaurantService = {
   async leaveRestaurant() {

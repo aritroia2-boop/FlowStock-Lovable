@@ -1,44 +1,103 @@
+# Advanced Invoice Processing Upgrade
 
-# Make Invoice AI Faster & More Efficient
+Goal: make invoice AI extract clean structured data, match to inventory using attribute-aware semantic logic, and keep invoice prices separate from the product's standard reference price so inventory value reflects real cost per batch.
 
-Goal: cut invoice processing time and cost without losing accuracy. Today every invoice goes to `google/gemini-2.5-pro` with the full PDF as base64, which is the slowest and most expensive path.
+## 1. Schema changes (migration)
 
-## Changes to `supabase/functions/process-invoice/index.ts`
+**`ingredients` table** — add a baseline reference field (the "standard price" stays as `price_per_unit`, but we add):
+- `standard_price` numeric — manually-set baseline reference price (defaults from first ever entry).
+- `last_purchase_price` numeric — most recent invoice unit price.
+- `attributes` jsonb — `{ fat_pct, protein_pct, brand, packaging_size, type, ... }` used for matching.
 
-### 1. Switch default model to a fast one
-- Use `google/gemini-3-flash-preview` as the primary model (5–10x faster, much cheaper, strong at structured extraction with tool calling).
-- Keep `google/gemini-2.5-pro` only as a **fallback** when flash returns 0 valid items or fails the schema. This gives us speed by default and accuracy when needed.
+**`order_items` table** — extend extraction output:
+- `normalized_name` text
+- `attributes` jsonb (fat %, brand, size, etc.)
+- `total_price_line` numeric
+- `confidence_score` numeric (0–1 match score)
+- `invoice_unit_price` numeric (the real invoice price; existing `price_per_unit` becomes alias)
 
-### 2. Send the PDF as a URL, not base64
-- Today: download PDF from storage → base64 encode → send inline. Doubles payload size and adds a full download step on the edge function.
-- New: create a short-lived **signed URL** for the file in `order-invoices` and send it as `image_url.url` directly. Removes the download + base64 step entirely.
+**New table `inventory_batches`** — one row per accepted invoice line, so valuation uses per-batch real cost:
+- `ingredient_id`, `order_id`, `quantity`, `unit`, `purchase_price` (from invoice), `currency`, `received_at`
+- Powers `inventory_value = sum(remaining_qty_per_batch * batch.purchase_price)`.
 
-### 3. Trim the prompt + schema
-- The current system prompt is long and repeats rules. Tighten it to ~10 lines focused on: extract supplier, extract line items, exclude transport/TVA/total, detect currency.
-- Remove `total_price` from the tool schema (we never use it; we recompute from qty × unit_price). Smaller schema = faster tool-call generation.
+**`orders` table** — add `invoice_date date` (extracted from invoice).
 
-### 4. Parallelize DB writes
-- Today: `update orders` → await → `insert order_items` → await. Run both in `Promise.all` since they don't depend on each other (order id is already known).
+RLS mirrors existing patterns (personal vs restaurant).
 
-### 5. Early status update + no double `req.json()`
-- The current `catch` block calls `req.json()` again, which throws because the body was already consumed. Parse once at the top, store `orderId`, reuse in the catch. This avoids a hidden second failure that masks the real error and slows the error path.
+## 2. Edge function `process-invoice` rewrite
 
-### 6. Cache supplier-name → matched ingredients hint (optional, small win)
-- Pass the list of existing ingredient names for the user/restaurant into the prompt (just names, comma-separated, capped at ~200). The model returns names that already match our catalog, which makes the client-side `matchIngredients` step nearly instant and reduces "needs confirmation" rows.
+**Prompt** asks the model to extract:
+- supplier_name, invoice_date, currency
+- For each item: `product_name_raw`, `normalized_name`, `attributes` (fat %, protein %, brand, packaging, type), `quantity`, `unit`, `unit_price`, `total_price_line`
+- Hard rules in prompt: ignore promo words ("premium", "ofertă", "promoție", slogans, headers/footers, transport/TVA/discount/total lines). Keep attribute info inside the product name (don't strip "4.5%").
 
-### 7. Reduce post-processing work
-- Move the irrelevant-keyword filter and dedupe into a single pass instead of two `.filter()` chains. Negligible CPU but cleaner.
+**Tool schema** updated to match. `total_price_line` recomputed = `qty * unit_price` if missing.
 
-## Expected impact
+**Catalog hint**: pass existing ingredients with their `attributes` so the model returns matching `normalized_name` when applicable.
 
-- ~3–6x faster end-to-end (flash vs pro, no base64 round-trip, parallel writes).
-- Lower AI cost per invoice.
-- Fewer "needs confirmation" items thanks to catalog hint.
-- Same or better accuracy because pro is still used as a fallback.
+## 3. Semantic matcher rewrite (`src/lib/ingredientMatcher.ts`)
 
-## Out of scope
-- No UI changes to `OrdersPage`.
-- No DB schema changes.
-- No change to how invoices are uploaded or to the order-items confirmation flow.
+Replace pure Levenshtein with a hybrid score:
+- **Base name similarity** (existing fuzzy + Romanian synonyms) — 50%
+- **Attribute compatibility** — 50%, but acts as a **gate**:
+  - If invoice has `fat_pct=4.5` and candidate has `fat_pct=2`, score is hard-capped at 0.4 (not a match).
+  - Same for `brand`, `protein_pct`, `packaging_size`, `type`.
+  - Missing attributes on candidate = neutral; missing on invoice = neutral.
+- Confidence buckets:
+  - `>= 0.9` auto-match
+  - `0.7–0.9` suggest, requires confirmation
+  - `< 0.7` → "create new product" suggestion (never auto-match)
 
-Approve and I'll implement.
+Returns `{ matchedIngredient, confidence, needsConfirmation, isNewIngredient, attributes }`.
+
+Example outcomes:
+- "Lapte 4.5% grasime" vs DB "Lapte" (no fat) → confidence ~0.6, suggest new product.
+- "Lapte 4.5%" vs DB "Lapte 4.5% Zuzu" → high if brand matches, otherwise ~0.75 suggest.
+
+## 4. Price handling rules (business logic)
+
+When an invoice line is confirmed in `OrdersPage`:
+- Always store `invoice_unit_price` on the `order_item` and on a new `inventory_batches` row.
+- Update `ingredients.last_purchase_price = invoice_unit_price`.
+- **Never** overwrite `ingredients.standard_price` automatically. UI shows the diff (e.g. "Standard: 10 RON/kg, Invoice: 6 RON/kg, −40%").
+- New ingredient created from invoice → `standard_price = invoice_unit_price` (initial seed) and a batch is created.
+
+## 5. Inventory valuation
+
+`InventoryPage` total value computed from batches:
+```
+value = Σ (batch.remaining_quantity * batch.purchase_price)
+```
+Falls back to `last_purchase_price` for ingredients without batches (legacy data). Standard price is shown but not used for valuation.
+
+Stock decrements (recipes / sales) consume batches FIFO, decreasing `remaining_quantity`.
+
+## 6. UI changes
+
+- **OrdersPage confirm modal**: show `extracted_name`, detected `attributes` chips, suggested match with confidence %, alternatives, "Create new product" CTA when confidence low. Show invoice price vs standard price side by side.
+- **InventoryPage**: add columns `Standard Price`, `Last Purchase Price`, `Δ%`. Tooltip shows recent batches.
+- **Ingredient edit form**: editable `standard_price` and `attributes` (fat %, brand, packaging).
+
+## 7. Out of scope
+
+- No auth, role, or subscription changes.
+- No changes to recipes/orders unrelated to invoice flow.
+- No new third-party integrations; continues to use Lovable AI Gateway with `google/gemini-3-flash-preview` (pro fallback).
+
+## Files affected
+
+- `supabase/migrations/<new>.sql` — schema additions
+- `supabase/functions/process-invoice/index.ts` — extended extraction
+- `src/lib/ingredientMatcher.ts` — attribute-aware scoring
+- `src/lib/database.ts` — `inventoryBatchesService`, batch creation on confirm
+- `src/components/OrdersPage.tsx` — richer confirm modal, attribute chips, price diff, new-product CTA
+- `src/components/InventoryPage.tsx` — show standard vs purchase price, batch-based valuation
+- `src/components/InventoryCard.tsx` — price diff indicator
+- `src/integrations/supabase/types.ts` — auto-regenerated
+
+## Acceptance
+
+- Promo words / transport / TVA never appear as items.
+- "Lapte 4.5%" doesn't match plain "Lapte"; offers create-new instead.
+- After confirming an invoice with discounted prices, `ingredients.standard_price` is unchanged, batch records the invoice price, inventory value uses batch price.
+- JSON output per invoice matches the structure in the request.
