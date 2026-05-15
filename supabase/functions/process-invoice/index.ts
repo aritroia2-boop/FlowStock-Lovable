@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { encodeBase64 } from "https://deno.land/std@0.224.0/encoding/base64.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.84.0';
 
 const corsHeaders = {
@@ -108,6 +109,19 @@ async function callAI(apiKey: string, model: string, fileUrl: string, catalogHin
   return JSON.parse(tc.function.arguments);
 }
 
+async function callAIWithRetry(apiKey: string, model: string, fileUrl: string, catalogHint: string) {
+  try {
+    return await callAI(apiKey, model, fileUrl, catalogHint);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    const transient = /no pages|INTERNAL|UNAVAILABLE|\b5\d\d\b/i.test(msg);
+    if (!transient) throw err;
+    console.warn(`Transient AI error on ${model}, retrying once: ${msg.slice(0, 200)}`);
+    await new Promise((r) => setTimeout(r, 1000));
+    return await callAI(apiKey, model, fileUrl, catalogHint);
+  }
+}
+
 function cleanItems(items: any[]): any[] {
   const seen = new Set<string>();
   const out: any[] = [];
@@ -183,8 +197,13 @@ serve(async (req) => {
       jpeg: 'image/jpeg',
       webp: 'image/webp',
       gif: 'image/gif',
+      heic: 'image/heic',
+      heif: 'image/heif',
     };
-    const mime = mimeMap[ext] || 'application/octet-stream';
+    const mime = mimeMap[ext];
+    if (!mime) {
+      throw new Error(`Unsupported file type ".${ext}". Upload PDF, JPG, PNG, WebP or HEIC.`);
+    }
 
     const fileRes = await fetch(signed.signedUrl);
     if (!fileRes.ok) throw new Error(`Failed to download invoice: ${fileRes.status}`);
@@ -193,13 +212,32 @@ serve(async (req) => {
     if (fileBuf.byteLength > MAX_BYTES) {
       throw new Error(`Invoice file too large (${(fileBuf.byteLength / 1024 / 1024).toFixed(1)}MB). Please upload a file under 15MB.`);
     }
-    // Encode in chunks to avoid call-stack overflow on large files
-    let binary = '';
-    const CHUNK = 0x8000;
-    for (let i = 0; i < fileBuf.length; i += CHUNK) {
-      binary += String.fromCharCode(...fileBuf.subarray(i, i + CHUNK));
+    if (fileBuf.byteLength < 64) {
+      throw new Error('Invoice file is empty or corrupt. Please re-upload.');
     }
-    const dataUrl = `data:${mime};base64,${btoa(binary)}`;
+
+    // Magic-byte sanity check — fail fast on corrupt uploads instead of letting Gemini
+    // return a confusing "document has no pages" error.
+    const startsWith = (sig: number[]) => sig.every((b, i) => fileBuf[i] === b);
+    const isPdf = startsWith([0x25, 0x50, 0x44, 0x46, 0x2d]); // %PDF-
+    const isPng = startsWith([0x89, 0x50, 0x4e, 0x47]);
+    const isJpeg = startsWith([0xff, 0xd8, 0xff]);
+    const isGif = startsWith([0x47, 0x49, 0x46, 0x38]);
+    const isWebp = startsWith([0x52, 0x49, 0x46, 0x46]) && startsWith([0x57, 0x45, 0x42, 0x50].map((_, i) => fileBuf[8 + i])) ;
+    // HEIC/HEIF: bytes 4..11 contain "ftypheic", "ftypheix", "ftyphevc", "ftypmif1", "ftypmsf1"
+    const ftyp = String.fromCharCode(...fileBuf.subarray(4, 12));
+    const isHeic = /^ftyp(heic|heix|hevc|mif1|msf1|heif)/i.test(ftyp);
+
+    if (mime === 'application/pdf' && !isPdf) {
+      throw new Error('Uploaded file is not a valid PDF (missing %PDF header).');
+    }
+    if (mime.startsWith('image/') && !(isPng || isJpeg || isGif || isWebp || isHeic)) {
+      throw new Error('Uploaded file is not a recognised image (PNG, JPEG, WebP, GIF or HEIC).');
+    }
+
+    // Encode as base64 directly from bytes — avoids the String.fromCharCode chunking bug
+    // that produced corrupt PDFs and triggered Gemini's "document has no pages" error.
+    const dataUrl = `data:${mime};base64,${encodeBase64(fileBuf)}`;
 
     // Catalog hint: include attributes for better semantic matching
     const { data: orderRow } = await supabase
@@ -230,11 +268,11 @@ serve(async (req) => {
     console.log('Calling fast model...');
     let extracted: any;
     try {
-      extracted = await callAI(lovableApiKey, 'google/gemini-3-flash-preview', dataUrl, catalogHint);
+      extracted = await callAIWithRetry(lovableApiKey, 'google/gemini-3-flash-preview', dataUrl, catalogHint);
       if (!extracted?.items?.length) throw new Error('flash returned 0 items');
     } catch (flashErr) {
       console.warn('Flash failed, falling back to pro:', flashErr);
-      extracted = await callAI(lovableApiKey, 'google/gemini-2.5-pro', dataUrl, catalogHint);
+      extracted = await callAIWithRetry(lovableApiKey, 'google/gemini-2.5-pro', dataUrl, catalogHint);
     }
 
     const cleaned = cleanItems(extracted.items || []);

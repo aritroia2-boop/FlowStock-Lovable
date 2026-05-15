@@ -56,18 +56,33 @@ export const deleteRecipeImage = async (imageUrl: string): Promise<void> => {
 };
 
 export const uploadOrderInvoice = async (file: File, userId: string): Promise<string> => {
-  // Validate file size (10MB limit)
-  const MAX_FILE_SIZE = 10 * 1024 * 1024;
+  // Validate file size (15MB limit, matches edge function)
+  const MAX_FILE_SIZE = 15 * 1024 * 1024;
   if (file.size > MAX_FILE_SIZE) {
-    throw new Error(`File size exceeds 10MB limit. Your file is ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+    throw new Error(`File size exceeds 15MB limit. Your file is ${(file.size / 1024 / 1024).toFixed(2)}MB`);
   }
 
-  // Validate file type
-  if (file.type !== 'application/pdf') {
-    throw new Error('Invalid file type. Please upload a PDF file');
+  // Validate file type — accept PDF and common image formats
+  const ALLOWED_TYPES: Record<string, string> = {
+    'application/pdf': 'pdf',
+    'image/jpeg': 'jpg',
+    'image/jpg': 'jpg',
+    'image/png': 'png',
+    'image/webp': 'webp',
+    'image/heic': 'heic',
+    'image/heif': 'heif',
+  };
+  let fileExt = ALLOWED_TYPES[file.type];
+  if (!fileExt) {
+    // Fallback to extension from filename (some browsers report empty type for HEIC)
+    const nameExt = file.name.split('.').pop()?.toLowerCase() || '';
+    if (['pdf', 'jpg', 'jpeg', 'png', 'webp', 'heic', 'heif'].includes(nameExt)) {
+      fileExt = nameExt === 'jpeg' ? 'jpg' : nameExt;
+    } else {
+      throw new Error('Invalid file type. Please upload a PDF or image (JPG, PNG, WebP, HEIC).');
+    }
   }
 
-  const fileExt = 'pdf';
   const fileName = `${userId}/${Date.now()}.${fileExt}`;
 
   console.log('Uploading invoice:', { fileName, fileSize: file.size });
@@ -76,12 +91,13 @@ export const uploadOrderInvoice = async (file: File, userId: string): Promise<st
     .from('order-invoices')
     .upload(fileName, file, {
       cacheControl: '3600',
-      upsert: false
+      upsert: false,
+      contentType: file.type || undefined,
     });
 
   if (uploadError) {
     console.error('Upload error:', uploadError);
-    throw new Error(`Failed to upload PDF: ${uploadError.message}`);
+    throw new Error(`Failed to upload invoice: ${uploadError.message}`);
   }
 
   const { data } = supabase.storage

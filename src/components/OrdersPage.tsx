@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
-import { ArrowLeft, Upload, FileText, Loader2, Check, X, AlertCircle, Trash2, Eye, ChevronDown } from 'lucide-react';
+import { ArrowLeft, Upload, FileText, Image as ImageIcon, Camera, Loader2, Check, X, AlertCircle, Trash2, Eye, ChevronDown, RefreshCw } from 'lucide-react';
 import { ordersService, orderItemsService, ingredientsService, inventoryBatchesService } from '../lib/database';
 import { uploadOrderInvoice, deleteOrderInvoice } from '../lib/supabase';
 import type { Order, OrderItem, Ingredient } from '../lib/supabase';
@@ -8,6 +8,7 @@ import { matchIngredients } from '../lib/ingredientMatcher';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { AppLayout } from './AppLayout';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface MatchedItem extends OrderItem {
   matchedIngredient: Ingredient | null;
@@ -22,6 +23,7 @@ import { PersonalPaywall } from './PersonalPaywall';
 export function OrdersPage() {
   useSubscriptionGuard();
   const { currentUser, setCurrentPage, canAccessRestaurantFeatures, isAdmin, subscriptionSource } = useApp();
+  const isMobile = useIsMobile();
   const canUsePersonal = isAdmin || subscriptionSource === 'self';
   const [context, setContext] = useState<'personal' | 'restaurant'>(
     canUsePersonal ? 'personal' : 'restaurant'
@@ -118,7 +120,7 @@ export function OrdersPage() {
     }
   };
 
-  const handleProcessInvoice = async (order: Order) => {
+  const handleProcessInvoice = async (order: Order, isRetry = false) => {
     if (!currentUser) return;
 
     // Feature gate check
@@ -130,19 +132,29 @@ export function OrdersPage() {
 
     try {
       setProcessingId(order.id);
-      toast.info('Processing invoice... This may take a moment');
+      if (isRetry) {
+        // Reset row state so the UI reflects "processing" immediately
+        await ordersService.update(order.id, { status: 'pending', error_message: null as any });
+      }
+      toast.info(isRetry ? 'Retrying invoice...' : 'Processing invoice... This may take a moment');
 
-      const { error } = await supabase.functions.invoke('process-invoice', {
+      const { data, error } = await supabase.functions.invoke('process-invoice', {
         body: { fileUrl: order.file_url, orderId: order.id }
       });
 
       if (error) throw error;
+      if (data && data.success === false) {
+        throw new Error(data.error || 'Processing failed');
+      }
 
       toast.success('Invoice processed successfully');
       loadOrders();
     } catch (error) {
       console.error('Error processing invoice:', error);
-      toast.error('Failed to process invoice');
+      const msg = error instanceof Error ? error.message : 'Failed to process invoice';
+      // Trim very long provider error JSON for the toast
+      toast.error(msg.length > 200 ? msg.slice(0, 200) + '…' : msg);
+      loadOrders();
     } finally {
       setProcessingId(null);
     }
@@ -391,25 +403,45 @@ export function OrdersPage() {
               <div>
                 <h2 className="text-lg font-semibold text-foreground">Upload Invoice</h2>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Upload PDF invoices from suppliers to extract ingredients
+                  Upload a PDF or photo of a supplier invoice to extract ingredients
                 </p>
               </div>
             </div>
 
-            <label className="relative flex flex-col items-center justify-center border-2 border-dashed border-border/40 rounded-lg p-8 cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-all group">
-              <Upload size={32} className="text-muted-foreground group-hover:text-primary transition-colors mb-2" />
-              <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
-                {uploading ? 'Uploading...' : 'Click to upload or drag and drop'}
-              </span>
-              <span className="text-xs text-muted-foreground mt-1">PDF files up to 10MB</span>
-              <input
-                type="file"
-                accept=".pdf"
-                onChange={handleFileUpload}
-                disabled={uploading}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              />
-            </label>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="relative flex flex-col items-center justify-center border-2 border-dashed border-border/40 rounded-lg p-8 cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-all group">
+                <Upload size={32} className="text-muted-foreground group-hover:text-primary transition-colors mb-2" />
+                <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
+                  {uploading ? 'Uploading...' : 'Upload file'}
+                </span>
+                <span className="text-xs text-muted-foreground mt-1 text-center">PDF, JPG, PNG, WebP, HEIC — up to 15MB</span>
+                <input
+                  type="file"
+                  accept="application/pdf,image/jpeg,image/png,image/webp,image/heic,image/heif"
+                  onChange={handleFileUpload}
+                  disabled={uploading}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+              </label>
+
+              {isMobile && (
+                <label className="relative flex flex-col items-center justify-center border-2 border-dashed border-primary/40 rounded-lg p-8 cursor-pointer hover:border-primary hover:bg-primary/5 transition-all group">
+                  <Camera size={32} className="text-primary mb-2" />
+                  <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
+                    {uploading ? 'Uploading...' : 'Take photo'}
+                  </span>
+                  <span className="text-xs text-muted-foreground mt-1 text-center">Snap the invoice with your camera</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    onChange={handleFileUpload}
+                    disabled={uploading}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                </label>
+              )}
+            </div>
           </div>
         </div>
 
@@ -500,6 +532,23 @@ export function OrdersPage() {
                               <Loader2 size={16} className="animate-spin" />
                             ) : (
                               'Process'
+                            )}
+                          </button>
+                        )}
+
+                        {order.status === 'error' && (
+                          <button
+                            onClick={() => handleProcessInvoice(order, true)}
+                            disabled={processingId === order.id}
+                            className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium flex items-center gap-2"
+                          >
+                            {processingId === order.id ? (
+                              <Loader2 size={16} className="animate-spin" />
+                            ) : (
+                              <>
+                                <RefreshCw size={14} />
+                                Retry
+                              </>
                             )}
                           </button>
                         )}
