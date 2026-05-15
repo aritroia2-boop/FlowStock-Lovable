@@ -232,14 +232,14 @@ export function Dashboard() {
               <div className="bg-card rounded-[10px] p-5 h-full transition-all duration-300">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Total Ingredients</p>
-                    <p className="text-3xl font-bold text-foreground mt-1">{stats.totalIngredients}</p>
+                    <p className="text-[11px] sm:text-sm font-medium text-muted-foreground">Total Ingredients</p>
+                    <p className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mt-1">{stats.totalIngredients}</p>
                     <p className="text-sm text-blue-600 mt-1 flex items-center gap-1">
                       <TrendingUp size={14} />
                       In stock & tracked
                     </p>
                   </div>
-                  <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:animate-icon-pulse transition-transform duration-300">
+                  <div className="w-9 h-9 sm:w-12 sm:h-12 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:animate-icon-pulse transition-transform duration-300">
                     <Leaf size={24} className="text-white" />
                   </div>
                 </div>
@@ -254,14 +254,14 @@ export function Dashboard() {
               <div className="bg-card rounded-[10px] p-5 h-full transition-all duration-300">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Total Recipes</p>
-                    <p className="text-3xl font-bold text-foreground mt-1">{stats.totalRecipes}</p>
+                    <p className="text-[11px] sm:text-sm font-medium text-muted-foreground">Total Recipes</p>
+                    <p className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mt-1">{stats.totalRecipes}</p>
                     <p className="text-sm text-purple-600 mt-1 flex items-center gap-1">
                       <ChefHat size={14} />
                       Ready to prepare
                     </p>
                   </div>
-                  <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:animate-icon-pulse transition-transform duration-300">
+                  <div className="w-9 h-9 sm:w-12 sm:h-12 bg-purple-500 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:animate-icon-pulse transition-transform duration-300">
                     <BookOpen size={24} className="text-white" />
                   </div>
                 </div>
@@ -276,8 +276,8 @@ export function Dashboard() {
               <div className="bg-card rounded-[10px] p-5 h-full transition-all duration-300">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Low Stock Items</p>
-                    <p className="text-3xl font-bold text-foreground mt-1">{stats.lowStockCount}</p>
+                    <p className="text-[11px] sm:text-sm font-medium text-muted-foreground">Low Stock Items</p>
+                    <p className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mt-1">{stats.lowStockCount}</p>
                     {stats.lowStockCount > 0 ? (
                       <p className="text-sm text-orange-600 mt-1 flex items-center gap-1">
                         <AlertTriangle size={14} />
@@ -290,7 +290,7 @@ export function Dashboard() {
                       </p>
                     )}
                   </div>
-                  <div className="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:animate-bounce-subtle transition-transform duration-300">
+                  <div className="w-9 h-9 sm:w-12 sm:h-12 bg-orange-500 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:animate-bounce-subtle transition-transform duration-300">
                     <AlertTriangle size={24} className="text-white" />
                   </div>
                 </div>
@@ -305,8 +305,8 @@ export function Dashboard() {
               <div className="bg-card rounded-[10px] p-5 h-full transition-all duration-300">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Unavailable Recipes</p>
-                    <p className="text-3xl font-bold text-foreground mt-1">{stats.unavailableRecipes}</p>
+                    <p className="text-[11px] sm:text-sm font-medium text-muted-foreground">Unavailable Recipes</p>
+                    <p className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mt-1">{stats.unavailableRecipes}</p>
                     {stats.unavailableRecipes > 0 ? (
                       <p className="text-sm text-red-600 mt-1 flex items-center gap-1">
                         <AlertCircle size={14} />
@@ -319,7 +319,7 @@ export function Dashboard() {
                       </p>
                     )}
                   </div>
-                  <div className="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:animate-icon-pulse transition-transform duration-300">
+                  <div className="w-9 h-9 sm:w-12 sm:h-12 bg-red-500 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:animate-icon-pulse transition-transform duration-300">
                     <XCircle size={24} className="text-white" />
                   </div>
                 </div>
@@ -337,11 +337,11 @@ export function Dashboard() {
               <div className="bg-card rounded-[10px] p-5 h-full transition-all duration-300">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Active Users</p>
-                    <p className="text-3xl font-bold text-foreground mt-1">{stats.activeUsers}</p>
+                    <p className="text-[11px] sm:text-sm font-medium text-muted-foreground">Active Users</p>
+                    <p className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mt-1">{stats.activeUsers}</p>
                     <p className="text-sm text-blue-600 mt-1">Members in your restaurant</p>
                   </div>
-                  <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:animate-icon-pulse transition-transform duration-300">
+                  <div className="w-9 h-9 sm:w-12 sm:h-12 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:animate-icon-pulse transition-transform duration-300">
                     <Users size={24} className="text-white" />
                   </div>
                 </div>
@@ -356,8 +356,8 @@ export function Dashboard() {
               <div className="bg-card rounded-[10px] p-5 h-full transition-all duration-300">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Inventory Value</p>
-                    <p className="text-3xl font-bold text-foreground mt-1">
+                    <p className="text-[11px] sm:text-sm font-medium text-muted-foreground">Inventory Value</p>
+                    <p className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mt-1">
                       {formatMoney(stats.inventoryValue, 'RON', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                     </p>
                     <p className="text-sm text-green-600 mt-1 flex items-center gap-1">
@@ -365,7 +365,7 @@ export function Dashboard() {
                       Total stock value
                     </p>
                   </div>
-                  <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:animate-icon-pulse transition-transform duration-300">
+                  <div className="w-9 h-9 sm:w-12 sm:h-12 bg-green-500 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:animate-icon-pulse transition-transform duration-300">
                     <Banknote size={24} className="text-white" />
                   </div>
                 </div>
