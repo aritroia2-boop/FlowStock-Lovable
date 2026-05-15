@@ -1,15 +1,13 @@
-import { LayoutDashboard, Package, ChefHat, ShoppingCart, FileText, Settings, LogOut, Bell, Menu, X, Moon, Sun } from 'lucide-react';
+import { LayoutDashboard, Package, ChefHat, ShoppingCart, FileText, Settings, LogOut, Menu } from 'lucide-react';
 import { NavLink } from './NavLink';
 import { useApp } from '@/context/AppContext';
 import { Button } from './ui/button';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from './ui/sheet';
+import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 import { useState } from 'react';
-import { useTheme } from 'next-themes';
 
 export const ResponsiveSidebar = () => {
   const { logout, currentUser } = useApp();
   const [open, setOpen] = useState(false);
-  const { theme, setTheme } = useTheme();
 
   const navItems = [
     { page: 'dashboard' as const, icon: LayoutDashboard, label: 'Dashboard' },
@@ -45,14 +43,6 @@ export const ResponsiveSidebar = () => {
       </nav>
 
       <div className="p-3 border-t border-border space-y-2">
-        <Button
-          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-          variant="ghost"
-          className="w-full justify-start gap-3"
-        >
-          {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-          <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
-        </Button>
         <Button
           onClick={() => {
             logout();

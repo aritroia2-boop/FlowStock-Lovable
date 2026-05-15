@@ -415,6 +415,15 @@ export function OrdersPage() {
                               <span className="text-foreground font-medium">{order.supplier}</span>
                             </>
                           )}
+
+                          {(order as any).currency && order.status === 'processed' && (
+                            <>
+                              <span>•</span>
+                              <span className="px-2 py-0.5 rounded-md text-xs font-bold bg-primary/10 text-primary border border-primary/20">
+                                {(order as any).currency}
+                              </span>
+                            </>
+                          )}
                         </div>
 
                         {order.error_message && (
