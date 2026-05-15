@@ -34,6 +34,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const isSubscribed = currentUser?.is_subscribed || false;
   const isAdmin = currentUser?.is_admin || false;
   const canAccessRestaurantFeatures = isSubscribed || isAdmin;
+  const subscriptionSource = currentUser?.subscription_source || 'none';
 
   useEffect(() => {
     checkSession();
