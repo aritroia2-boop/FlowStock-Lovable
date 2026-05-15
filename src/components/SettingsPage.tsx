@@ -1210,7 +1210,7 @@ export const SettingsPage = () => {
 
                   <div className="p-6 space-y-6">
                     {showCreateTeam && (
-                      <div className="p-5 bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl border-2 border-orange-100">
+                      <div className="p-5 bg-orange-500/10 dark:bg-orange-500/5 rounded-xl border-2 border-orange-500/30">
                         <h3 className="font-bold text-foreground mb-4 text-lg">Create New Team</h3>
                         <div className="space-y-3">
                           <input
@@ -1218,14 +1218,14 @@ export const SettingsPage = () => {
                             value={newTeamName}
                             onChange={(e) => setNewTeamName(e.target.value)}
                             placeholder="Team name (e.g., Kitchen Staff, Waiters)"
-                            className="w-full px-4 py-3 border-2 border-orange-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
+                            className="w-full px-4 py-3 bg-background text-foreground border-2 border-border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
                           />
                           <textarea
                             value={newTeamDescription}
                             onChange={(e) => setNewTeamDescription(e.target.value)}
                             placeholder="Team description (optional)"
                             rows={2}
-                            className="w-full px-4 py-3 border-2 border-orange-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all resize-none"
+                            className="w-full px-4 py-3 bg-background text-foreground border-2 border-border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all resize-none"
                           />
                           <div className="flex gap-3">
                             <button
