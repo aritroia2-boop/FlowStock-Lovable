@@ -70,15 +70,21 @@ export const PricingPage = () => {
               <Check className="w-8 h-8 text-green-500" />
             </div>
             <h2 className="text-2xl font-bold text-foreground mb-2">
-              {isAdmin ? 'Admin Access Active' : 'Subscription Active'}
+              {isAdmin
+                ? 'Admin Access Active'
+                : subscriptionSource === 'restaurant'
+                  ? 'Access Provided by Your Restaurant'
+                  : 'Subscription Active'}
             </h2>
             <p className="text-muted-foreground mb-6">
-              {isAdmin 
-                ? 'You have admin access to all restaurant features.' 
-                : 'You have full access to all restaurant features.'}
+              {isAdmin
+                ? 'You have admin access to all restaurant features.'
+                : subscriptionSource === 'restaurant'
+                  ? 'Your restaurant owner is subscribed to FlowStock Pro, so you have full access to all features. Billing is managed by the owner.'
+                  : 'You have full access to all restaurant features.'}
             </p>
-            
-            {isSubscribed && !isAdmin && (
+
+            {isSubscribed && !isAdmin && subscriptionSource === 'self' && (
               <div className="space-y-4">
                 <div className="bg-muted/50 rounded-xl p-4 text-left">
                   <div className="flex items-center justify-between mb-2">
@@ -90,7 +96,7 @@ export const PricingPage = () => {
                     <span className="font-medium text-foreground">{SUBSCRIPTION_PRICE}/month</span>
                   </div>
                 </div>
-                
+
                 <button
                   onClick={handleManageBilling}
                   disabled={portalLoading}
