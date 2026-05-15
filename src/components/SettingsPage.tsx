@@ -1155,7 +1155,7 @@ export const SettingsPage = () => {
                           {employees.map((employee) => (
                             <div
                               key={employee.id}
-                              className="flex items-center justify-between p-4 bg-gradient-to-r from-slate-50 to-slate-100 hover:from-slate-100 hover:to-slate-200 rounded-xl border border-border transition-all"
+                              className="flex items-center justify-between p-4 bg-muted/60 hover:bg-muted rounded-xl border border-border transition-all"
                             >
                               <div className="flex items-center gap-4">
                                 <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-400 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg">
@@ -1210,7 +1210,7 @@ export const SettingsPage = () => {
 
                   <div className="p-6 space-y-6">
                     {showCreateTeam && (
-                      <div className="p-5 bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl border-2 border-orange-100">
+                      <div className="p-5 bg-orange-500/10 dark:bg-orange-500/5 rounded-xl border-2 border-orange-500/30">
                         <h3 className="font-bold text-foreground mb-4 text-lg">Create New Team</h3>
                         <div className="space-y-3">
                           <input
@@ -1218,14 +1218,14 @@ export const SettingsPage = () => {
                             value={newTeamName}
                             onChange={(e) => setNewTeamName(e.target.value)}
                             placeholder="Team name (e.g., Kitchen Staff, Waiters)"
-                            className="w-full px-4 py-3 border-2 border-orange-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
+                            className="w-full px-4 py-3 bg-background text-foreground border-2 border-border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
                           />
                           <textarea
                             value={newTeamDescription}
                             onChange={(e) => setNewTeamDescription(e.target.value)}
                             placeholder="Team description (optional)"
                             rows={2}
-                            className="w-full px-4 py-3 border-2 border-orange-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all resize-none"
+                            className="w-full px-4 py-3 bg-background text-foreground border-2 border-border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all resize-none"
                           />
                           <div className="flex gap-3">
                             <button
@@ -1259,7 +1259,7 @@ export const SettingsPage = () => {
                     ) : (
                       <div className="space-y-4">
                         {teams.map((team) => (
-                          <div key={team.id} className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl border border-border overflow-hidden">
+                          <div key={team.id} className="bg-muted/40 rounded-xl border border-border overflow-hidden">
                             <div className="p-4 bg-card/50 border-b border-border">
                               {editingTeamId === team.id ? (
                                 <div className="flex items-center gap-3">

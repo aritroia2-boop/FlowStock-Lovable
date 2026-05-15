@@ -117,6 +117,32 @@ export const PricingPage = () => {
               </div>
             )}
 
+            {subscriptionSource === 'restaurant' && !isAdmin && (
+              <div className="mt-6 bg-muted/40 border border-border rounded-xl p-5 text-left">
+                <h3 className="font-semibold text-foreground mb-1">Want your own Personal workspace?</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Restaurant features are covered by your owner. Upgrade your own account to Pro to also use Personal inventory, recipes and orders.
+                </p>
+                <button
+                  onClick={handleSubscribe}
+                  disabled={loading}
+                  className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Loading...
+                    </>
+                  ) : (
+                    <>
+                      <CreditCard className="w-5 h-5" />
+                      Upgrade for Personal features ({SUBSCRIPTION_PRICE}/month)
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
+
             <button
               onClick={() => setCurrentPage('dashboard')}
               className="mt-6 text-muted-foreground hover:text-foreground transition-colors"

@@ -8,15 +8,19 @@ import { formatPrice } from '../lib/unitConverter';
 import { AppLayout } from './AppLayout';
 
 import { useSubscriptionGuard } from '../hooks/useSubscriptionGuard';
+import { PersonalPaywall } from './PersonalPaywall';
 
 export const InventoryPage = () => {
   useSubscriptionGuard();
-  const { currentUser, setCurrentPage, inventoryFilter, setInventoryFilter } = useApp();
+  const { currentUser, setCurrentPage, inventoryFilter, setInventoryFilter, isAdmin, subscriptionSource } = useApp();
   const { restaurantRole, getPermissionsForContext } = usePermissions();
+  const canUsePersonal = isAdmin || subscriptionSource === 'self';
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('All');
-  const [viewContext, setViewContext] = useState<'personal' | 'restaurant'>('personal');
+  const [viewContext, setViewContext] = useState<'personal' | 'restaurant'>(
+    canUsePersonal ? 'personal' : 'restaurant'
+  );
   const [showAddModal, setShowAddModal] = useState(false);
   const [showIncreaseModal, setShowIncreaseModal] = useState(false);
   const [showDecreaseModal, setShowDecreaseModal] = useState(false);
@@ -271,6 +275,10 @@ export const InventoryPage = () => {
               </div>
             )}
 
+            {viewContext === 'personal' && !canUsePersonal ? (
+              <PersonalPaywall feature="Personal" />
+            ) : (
+            <>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 md:gap-4 mb-6 md:mb-8">
               <div className="flex-1 relative group">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={20} />
@@ -507,6 +515,8 @@ export const InventoryPage = () => {
               </table>
               </div>
             </div>
+            </>
+            )}
           </div>
         </div>
       </div>

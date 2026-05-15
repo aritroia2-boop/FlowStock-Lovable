@@ -10,16 +10,20 @@ import { formatMoney } from '../lib/currency';
 import { AppLayout } from './AppLayout';
 
 import { useSubscriptionGuard } from '../hooks/useSubscriptionGuard';
+import { PersonalPaywall } from './PersonalPaywall';
 
 export const RecipesPage = () => {
   useSubscriptionGuard();
-  const { currentUser, setCurrentPage } = useApp();
+  const { currentUser, setCurrentPage, isAdmin, subscriptionSource } = useApp();
   const { restaurantRole, getPermissionsForContext } = usePermissions();
+  const canUsePersonal = isAdmin || subscriptionSource === 'self';
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [recipeMissingIngredients, setRecipeMissingIngredients] = useState<Record<string, number>>({});
-  const [viewContext, setViewContext] = useState<'personal' | 'restaurant'>('personal');
+  const [viewContext, setViewContext] = useState<'personal' | 'restaurant'>(
+    canUsePersonal ? 'personal' : 'restaurant'
+  );
 
   const permissions = getPermissionsForContext(viewContext);
   const [newRecipe, setNewRecipe] = useState({
@@ -174,6 +178,9 @@ export const RecipesPage = () => {
           </div>
         )}
 
+        {viewContext === 'personal' && !canUsePersonal ? (
+          <PersonalPaywall feature="Personal" />
+        ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {recipes.map((recipe) => (
             <div
@@ -247,6 +254,7 @@ export const RecipesPage = () => {
             </div>
           ))}
         </div>
+        )}
       </div>
 
       {showAddModal && (

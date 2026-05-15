@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Calendar, ChevronLeft, ChevronRight, Home, Settings } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { auditLogsService, AuditLog } from '../lib/database';
 import { useApp } from '../context/AppContext';
 import { AppLayout } from './AppLayout';
@@ -13,6 +13,8 @@ export const AuditLogPage = () => {
   const [filterIngredient, setFilterIngredient] = useState('');
   const [filterOperation, setFilterOperation] = useState('Operation');
   const [filterUser, setFilterUser] = useState('');
+  const [filterDateFrom, setFilterDateFrom] = useState('');
+  const [filterDateTo, setFilterDateTo] = useState('');
   const [currentLogPage] = useState(2);
 
   useEffect(() => {
@@ -35,7 +37,12 @@ export const AuditLogPage = () => {
     const matchesIngredient = !filterIngredient || ingredientName.toLowerCase().includes(filterIngredient.toLowerCase());
     const matchesOperation = filterOperation === 'Operation' || log.operation === filterOperation;
     const matchesUser = !filterUser || log.user_name.toLowerCase().includes(filterUser.toLowerCase());
-    return matchesIngredient && matchesOperation && matchesUser;
+
+    const logTime = new Date(log.created_at).getTime();
+    const matchesFrom = !filterDateFrom || logTime >= new Date(filterDateFrom + 'T00:00:00').getTime();
+    const matchesTo = !filterDateTo || logTime <= new Date(filterDateTo + 'T23:59:59').getTime();
+
+    return matchesIngredient && matchesOperation && matchesUser && matchesFrom && matchesTo;
   });
 
   return (
@@ -77,10 +84,33 @@ export const AuditLogPage = () => {
               className="px-6 py-3 border-2 border-border bg-background text-foreground placeholder:text-muted-foreground rounded-2xl focus:outline-none focus:border-primary transition-colors"
             />
 
-            <div className="flex items-center gap-3 px-6 py-3 border-2 border-primary/50 bg-primary/10 rounded-2xl">
-              <Calendar size={20} className="text-muted-foreground" />
-              <span className="text-foreground font-medium">Timestamp</span>
-              <Calendar size={20} className="text-muted-foreground" />
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+              <div className="flex flex-col">
+                <label className="text-xs font-medium text-muted-foreground mb-1 ml-1">From</label>
+                <input
+                  type="date"
+                  value={filterDateFrom}
+                  onChange={(e) => setFilterDateFrom(e.target.value)}
+                  className="px-4 py-3 border-2 border-border bg-background text-foreground rounded-2xl focus:outline-none focus:border-primary transition-colors"
+                />
+              </div>
+              <div className="flex flex-col">
+                <label className="text-xs font-medium text-muted-foreground mb-1 ml-1">To</label>
+                <input
+                  type="date"
+                  value={filterDateTo}
+                  onChange={(e) => setFilterDateTo(e.target.value)}
+                  className="px-4 py-3 border-2 border-border bg-background text-foreground rounded-2xl focus:outline-none focus:border-primary transition-colors"
+                />
+              </div>
+              {(filterDateFrom || filterDateTo) && (
+                <button
+                  onClick={() => { setFilterDateFrom(''); setFilterDateTo(''); }}
+                  className="self-end px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground rounded-2xl hover:bg-muted transition-colors"
+                >
+                  Clear dates
+                </button>
+              )}
             </div>
           </div>
 
@@ -94,7 +124,7 @@ export const AuditLogPage = () => {
                   <th className="text-left px-6 py-4 font-bold text-foreground">Operation</th>
                   <th className="text-left px-6 py-4 font-bold text-foreground">Amount</th>
                   <th className="text-left px-6 py-4 font-bold text-foreground">User</th>
-                  <th className="text-left px-6 py-4 font-bold text-foreground">Timestamp</th>
+                  <th className="text-left px-6 py-4 font-bold text-foreground">Date</th>
                 </tr>
               </thead>
               <tbody>
